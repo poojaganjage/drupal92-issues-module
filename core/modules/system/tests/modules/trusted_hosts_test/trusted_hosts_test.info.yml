@@ -1,0 +1,9 @@
+type: module
+name: 'Trusted hosts test module'
+package: Testing
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2020-10-22
+version: '9.2.x-dev'
+project: 'drupal'
+datestamp: 1603367007

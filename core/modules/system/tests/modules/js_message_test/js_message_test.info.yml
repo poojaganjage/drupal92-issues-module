@@ -1,0 +1,10 @@
+name: 'JS Message test module'
+type: module
+description: 'Module for the JSMessageTest test.'
+package: Testing
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2020-10-22
+version: '9.2.x-dev'
+project: 'drupal'
+datestamp: 1603367007

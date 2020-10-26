@@ -1,0 +1,10 @@
+name: 'Cancel mail test support'
+description: 'Test that the mail can be cancelled.'
+type: module
+package: Testing
+# version: VERSION
+
+# Information added by Drupal.org packaging script on 2020-10-22
+version: '9.2.x-dev'
+project: 'drupal'
+datestamp: 1603367007

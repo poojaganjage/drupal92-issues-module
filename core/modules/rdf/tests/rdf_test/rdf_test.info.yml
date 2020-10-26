@@ -1,0 +1,12 @@
+name: 'RDF test module'
+type: module
+description: 'Test functionality for the RDF module.'
+package: Testing
+# version: VERSION
+dependencies:
+  - drupal:rdf
+
+# Information added by Drupal.org packaging script on 2020-10-22
+version: '9.2.x-dev'
+project: 'drupal'
+datestamp: 1603367008
