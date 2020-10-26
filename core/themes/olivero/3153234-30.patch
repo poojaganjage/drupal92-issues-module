@@ -1,0 +1,457 @@
+diff --git a/core/themes/olivero/css/base/base.css b/core/themes/olivero/css/base/base.css
+index 5c310fc..b5b9da6 100644
+--- a/core/themes/olivero/css/base/base.css
++++ b/core/themes/olivero/css/base/base.css
+@@ -37,7 +37,7 @@ body {
+   background-position: top left /* LTR */
+ }
+ 
+-body.js-fixed {
++body.data-fixed {
+     position: fixed;
+     overflow: hidden;
+     width: 100%;
+@@ -152,6 +152,6 @@ ul {
+   background: #0d77b5;
+ }
+ 
+-.js-overlay-active .overlay {
++.data-overlay-active .overlay {
+   display: block;
+ }
+diff --git a/core/themes/olivero/css/base/base.pcss.css b/core/themes/olivero/css/base/base.pcss.css
+index 8758792..16b778e 100644
+--- a/core/themes/olivero/css/base/base.pcss.css
++++ b/core/themes/olivero/css/base/base.pcss.css
+@@ -31,7 +31,7 @@ body {
+   background-image: url("../../images/background.svg");
+   background-position: top left; /* LTR */
+ 
+-  &.js-fixed {
++  &.data-fixed {
+     position: fixed;
+     overflow: hidden;
+     width: 100%;
+@@ -109,6 +109,6 @@ ul {
+   background: var(--color--blue-20);
+ }
+ 
+-.js-overlay-active .overlay {
++.data-overlay-active .overlay {
+   display: block;
+ }
+diff --git a/core/themes/olivero/css/components/header.css b/core/themes/olivero/css/components/header.css
+index 48a82a2..a807559 100644
+--- a/core/themes/olivero/css/components/header.css
++++ b/core/themes/olivero/css/components/header.css
+@@ -42,13 +42,13 @@
+ }
+ 
+ @media (min-width: 1200px) {
+-      .site-header__fixable.js-fixed:not(.is-expanded) {
++      .site-header__fixable.data-fixed:not(.is-expanded) {
+         pointer-events: none;
+       }
+     }
+ 
+ @media (min-width: 1200px) {
+-    body:not(.is-always-mobile-nav) .site-header__fixable.js-fixed {
++    body:not(.is-always-mobile-nav) .site-header__fixable.data-fixed {
+       position: fixed;
+       z-index: 2; /* Appear above body content that is position: relative */
+       top: -72px;
+@@ -58,13 +58,13 @@
+ 
+     /* Toolbar is fixed, and tray is either vertical or closed and horizontal. */
+   }
+-      body:not(.is-always-mobile-nav).toolbar-vertical.toolbar-fixed .site-header__fixable.js-fixed, body:not(.is-always-mobile-nav).toolbar-horizontal.toolbar-fixed .site-header__fixable.js-fixed {
++      body:not(.is-always-mobile-nav).toolbar-vertical.toolbar-fixed .site-header__fixable.data-fixed, body:not(.is-always-mobile-nav).toolbar-horizontal.toolbar-fixed .site-header__fixable.data-fixed {
+         top: -33px;
+       }
+   body:not(.is-always-mobile-nav) {
+     /* Toolbar is fixed, and tray is open and horizontal. */
+   }
+-    body:not(.is-always-mobile-nav).toolbar-horizontal.toolbar-fixed.toolbar-tray-open .site-header__fixable.js-fixed {
++    body:not(.is-always-mobile-nav).toolbar-horizontal.toolbar-fixed.toolbar-tray-open .site-header__fixable.data-fixed {
+       top: 7px;
+     }
+ }
+@@ -89,14 +89,14 @@ html.js body:not(.is-always-mobile-nav) .site-header__inner {
+ 
+ @media (min-width: 1200px) {
+ 
+-.site-header__fixable.js-fixed .site-header__inner {
++.site-header__fixable.data-fixed .site-header__inner {
+     box-shadow: -36px 1px 36px rgba(0, 0, 0, 0.08) /* LTR */
+ }
+   }
+ 
+ @media (min-width: 1200px) {
+ 
+-[dir="rtl"] .site-header__fixable.js-fixed .site-header__inner {
++[dir="rtl"] .site-header__fixable.data-fixed .site-header__inner {
+     box-shadow: 36px 1px 36px rgba(0, 0, 0, 0.08)
+ }
+   }
+@@ -105,7 +105,7 @@ html.js body:not(.is-always-mobile-nav) .site-header__inner {
+ 
+ @media (min-width: 1200px) {
+ 
+-body:not(.is-always-mobile-nav) .site-header__fixable.js-fixed:not(.is-expanded) .site-header__inner {
++body:not(.is-always-mobile-nav) .site-header__fixable.data-fixed:not(.is-expanded) .site-header__inner {
+     transform: translateX(-101%); /* LTR */
+     opacity: 0
+ }
+@@ -113,7 +113,7 @@ body:not(.is-always-mobile-nav) .site-header__fixable.js-fixed:not(.is-expanded)
+ 
+ @media (min-width: 1200px) {
+ 
+-[dir="rtl"] body:not(.is-always-mobile-nav) .site-header__fixable.js-fixed:not(.is-expanded) .site-header__inner {
++[dir="rtl"] body:not(.is-always-mobile-nav) .site-header__fixable.data-fixed:not(.is-expanded) .site-header__inner {
+     transform: translateX(101%)
+ }
+   }
+diff --git a/core/themes/olivero/css/components/header.pcss.css b/core/themes/olivero/css/components/header.pcss.css
+index d7eef24..effd612 100644
+--- a/core/themes/olivero/css/components/header.pcss.css
++++ b/core/themes/olivero/css/components/header.pcss.css
+@@ -30,7 +30,7 @@
+   align-items: flex-end;
+   transition: all 0.5s;
+ 
+-  &.js-fixed {
++  &.data-fixed {
+     @media (--nav) {
+       &:not(.is-expanded) {
+         pointer-events: none;
+@@ -41,7 +41,7 @@
+ 
+ @media (--nav) {
+   body:not(.is-always-mobile-nav) {
+-    & .site-header__fixable.js-fixed {
++    & .site-header__fixable.data-fixed {
+       position: fixed;
+       z-index: 2; /* Appear above body content that is position: relative */
+       inset-block-start: calc(-1 * var(--sp4));
+@@ -51,12 +51,12 @@
+     /* Toolbar is fixed, and tray is either vertical or closed and horizontal. */
+     &.toolbar-vertical.toolbar-fixed,
+     &.toolbar-horizontal.toolbar-fixed {
+-      & .site-header__fixable.js-fixed {
++      & .site-header__fixable.data-fixed {
+         inset-block-start: calc(var(--toolbar-height) - var(--sp4));
+       }
+     }
+     /* Toolbar is fixed, and tray is open and horizontal. */
+-    &.toolbar-horizontal.toolbar-fixed.toolbar-tray-open .site-header__fixable.js-fixed {
++    &.toolbar-horizontal.toolbar-fixed.toolbar-tray-open .site-header__fixable.data-fixed {
+       inset-block-start: calc(var(--toolbar-tray-height) + var(--toolbar-height) - var(--sp4));
+     }
+   }
+@@ -78,27 +78,27 @@ html.js body:not(.is-always-mobile-nav) .site-header__inner {
+   }
+ }
+ 
+-.site-header__fixable.js-fixed .site-header__inner {
++.site-header__fixable.data-fixed .site-header__inner {
+   @media (--nav) {
+     box-shadow: -36px 1px 36px rgba(0, 0, 0, 0.08); /* LTR */
+   }
+ }
+ 
+-[dir="rtl"] .site-header__fixable.js-fixed .site-header__inner {
++[dir="rtl"] .site-header__fixable.data-fixed .site-header__inner {
+   @media (--nav) {
+     box-shadow: 36px 1px 36px rgba(0, 0, 0, 0.08);
+   }
+ }
+ 
+ /* Hide the desktop nav when it's fixed and not active. */
+-body:not(.is-always-mobile-nav) .site-header__fixable.js-fixed:not(.is-expanded) .site-header__inner {
++body:not(.is-always-mobile-nav) .site-header__fixable.data-fixed:not(.is-expanded) .site-header__inner {
+   @media (--nav) {
+     transform: translateX(-101%); /* LTR */
+     opacity: 0;
+   }
+ }
+ 
+-[dir="rtl"] body:not(.is-always-mobile-nav) .site-header__fixable.js-fixed:not(.is-expanded) .site-header__inner {
++[dir="rtl"] body:not(.is-always-mobile-nav) .site-header__fixable.data-fixed:not(.is-expanded) .site-header__inner {
+   @media (--nav) {
+     transform: translateX(101%);
+   }
+diff --git a/core/themes/olivero/css/components/messages.css b/core/themes/olivero/css/components/messages.css
+index bef66a7..1458db5 100644
+--- a/core/themes/olivero/css/components/messages.css
++++ b/core/themes/olivero/css/components/messages.css
+@@ -120,7 +120,7 @@
+   margin-top: 9px;
+ }
+ 
+-.messages__container {
++.data-messages__container {
+   display: flex;
+ }
+ 
+diff --git a/core/themes/olivero/css/components/messages.pcss.css b/core/themes/olivero/css/components/messages.pcss.css
+index f9d5423..a423acb 100644
+--- a/core/themes/olivero/css/components/messages.pcss.css
++++ b/core/themes/olivero/css/components/messages.pcss.css
+@@ -54,7 +54,7 @@
+   margin-block-start: var(--sp0-5);
+ }
+ 
+-.messages__container {
++.data-messages__container {
+   display: flex;
+ }
+ 
+diff --git a/core/themes/olivero/css/components/navigation/nav-button-wide.css b/core/themes/olivero/css/components/navigation/nav-button-wide.css
+index ebb7aa3..cc5d53b 100644
+--- a/core/themes/olivero/css/components/navigation/nav-button-wide.css
++++ b/core/themes/olivero/css/components/navigation/nav-button-wide.css
+@@ -38,7 +38,7 @@
+ 
+ @media (min-width: 1200px) {
+ 
+-body:not(.is-always-mobile-nav) .js-fixed .nav-primary__button {
++body:not(.is-always-mobile-nav) .data-fixed .nav-primary__button {
+     visibility: visible
+ }
+   }
+@@ -119,7 +119,7 @@ body.is-always-mobile-nav .nav-primary__button {
+       background-color: #fff;
+     }
+ 
+-.js-fixed .nav-primary__icon {
++.data-fixed .nav-primary__icon {
+   opacity: 1;
+ }
+ 
+diff --git a/core/themes/olivero/css/components/navigation/nav-button-wide.pcss.css b/core/themes/olivero/css/components/navigation/nav-button-wide.pcss.css
+index f4abc31..9c5f91c 100644
+--- a/core/themes/olivero/css/components/navigation/nav-button-wide.pcss.css
++++ b/core/themes/olivero/css/components/navigation/nav-button-wide.pcss.css
+@@ -28,7 +28,7 @@
+   }
+ }
+ 
+-body:not(.is-always-mobile-nav) .js-fixed .nav-primary__button {
++body:not(.is-always-mobile-nav) .data-fixed .nav-primary__button {
+   @media (--nav) {
+     visibility: visible;
+   }
+@@ -87,7 +87,7 @@ body.is-always-mobile-nav .nav-primary__button {
+   }
+ }
+ 
+-.js-fixed .nav-primary__icon {
++.data-fixed .nav-primary__icon {
+   opacity: 1;
+ }
+ 
+diff --git a/core/themes/olivero/css/layout/social-bar.css b/core/themes/olivero/css/layout/social-bar.css
+index 4ab5d64..1f3b21d 100644
+--- a/core/themes/olivero/css/layout/social-bar.css
++++ b/core/themes/olivero/css/layout/social-bar.css
+@@ -67,15 +67,15 @@
+     padding-bottom: 90px
+ }
+ 
+-    [dir="ltr"] .social-bar__inner.js-fixed {
++    [dir="ltr"] .social-bar__inner.data-fixed {
+       left: 0
+ }
+ 
+-    [dir="rtl"] .social-bar__inner.js-fixed {
++    [dir="rtl"] .social-bar__inner.data-fixed {
+       right: 0
+ }
+ 
+-    .social-bar__inner.js-fixed {
++    .social-bar__inner.data-fixed {
+       position: fixed;
+       top: 108px;
+       height: calc(100vh - 108px);
+diff --git a/core/themes/olivero/js/comments.es6.js b/core/themes/olivero/js/comments.es6.js
+index 5117d8e..40254e7 100644
+--- a/core/themes/olivero/js/comments.es6.js
++++ b/core/themes/olivero/js/comments.es6.js
+@@ -17,7 +17,7 @@
+ 
+   indentedComments.forEach((commentGroup) => {
+     const showHideWrapper = document.createElement('div');
+-    showHideWrapper.setAttribute('class', 'show-hide-wrapper');
++    showHideWrapper.setAttribute('class', 'data-show-hide-wrapper');
+ 
+     const toggleCommentsBtn = document.createElement('button');
+     toggleCommentsBtn.setAttribute('type', 'button');
+diff --git a/core/themes/olivero/js/comments.js b/core/themes/olivero/js/comments.js
+index 8376ad2..c3a932e 100644
+--- a/core/themes/olivero/js/comments.js
++++ b/core/themes/olivero/js/comments.js
+@@ -14,7 +14,7 @@
+   });
+   indentedComments.forEach(function (commentGroup) {
+     var showHideWrapper = document.createElement('div');
+-    showHideWrapper.setAttribute('class', 'show-hide-wrapper');
++    showHideWrapper.setAttribute('class', 'data-show-hide-wrapper');
+     var toggleCommentsBtn = document.createElement('button');
+     toggleCommentsBtn.setAttribute('type', 'button');
+     toggleCommentsBtn.setAttribute('aria-expanded', 'true');
+diff --git a/core/themes/olivero/js/messages.es6.js b/core/themes/olivero/js/messages.es6.js
+index cf1fdd8..c4e4c37 100644
+--- a/core/themes/olivero/js/messages.es6.js
++++ b/core/themes/olivero/js/messages.es6.js
+@@ -11,7 +11,7 @@
+    *   The message object.
+    */
+   const closeMessage = (message) => {
+-    const messageContainer = message.querySelector('.messages__container');
++    const messageContainer = message.querySelector('.data-messages__container');
+ 
+     const closeBtnWrapper = document.createElement('div');
+     closeBtnWrapper.setAttribute('class', 'messages__button');
+@@ -28,7 +28,7 @@
+     closeBtnWrapper.appendChild(closeBtn);
+     closeBtn.appendChild(closeBtnText);
+ 
+-    message.classList.add('messages-processed');
++    message.classList.add('data-messages-processed');
+ 
+     closeBtn.addEventListener('click', () => {
+       message.classList.add('hidden');
+diff --git a/core/themes/olivero/js/messages.js b/core/themes/olivero/js/messages.js
+index aadb74b..4e36901 100644
+--- a/core/themes/olivero/js/messages.js
++++ b/core/themes/olivero/js/messages.js
+@@ -7,7 +7,7 @@
+ 
+ (function (Drupal) {
+   var closeMessage = function closeMessage(message) {
+-    var messageContainer = message.querySelector('.messages__container');
++    var messageContainer = message.querySelector('.data-messages__container');
+     var closeBtnWrapper = document.createElement('div');
+     closeBtnWrapper.setAttribute('class', 'messages__button');
+     var closeBtn = document.createElement('button');
+@@ -19,7 +19,7 @@
+     messageContainer.appendChild(closeBtnWrapper);
+     closeBtnWrapper.appendChild(closeBtn);
+     closeBtn.appendChild(closeBtnText);
+-    message.classList.add('messages-processed');
++    message.classList.add('data-messages-processed');
+     closeBtn.addEventListener('click', function () {
+       message.classList.add('hidden');
+     });
+@@ -31,7 +31,7 @@
+         id = _ref2.id;
+     var messagesTypes = Drupal.Message.getMessageTypeLabels();
+     var messageWrapper = document.createElement('div');
+-    messageWrapper.setAttribute('class', "messages-list__item messages messages--".concat(type, " messages-processed"));
++    messageWrapper.setAttribute('class', "messages-list__item messages messages--".concat(type, "messages-processed"));
+     messageWrapper.setAttribute('role', type === 'error' || type === 'warning' ? 'alert' : 'status');
+     messageWrapper.setAttribute('aria-labelledby', "".concat(id, "-title"));
+     messageWrapper.setAttribute('data-drupal-message-id', id);
+@@ -63,7 +63,7 @@
+ 
+   Drupal.behaviors.messages = {
+     attach: function attach(context) {
+-      var messages = context.querySelectorAll('.messages:not(.messages-processed)');
++      var messages = context.querySelectorAll('.messages:not(.data-messages-processed)');
+       messages.forEach(function (message) {
+         closeMessage(message);
+       });
+diff --git a/core/themes/olivero/js/navigation.es6.js b/core/themes/olivero/js/navigation.es6.js
+index 4e2fe5b..189863c 100644
+--- a/core/themes/olivero/js/navigation.es6.js
++++ b/core/themes/olivero/js/navigation.es6.js
+@@ -22,12 +22,12 @@
+     props.navButton.setAttribute('aria-expanded', value);
+ 
+     if (value) {
+-      props.body.classList.add('js-overlay-active');
+-      props.body.classList.add('js-fixed');
++      props.body.classList.add('data-overlay-active');
++      props.body.classList.add('data-fixed');
+       props.navWrapper.classList.add('is-active');
+     } else {
+-      props.body.classList.remove('js-overlay-active');
+-      props.body.classList.remove('js-fixed');
++      props.body.classList.remove('data-overlay-active');
++      props.body.classList.remove('data-fixed');
+       props.navWrapper.classList.remove('is-active');
+     }
+   }
+@@ -90,7 +90,7 @@
+     window.addEventListener('resize', () => {
+       if (props.olivero.isDesktopNav()) {
+         toggleNav(props, false);
+-        props.body.classList.remove('js-overlay-active', 'js-fixed');
++        props.body.classList.remove('data-overlay-active', 'data-fixed');
+       }
+     });
+   }
+diff --git a/core/themes/olivero/js/navigation.js b/core/themes/olivero/js/navigation.js
+index 8a26829..b1e97a8 100644
+--- a/core/themes/olivero/js/navigation.js
++++ b/core/themes/olivero/js/navigation.js
+@@ -15,12 +15,12 @@
+     props.navButton.setAttribute('aria-expanded', value);
+ 
+     if (value) {
+-      props.body.classList.add('js-overlay-active');
+-      props.body.classList.add('js-fixed');
++      props.body.classList.add('data-overlay-active');
++      props.body.classList.add('data-fixed');
+       props.navWrapper.classList.add('is-active');
+     } else {
+-      props.body.classList.remove('js-overlay-active');
+-      props.body.classList.remove('js-fixed');
++      props.body.classList.remove('data-overlay-active');
++      props.body.classList.remove('data-fixed');
+       props.navWrapper.classList.remove('is-active');
+     }
+   }
+@@ -62,7 +62,7 @@
+     window.addEventListener('resize', function () {
+       if (props.olivero.isDesktopNav()) {
+         toggleNav(props, false);
+-        props.body.classList.remove('js-overlay-active', 'js-fixed');
++        props.body.classList.remove('data-overlay-active', 'data-fixed');
+       }
+     });
+   }
+diff --git a/core/themes/olivero/js/scripts.es6.js b/core/themes/olivero/js/scripts.es6.js
+index e38cff5..ea43e1b 100644
+--- a/core/themes/olivero/js/scripts.es6.js
++++ b/core/themes/olivero/js/scripts.es6.js
+@@ -55,9 +55,9 @@
+         // FF doesn't seem to support entry.isIntersecting properly,
+         // so we check the intersectionRatio.
+         if (entry.intersectionRatio < 1) {
+-          fixableElements.forEach((el) => el.classList.add('js-fixed'));
++          fixableElements.forEach((el) => el.classList.add('data-fixed'));
+         } else {
+-          fixableElements.forEach((el) => el.classList.remove('js-fixed'));
++          fixableElements.forEach((el) => el.classList.remove('data-fixed'));
+         }
+       });
+     }
+diff --git a/core/themes/olivero/js/scripts.js b/core/themes/olivero/js/scripts.js
+index 0c22374..ec207f8 100644
+--- a/core/themes/olivero/js/scripts.js
++++ b/core/themes/olivero/js/scripts.js
+@@ -43,11 +43,11 @@
+       entries.forEach(function (entry) {
+         if (entry.intersectionRatio < 1) {
+           fixableElements.forEach(function (el) {
+-            return el.classList.add('js-fixed');
++            return el.classList.add('data-fixed');
+           });
+         } else {
+           fixableElements.forEach(function (el) {
+-            return el.classList.remove('js-fixed');
++            return el.classList.remove('data-fixed');
+           });
+         }
+       });
