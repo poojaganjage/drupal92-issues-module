@@ -87,7 +87,6 @@ trait DoTrustedCallbackTrait {
       }
       $message = sprintf($message, $description);
       if ($error_type === TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION) {
-        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
         @trigger_error($message, E_USER_DEPRECATED);
       }
       elseif ($error_type === TrustedCallbackInterface::TRIGGER_WARNING) {

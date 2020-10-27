@@ -87,7 +87,7 @@ class SystemController extends ControllerBase {
     $this->themeHandler = $theme_handler;
     $this->menuLinkTree = $menu_link_tree;
     if ($module_extension_list === NULL) {
-      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:8.9.0 and this argument will be required in drupal:10.0.0. See https://www.drupal.org/node/2937955', E_USER_DEPRECATED);
+      @trigger_error('The extension.list.module service must be passed to ' . __NAMESPACE__ . '\SystemController::__construct. It was added in Drupal 8.9.0 and will be required before Drupal 10.0.0.', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');
     }
     $this->moduleExtensionList = $module_extension_list;

@@ -56,7 +56,7 @@ class LayoutBuilder extends RenderElement implements ContainerFactoryPluginInter
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     if (!($event_dispatcher instanceof EventDispatcherInterface)) {
-      @trigger_error('Passing the layout_builder.tempstore_repository service to LayoutBuilder::__construct() is deprecated in drupal:9.1.0 and is not allowed in drupal:10.0.0. Instead pass the event_dispatcher service. See https://www.drupal.org/node/3152690', E_USER_DEPRECATED);
+      @trigger_error('The event_dispatcher service should be passed to LayoutBuilder::__construct() instead of the layout_builder.tempstore_repository service since 9.1.0. This will be required in Drupal 10.0.0. See https://www.drupal.org/node/3152690', E_USER_DEPRECATED);
       $event_dispatcher = \Drupal::service('event_dispatcher');
     }
     $this->eventDispatcher = $event_dispatcher;

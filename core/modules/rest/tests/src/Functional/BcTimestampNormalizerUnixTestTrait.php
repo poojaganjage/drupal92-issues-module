@@ -2,7 +2,7 @@
 
 namespace Drupal\Tests\rest\Functional;
 
-@trigger_error(__NAMESPACE__ . '\BcTimestampNormalizerUnixTestTrait is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Instead of BcTimestampNormalizerUnixTestTrait::formatExpectedTimestampItemValues(123456789), use (new \DateTime())->setTimestamp(123456789)->setTimezone(new \DateTimeZone("UTC"))->format(\DateTime::RFC3339). See https://www.drupal.org/node/2859657', E_USER_DEPRECATED);
+@trigger_error(__NAMESPACE__ . '\BcTimestampNormalizerUnixTestTrait is deprecated in Drupal 9.0.0 and will be removed before Drupal 10.0.0. Instead of BcTimestampNormalizerUnixTestTrait::formatExpectedTimestampItemValues(123456789), use (new \DateTime())->setTimestamp(123456789)->setTimezone(new \DateTimeZone("UTC"))->format(\DateTime::RFC3339), see https://www.drupal.org/node/2859657.', E_USER_DEPRECATED);
 
 /**
  * Trait for ResourceTestBase subclasses formatting expected timestamp data.

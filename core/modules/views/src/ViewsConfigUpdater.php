@@ -244,7 +244,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     $deprecations_triggered = &$this->triggeredDeprecations['2857891'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The entity link url update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2857891', $view->id()), E_USER_DEPRECATED);
+      @trigger_error(sprintf('The entity link url update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -301,7 +301,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     $deprecations_triggered = &$this->triggeredDeprecations['2869168'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The operator defaults update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2869168', $view->id()), E_USER_DEPRECATED);
+      @trigger_error(sprintf('The operator defaults update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;
@@ -449,7 +449,7 @@ class ViewsConfigUpdater implements ContainerInjectionInterface {
     $deprecations_triggered = &$this->triggeredDeprecations['2900684'][$view->id()];
     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
       $deprecations_triggered = TRUE;
-      @trigger_error(sprintf('The multivalue base field update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2900684', $view->id()), E_USER_DEPRECATED);
+      @trigger_error(sprintf('The multivalue base field update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.', $view->id()), E_USER_DEPRECATED);
     }
 
     return $changed;

@@ -117,7 +117,6 @@ final class Settings {
     // If the caller is asking for the value of a deprecated setting, trigger a
     // deprecation message about it.
     if (isset(self::$deprecatedSettings[$name])) {
-      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
       @trigger_error(self::$deprecatedSettings[$name]['message'], E_USER_DEPRECATED);
     }
     return isset(self::$instance->storage[$name]) ? self::$instance->storage[$name] : $default;
@@ -240,7 +239,6 @@ final class Settings {
   private static function handleDeprecations(array &$settings): void {
     foreach (self::$deprecatedSettings as $legacy => $deprecation) {
       if (!empty($settings[$legacy])) {
-        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
         @trigger_error($deprecation['message'], E_USER_DEPRECATED);
         // Set the new key if needed.
         if (!isset($settings[$deprecation['replacement']])) {

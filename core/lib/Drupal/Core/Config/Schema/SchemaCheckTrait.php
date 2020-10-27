@@ -85,7 +85,6 @@ trait SchemaCheckTrait {
     // Check if this type has been deprecated.
     $data_definition = $element->getDataDefinition();
     if (!empty($data_definition['deprecated'])) {
-      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
       @trigger_error($data_definition['deprecated'], E_USER_DEPRECATED);
     }
 

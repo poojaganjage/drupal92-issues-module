@@ -60,7 +60,7 @@ class StatementWrapper implements \IteratorAggregate, StatementInterface {
    */
   public function __get($name) {
     if ($name === 'queryString') {
-      @trigger_error(sprintf('StatementWrapper::$%s is deprecated in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', $name), E_USER_DEPRECATED);
+      @trigger_error("StatementWrapper::\${$name} should not be accessed in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
       return $this->getClientStatement()->queryString;
     }
   }
@@ -75,7 +75,7 @@ class StatementWrapper implements \IteratorAggregate, StatementInterface {
    */
   public function __call($method, $arguments) {
     if (is_callable([$this->getClientStatement(), $method])) {
-      @trigger_error(sprintf('StatementWrapper::%s() is deprecated in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', $method), E_USER_DEPRECATED);
+      @trigger_error("StatementWrapper::{$method} should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
       return call_user_func_array([$this->getClientStatement(), $method], $arguments);
     }
     throw new \BadMethodCallException($method);
@@ -310,7 +310,7 @@ class StatementWrapper implements \IteratorAggregate, StatementInterface {
    * @see https://www.drupal.org/node/3177488
    */
   public function bindColumn($column, &$param, int $type = 0, int $maxlen = 0, $driverdata = NULL): bool {
-    @trigger_error('StatementWrapper::bindColumn() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', E_USER_DEPRECATED);
+    @trigger_error("StatementWrapper::bindColumn should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
     switch (func_num_args()) {
       case 2:
         return $this->clientStatement->bindColumn($column, $param);
@@ -357,7 +357,7 @@ class StatementWrapper implements \IteratorAggregate, StatementInterface {
    * @see https://www.drupal.org/node/3177488
    */
   public function bindParam($parameter, &$variable, int $data_type = \PDO::PARAM_STR, int $length = 0, $driver_options = NULL) : bool {
-    @trigger_error('StatementWrapper::bindParam() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', E_USER_DEPRECATED);
+    @trigger_error("StatementWrapper::bindParam should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
     switch (func_num_args()) {
       case 2:
         return $this->clientStatement->bindParam($parameter, $variable);
