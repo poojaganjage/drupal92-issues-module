@@ -445,6 +445,7 @@ class ModuleHandler implements ModuleHandlerInterface {
       $implementations = array_map(function ($module) use ($hook) {
         return $module . '_' . $hook . '()';
       }, $modules);
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
       @trigger_error($message . implode(', ', $implementations) . '. ' . $description, E_USER_DEPRECATED);
     }
   }
@@ -558,6 +559,7 @@ class ModuleHandler implements ModuleHandlerInterface {
     }
     if (!empty($this->alterFunctions[$cid])) {
       $message = 'The deprecated alter hook hook_' . $type . '_alter() is implemented in these functions: ' . implode(', ', $this->alterFunctions[$cid]) . '.';
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
       @trigger_error($message . ' ' . $description, E_USER_DEPRECATED);
     }
   }

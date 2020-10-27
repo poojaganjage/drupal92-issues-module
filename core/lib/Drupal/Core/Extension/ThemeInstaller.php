@@ -113,7 +113,7 @@ class ThemeInstaller implements ThemeInstallerInterface {
     $this->logger = $logger;
     $this->state = $state;
     if ($module_extension_list === NULL) {
-      @trigger_error('The extension.list.module service must be passed to ' . __NAMESPACE__ . '\ThemeInstaller::__construct(). It was added in drupal:8.9.0 and will be required before drupal:10.0.0.', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:8.9.0 and this argument will be required before drupal:10.0.0. See https://www.drupal.org/node/2937955', E_USER_DEPRECATED);
       $module_extension_list = \Drupal::service('extension.list.module');
     }
     $this->moduleExtensionList = $module_extension_list;

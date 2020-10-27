@@ -233,7 +233,7 @@ class FormattableMarkup implements MarkupInterface, \Countable {
         default:
           // Deprecate support for random variables that won't be replaced.
           if (ctype_alpha($key[0]) && strpos($string, $key) === FALSE) {
-            @trigger_error(sprintf('Support for keys without a placeholder prefix is deprecated in Drupal 9.1.0 and will be removed in Drupal 10.0.0. Invalid placeholder (%s) with string: "%s"', $key, $string), E_USER_DEPRECATED);
+             @trigger_error(sprintf('Support for keys without a placeholder prefix is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Invalid placeholder (%s) with string: "%s". See https://www.drupal.org/node/2807743', $key, $string), E_USER_DEPRECATED);
           }
           else {
             trigger_error(sprintf('Invalid placeholder (%s) with string: "%s"', $key, $string), E_USER_WARNING);

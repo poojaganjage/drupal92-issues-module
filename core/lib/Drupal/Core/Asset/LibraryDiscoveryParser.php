@@ -73,7 +73,7 @@ class LibraryDiscoveryParser {
     $this->themeManager = $theme_manager;
     $this->streamWrapperManager = $stream_wrapper_manager;
     if (!$libraries_directory_file_finder) {
-      @trigger_error('Calling LibraryDiscoveryParser::__construct() without the $libraries_directory_file_finder argument is deprecated in drupal:8.9.0. The $libraries_directory_file_finder argument will be required in drupal:10.0.0. See https://www.drupal.org/node/3099614', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $libraries_directory_file_finder argument is deprecated in drupal:8.9.0 and this argument will be required in drupal:10.0.0. See https://www.drupal.org/node/3099614', E_USER_DEPRECATED);
       $libraries_directory_file_finder = \Drupal::service('library.libraries_directory_file_finder');
     }
     $this->librariesDirectoryFileFinder = $libraries_directory_file_finder;
@@ -385,6 +385,7 @@ class LibraryDiscoveryParser {
           if (isset($library['deprecated'])) {
             $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $extension);
             $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library['deprecated']);
+            // phpcs:ignore Drupal.Semantics.FunctionTriggerError
             @trigger_error("$override_message $library_deprecation", E_USER_DEPRECATED);
           }
           // Active theme defines an override for this library.

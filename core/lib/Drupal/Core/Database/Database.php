@@ -630,7 +630,7 @@ abstract class Database {
    * @see https://www.drupal.org/node/3127769
    */
   protected static function getDatabaseDriverNamespace(array $connection_info) {
-    @trigger_error(__METHOD__ . " is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. There is no replacement as \$connection_info['namespace'] is always set. See https://www.drupal.org/node/3127769.", E_USER_DEPRECATED);
+    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. There is no replacement as \$connection_info['namespace'] is always set. See https://www.drupal.org/node/3127769", E_USER_DEPRECATED);
     if (isset($connection_info['namespace'])) {
       return $connection_info['namespace'];
     }

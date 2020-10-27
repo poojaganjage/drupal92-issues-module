@@ -134,9 +134,14 @@ trait RevisionLogEntityTrait {
    *
    * @return string
    *   The name of the field for the specified $key.
+   *
+   * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Use
+   *   $entity_type->getRevisionMetadataKey() instead.
+   *
+   * @see https://www.drupal.org/node/2831499
    */
   protected static function getRevisionMetadataKey(EntityTypeInterface $entity_type, $key) {
-    @trigger_error(static::class . 'getRevisionMetadataKey() is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Use $entity_type->getRevisionMetadataKey() instead. See: https://www.drupal.org/node/2831499', E_USER_DEPRECATED);
+    @trigger_error(static::class . '::getRevisionMetadataKey() is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Use $entity_type->getRevisionMetadataKey() instead. See https://www.drupal.org/node/2831499', E_USER_DEPRECATED);
     /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
     return $entity_type->getRevisionMetadataKey($key);
   }
