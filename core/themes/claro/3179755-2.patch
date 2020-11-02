@@ -1,0 +1,36 @@
+diff --git a/core/themes/claro/images/core/ffffff/ex.svg b/core/themes/claro/images/core/ffffff/ex_light.svg
+similarity index 100%
+rename from core/themes/claro/images/core/ffffff/ex.svg
+rename to core/themes/claro/images/core/ffffff/ex_light.svg
+diff --git a/core/themes/claro/images/icons/00309e/ex.svg b/core/themes/claro/images/icons/00309e/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/00309e/ex.svg
+rename to core/themes/claro/images/icons/00309e/ex_heavy.svg
+diff --git a/core/themes/claro/images/icons/0036b1/ex.svg b/core/themes/claro/images/icons/0036b1/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/0036b1/ex.svg
+rename to core/themes/claro/images/icons/0036b1/ex_heavy.svg
+diff --git a/core/themes/claro/images/icons/545560/ex.svg b/core/themes/claro/images/icons/545560/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/545560/ex.svg
+rename to core/themes/claro/images/icons/545560/ex_heavy.svg
+diff --git a/core/themes/claro/images/icons/ab1b1b/ex.svg b/core/themes/claro/images/icons/ab1b1b/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/ab1b1b/ex.svg
+rename to core/themes/claro/images/icons/ab1b1b/ex_heavy.svg
+diff --git a/core/themes/claro/images/icons/c11f1f/ex.svg b/core/themes/claro/images/icons/c11f1f/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/c11f1f/ex.svg
+rename to core/themes/claro/images/icons/c11f1f/ex_heavy.svg
+diff --git a/core/themes/claro/images/icons/d3d4d9/ex.svg b/core/themes/claro/images/icons/d3d4d9/ex_light.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/d3d4d9/ex.svg
+rename to core/themes/claro/images/icons/d3d4d9/ex_light.svg
+diff --git a/core/themes/claro/images/icons/d72222/ex.svg b/core/themes/claro/images/icons/d72222/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/d72222/ex.svg
+rename to core/themes/claro/images/icons/d72222/ex_heavy.svg
+diff --git a/core/themes/claro/images/icons/windowText/ex.svg b/core/themes/claro/images/icons/windowText/ex_heavy.svg
+similarity index 100%
+rename from core/themes/claro/images/icons/windowText/ex.svg
+rename to core/themes/claro/images/icons/windowText/ex_heavy.svg
