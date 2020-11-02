@@ -67,7 +67,7 @@ class TaxonomyIndexTid extends ManyToOne {
     $this->vocabularyStorage = $vocabulary_storage;
     $this->termStorage = $term_storage;
     if (!$current_user) {
-      @trigger_error('The current_user service must be passed to ' . __NAMESPACE__ . '\TaxonomyIndexTid::__construct(). It was added in drupal:8.9.0 and will be required before drupal:10.0.0.', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __NAMESPACE__ . '\TaxonomyIndexTid::__construct() without the current_user service parameter is deprecated in drupal:8.9.0 and this parameter is required in drupal:10.0.0. See https://www.drupal.org/node/3101738', E_USER_DEPRECATED);
       $current_user = \Drupal::service('current_user');
     }
     $this->currentUser = $current_user;

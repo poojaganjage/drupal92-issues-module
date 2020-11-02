@@ -70,7 +70,7 @@ class ImageStyleDownloadController extends FileDownloadController {
     $this->logger = $this->getLogger('image');
 
     if (!isset($file_system)) {
-      @trigger_error('Not defining the $file_system argument to ' . __METHOD__ . ' is deprecated in drupal:9.1.0 and will throw an error in drupal:10.0.0.', E_USER_DEPRECATED);
+      @trigger_error('Calling ' . __METHOD__ . '() without the $file_system argument is deprecated in drupal:9.1.0 and it is required in drupal:10.0.0. See https://www.drupal.org/node/2630230', E_USER_DEPRECATED);
       $file_system = \Drupal::service('file_system');
     }
     $this->fileSystem = $file_system;

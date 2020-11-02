@@ -23,6 +23,7 @@ class ExpectDeprecationTest extends UnitTestCase {
   public function testExpectDeprecation() {
     $this->expectDeprecation('Drupal\Tests\Traits\ExpectDeprecationTrait::addExpectedDeprecationMessage() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use \Symfony\Bridge\PhpUnit\ExpectDeprecationTrait::expectDeprecation() instead. See https://www.drupal.org/node/3161901');
     $this->addExpectedDeprecationMessage('Test deprecation');
+    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
     @trigger_error('Test deprecation', E_USER_DEPRECATED);
   }
 
@@ -36,7 +37,9 @@ class ExpectDeprecationTest extends UnitTestCase {
     $this->expectDeprecation('Drupal\Tests\Traits\ExpectDeprecationTrait::expectedDeprecations() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use \Symfony\Bridge\PhpUnit\ExpectDeprecationTrait::expectDeprecation() instead. See https://www.drupal.org/node/3161901');
     $this->addExpectedDeprecationMessage('Test isolated deprecation');
     $this->expectedDeprecations(['Test isolated deprecation2']);
+    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
     @trigger_error('Test isolated deprecation', E_USER_DEPRECATED);
+    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
     @trigger_error('Test isolated deprecation2', E_USER_DEPRECATED);
   }
 

@@ -50,7 +50,7 @@ class NodeReferenceFieldTest extends UnitTestCase {
    * @runInSeparateProcess
    */
   public function testDefineValueProcessPipeline() {
-    $this->expectDeprecation('The Drupal\migrate_drupal\Plugin\migrate\field\NodeReference is deprecated in drupal:9.1.0 and will be removed from drupal:10.0.0. Instead use \Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference. See https://www.drupal.org/node/3159537.');
+    $this->expectDeprecation('The Drupal\migrate_drupal\Plugin\migrate\field\NodeReference is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Instead use \Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference. See https://www.drupal.org/node/3159537');
     $this->plugin->defineValueProcessPipeline($this->migration, 'somefieldname', []);
 
     $expected = [

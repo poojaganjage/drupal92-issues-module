@@ -30,7 +30,7 @@ class StatementWrapperLegacyTest extends DatabaseTestBase {
    * @covers ::getQueryString
    */
   public function testQueryString() {
-    $this->expectDeprecation('StatementWrapper::$queryString should not be accessed in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+    $this->expectDeprecation('StatementWrapper::$queryString is deprecated in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
     $this->assertStringContainsString('SELECT * FROM ', $this->statement->queryString);
     $this->assertStringContainsString('SELECT * FROM ', $this->statement->getQueryString());
   }
@@ -47,7 +47,7 @@ class StatementWrapperLegacyTest extends DatabaseTestBase {
    * Tests calling an existing \PDOStatement method.
    */
   public function testClientStatementMethod() {
-    $this->expectDeprecation('StatementWrapper::columnCount should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+    $this->expectDeprecation('StatementWrapper::columnCount() is deprecated in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
     $this->statement->execute();
     $this->assertEquals(4, $this->statement->columnCount());
   }
@@ -56,7 +56,7 @@ class StatementWrapperLegacyTest extends DatabaseTestBase {
    * @covers ::bindParam
    */
   public function testBindParam() {
-    $this->expectDeprecation('StatementWrapper::bindParam should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+    $this->expectDeprecation('StatementWrapper::bindParam() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
     $test = NULL;
     $this->assertTrue($this->statement->bindParam(':name', $test));
   }
@@ -65,7 +65,7 @@ class StatementWrapperLegacyTest extends DatabaseTestBase {
    * @covers ::bindColumn
    */
   public function testBindColumn() {
-    $this->expectDeprecation('StatementWrapper::bindColumn should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+    $this->expectDeprecation('StatementWrapper::bindColumn() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
     $test = NULL;
     $this->assertTrue($this->statement->bindColumn(1, $test));
   }

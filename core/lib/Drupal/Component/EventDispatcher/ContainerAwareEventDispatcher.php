@@ -99,6 +99,7 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
       // Trigger a deprecation error if the deprecated Event class is used
       // directly.
       if ($class_name === 'Symfony\Component\EventDispatcher\Event') {
+        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
         @trigger_error($deprecation_message, E_USER_DEPRECATED);
       }
       // Also try to trigger deprecation errors when classes are in the Drupal
@@ -108,12 +109,13 @@ class ContainerAwareEventDispatcher implements EventDispatcherInterface {
       // bridge class as a special case, otherwise it's pointless.
       elseif ($class_name !== 'Drupal\Component\EventDispatcher\Event' && strpos($class_name, 'Drupal') !== FALSE) {
         if (get_parent_class($event) === 'Symfony\Component\EventDispatcher\Event') {
+          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
           @trigger_error($deprecation_message, E_USER_DEPRECATED);
         }
       }
     }
     elseif (\is_string($event) && (NULL === $event_name || $event_name instanceof ContractsEvent || $event_name instanceof Event)) {
-      @trigger_error('Calling the Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch() method with a string event name as the first argument is deprecated in drupal:9.1.0, an Event object will be required instead in drupal:10.0.0. See https://www.drupal.org/node/3154407', E_USER_DEPRECATED);
+      @trigger_error('Calling the Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch() method with a string event name as the first argument is deprecated in drupal:9.1.0 and an Event object will be required instead in drupal:10.0.0. See https://www.drupal.org/node/3154407', E_USER_DEPRECATED);
       $swap = $event;
       $event = $event_name ?? new Event();
       $event_name = $swap;

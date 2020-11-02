@@ -28,7 +28,7 @@ class RegistryLegacyTest extends KernelTestBase {
    * Tests the theme registry with theme functions and multiple subthemes.
    */
   public function testMultipleSubThemes() {
-    $this->expectDeprecation('Unsilenced deprecation: Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of theme_theme_test(). See https://www.drupal.org/node/1831138');
+    $this->expectDeprecation('Unsilenced deprecation: Declaring theme functions is deprecated in drupal:8.0.0 and is removed from drupal:10.0.0. Use Twig templates instead of theme_theme_test_function_suggestions(). See https://www.drupal.org/node/1831138');
     $theme_handler = \Drupal::service('theme_handler');
     \Drupal::service('module_installer')->install(['theme_legacy_test']);
     \Drupal::service('theme_installer')->install(['test_basetheme']);
@@ -47,7 +47,7 @@ class RegistryLegacyTest extends KernelTestBase {
    * Tests the theme registry with theme functions with suggestions.
    */
   public function testSuggestionPreprocessFunctions() {
-    $this->expectDeprecation('Unsilenced deprecation: Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of test_legacy_theme_theme_test_preprocess_suggestions__kitten__meerkat(). See https://www.drupal.org/node/1831138');
+    $this->expectDeprecation('Unsilenced deprecation: Declaring theme functions is deprecated in drupal:8.0.0 and is removed from drupal:10.0.0. Use Twig templates instead of test_legacy_theme_theme_test_preprocess_suggestions__kitten__meerkat(). See https://www.drupal.org/node/1831138');
     $theme_handler = \Drupal::service('theme_handler');
     \Drupal::service('theme_installer')->install(['test_legacy_theme']);
 

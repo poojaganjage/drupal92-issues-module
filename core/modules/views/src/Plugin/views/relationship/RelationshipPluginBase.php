@@ -126,6 +126,7 @@ abstract class RelationshipPluginBase extends HandlerBase {
    */
   public function query() {
     if (!empty($this->definition['deprecated'])) {
+      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
       @trigger_error($this->definition['deprecated'], E_USER_DEPRECATED);
     }
 

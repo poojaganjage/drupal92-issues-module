@@ -13,6 +13,7 @@ class SkippedDeprecationTest extends UnitTestCase {
    * @see \Drupal\Tests\Listeners\DeprecationListenerTrait::getSkippedDeprecations()
    */
   public function testSkippingDeprecations() {
+    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
     @trigger_error('\Drupal\Tests\SkippedDeprecationTest deprecation', E_USER_DEPRECATED);
     $this->addToAssertionCount(1);
   }
@@ -23,6 +24,7 @@ class SkippedDeprecationTest extends UnitTestCase {
    * @see \Drupal\Tests\Listeners\DeprecationListenerTrait::getSkippedDeprecations()
    */
   public function testSkippingDeprecationsAgain() {
+    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
     @trigger_error('\Drupal\Tests\SkippedDeprecationTest deprecation', E_USER_DEPRECATED);
     $this->addToAssertionCount(1);
   }

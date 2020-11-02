@@ -97,14 +97,14 @@ class DrupalListener implements TestListener {
         $reflected_method = $class->getMethod($method);
         if ($reflected_method->getDeclaringClass()->getName() === get_class($test)) {
           if (!$reflected_method->hasReturnType() || $reflected_method->getReturnType()->getName() !== 'void') {
-            @trigger_error("Declaring ::$method without a void return typehint in " . get_class($test) . " is deprecated in drupal:9.0.0. Typehinting will be required before drupal:10.0.0. See https://www.drupal.org/node/3114724", E_USER_DEPRECATED);
+            @trigger_error("Declaring ::$method without a void return typehint in " . get_class($test) . " is deprecated in drupal:9.0.0 and typehinting will be required before drupal:10.0.0. See https://www.drupal.org/node/3114724", E_USER_DEPRECATED);
           }
         }
       }
     }
     // Check for incorrect visibility of the $modules property.
     if ($class->hasProperty('modules') && !$class->getProperty('modules')->isProtected()) {
-      @trigger_error('The ' . get_class($test) . '::$modules property must be declared protected. See https://www.drupal.org/node/2909426', E_USER_DEPRECATED);
+      @trigger_error('Declaring ' . get_class($test) . '::$modules with public visibility is deprecated in drupal:9.1.0 and must be declared protected in drupal:10.0.0. See https://www.drupal.org/node/2909426', E_USER_DEPRECATED);
     }
   }
 

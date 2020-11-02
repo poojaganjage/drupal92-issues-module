@@ -21,7 +21,7 @@ class LayoutBuilderElementTest extends KernelTestBase {
    * @group legacy
    */
   public function testConstructorTempStoreDeprecation() {
-    $this->expectDeprecation('The event_dispatcher service should be passed to LayoutBuilder::__construct() instead of the layout_builder.tempstore_repository service since 9.1.0. This will be required in Drupal 10.0.0. See https://www.drupal.org/node/3152690');
+    $this->expectDeprecation('Passing the layout_builder.tempstore_repository service to LayoutBuilder::__construct() is deprecated in drupal:9.1.0 and is not allowed in drupal:10.0.0. Instead pass the event_dispatcher service. See https://www.drupal.org/node/3152690');
     $layout_temp_storage = $this->prophesize(LayoutTempstoreRepositoryInterface::class);
     $element = new LayoutBuilder(
       [],

@@ -1,0 +1,829 @@
+diff --git a/core/lib/Drupal/Component/EventDispatcher/ContainerAwareEventDispatcher.php b/core/lib/Drupal/Component/EventDispatcher/ContainerAwareEventDispatcher.php
+index 0cf5669..c9808b2 100644
+--- a/core/lib/Drupal/Component/EventDispatcher/ContainerAwareEventDispatcher.php
++++ b/core/lib/Drupal/Component/EventDispatcher/ContainerAwareEventDispatcher.php
+@@ -99,6 +99,7 @@ public function dispatch($event/*, string $event_name = NULL*/) {
+       // Trigger a deprecation error if the deprecated Event class is used
+       // directly.
+       if ($class_name === 'Symfony\Component\EventDispatcher\Event') {
++        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+         @trigger_error($deprecation_message, E_USER_DEPRECATED);
+       }
+       // Also try to trigger deprecation errors when classes are in the Drupal
+@@ -108,12 +109,13 @@ public function dispatch($event/*, string $event_name = NULL*/) {
+       // bridge class as a special case, otherwise it's pointless.
+       elseif ($class_name !== 'Drupal\Component\EventDispatcher\Event' && strpos($class_name, 'Drupal') !== FALSE) {
+         if (get_parent_class($event) === 'Symfony\Component\EventDispatcher\Event') {
++          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+           @trigger_error($deprecation_message, E_USER_DEPRECATED);
+         }
+       }
+     }
+     elseif (\is_string($event) && (NULL === $event_name || $event_name instanceof ContractsEvent || $event_name instanceof Event)) {
+-      @trigger_error('Calling the Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch() method with a string event name as the first argument is deprecated in drupal:9.1.0, an Event object will be required instead in drupal:10.0.0. See https://www.drupal.org/node/3154407', E_USER_DEPRECATED);
++      @trigger_error('Calling the Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch() method with a string event name as the first argument is deprecated in drupal:9.1.0 and an Event object will be required instead in drupal:10\.0\.0\. See https://www.drupal.org/node/3154407', E_USER_DEPRECATED);
+       $swap = $event;
+       $event = $event_name ?? new Event();
+       $event_name = $swap;
+diff --git a/core/lib/Drupal/Component/Render/FormattableMarkup.php b/core/lib/Drupal/Component/Render/FormattableMarkup.php
+index e26f90e..d02aaea 100644
+--- a/core/lib/Drupal/Component/Render/FormattableMarkup.php
++++ b/core/lib/Drupal/Component/Render/FormattableMarkup.php
+@@ -233,7 +233,7 @@ protected static function placeholderFormat($string, array $args) {
+         default:
+           // Deprecate support for random variables that won't be replaced.
+           if (ctype_alpha($key[0]) && strpos($string, $key) === FALSE) {
+-            @trigger_error(sprintf('Support for keys without a placeholder prefix is deprecated in Drupal 9.1.0 and will be removed in Drupal 10.0.0. Invalid placeholder (%s) with string: "%s"', $key, $string), E_USER_DEPRECATED);
++            @trigger_error(sprintf('Support for keys without a placeholder prefix is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Invalid placeholder (%s) with string: "%s". See https://www.drupal.org/node/2807743', $key, $string), E_USER_DEPRECATED);
+           }
+           else {
+             trigger_error(sprintf('Invalid placeholder (%s) with string: "%s"', $key, $string), E_USER_WARNING);
+diff --git a/core/lib/Drupal/Component/Utility/DeprecatedArray.php b/core/lib/Drupal/Component/Utility/DeprecatedArray.php
+index d8483ea..0ad29b8 100644
+--- a/core/lib/Drupal/Component/Utility/DeprecatedArray.php
++++ b/core/lib/Drupal/Component/Utility/DeprecatedArray.php
+@@ -4,6 +4,10 @@
+ 
+ /**
+  * An array that triggers a deprecation warning when accessed.
++ *
++ * Ignore the trigger_error standard throughout this file because the text is
++ * provided by the $message parameter.
++ * phpcs:disable Drupal.Semantics.FunctionTriggerError
+  */
+ class DeprecatedArray extends \ArrayObject {
+ 
+diff --git a/core/lib/Drupal/Core/Archiver/ArchiverManager.php b/core/lib/Drupal/Core/Archiver/ArchiverManager.php
+index e5545d7..b6e6575 100644
+--- a/core/lib/Drupal/Core/Archiver/ArchiverManager.php
++++ b/core/lib/Drupal/Core/Archiver/ArchiverManager.php
+@@ -42,7 +42,7 @@ public function __construct(\Traversable $namespaces, CacheBackendInterface $cac
+     $this->alterInfo('archiver_info');
+     $this->setCacheBackend($cache_backend, 'archiver_info_plugins');
+     if (!isset($file_system)) {
+-      @trigger_error('Not defining the final $file_system argument to ' . __METHOD__ . ' is deprecated in drupal:8.8.3 and will throw an error in drupal:10.0.0.', E_USER_DEPRECATED);
++      @trigger_error('Calling ' . __METHOD__ . '() without the $file_system argument is deprecated in drupal:8.8.3 and will throw an error in drupal:10\.0\.0\. See https://www.drupal.org/node/3101299', E_USER_DEPRECATED);
+       $file_system = \Drupal::service('file_system');
+     }
+     $this->fileSystem = $file_system;
+diff --git a/core/lib/Drupal/Core/Asset/LibraryDiscovery.php b/core/lib/Drupal/Core/Asset/LibraryDiscovery.php
+index 4c14561..feb343e 100644
+--- a/core/lib/Drupal/Core/Asset/LibraryDiscovery.php
++++ b/core/lib/Drupal/Core/Asset/LibraryDiscovery.php
+@@ -60,6 +60,7 @@ public function getLibraryByName($extension, $name) {
+       return FALSE;
+     }
+     if (isset($libraries[$name]['deprecated'])) {
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error(str_replace('%library_id%', "$extension/$name", $libraries[$name]['deprecated']), E_USER_DEPRECATED);
+     }
+     return $libraries[$name];
+diff --git a/core/lib/Drupal/Core/Asset/LibraryDiscoveryCollector.php b/core/lib/Drupal/Core/Asset/LibraryDiscoveryCollector.php
+index d72c584..a735f5d 100644
+--- a/core/lib/Drupal/Core/Asset/LibraryDiscoveryCollector.php
++++ b/core/lib/Drupal/Core/Asset/LibraryDiscoveryCollector.php
+@@ -139,6 +139,7 @@ protected function applyLibrariesExtend($extension, $library_name, $library_defi
+         if (isset($library_definition['deprecated'])) {
+           $extend_message = sprintf('Theme "%s" is extending a deprecated library.', $extension);
+           $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library_definition['deprecated']);
++          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+           @trigger_error("$extend_message $library_deprecation", E_USER_DEPRECATED);
+         }
+         if (!is_string($library_extend_name)) {
+diff --git a/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php b/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php
+index 8aff0c9..da4c593 100644
+--- a/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php
++++ b/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php
+@@ -73,7 +73,7 @@ public function __construct($root, ModuleHandlerInterface $module_handler, Theme
+     $this->themeManager = $theme_manager;
+     $this->streamWrapperManager = $stream_wrapper_manager;
+     if (!$libraries_directory_file_finder) {
+-      @trigger_error('Calling LibraryDiscoveryParser::__construct() without the $libraries_directory_file_finder argument is deprecated in drupal:8.9.0. The $libraries_directory_file_finder argument will be required in drupal:10.0.0. See https://www.drupal.org/node/3099614', E_USER_DEPRECATED);
++      @trigger_error('Calling ' . __METHOD__ . '() without the $libraries_directory_file_finder argument is deprecated in drupal:8.9.0 and this argument will be required in drupal:10\.0\.0\. See https://www.drupal.org/node/3099614', E_USER_DEPRECATED);
+       $libraries_directory_file_finder = \Drupal::service('library.libraries_directory_file_finder');
+     }
+     $this->librariesDirectoryFileFinder = $libraries_directory_file_finder;
+@@ -385,6 +385,7 @@ protected function applyLibrariesOverride($libraries, $extension) {
+           if (isset($library['deprecated'])) {
+             $override_message = sprintf('Theme "%s" is overriding a deprecated library.', $extension);
+             $library_deprecation = str_replace('%library_id%', "$extension/$library_name", $library['deprecated']);
++            // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+             @trigger_error("$override_message $library_deprecation", E_USER_DEPRECATED);
+           }
+           // Active theme defines an override for this library.
+diff --git a/core/lib/Drupal/Core/Config/Schema/SchemaCheckTrait.php b/core/lib/Drupal/Core/Config/Schema/SchemaCheckTrait.php
+index 4e044f9..e7fa2cf 100644
+--- a/core/lib/Drupal/Core/Config/Schema/SchemaCheckTrait.php
++++ b/core/lib/Drupal/Core/Config/Schema/SchemaCheckTrait.php
+@@ -85,6 +85,7 @@ protected function checkValue($key, $value) {
+     // Check if this type has been deprecated.
+     $data_definition = $element->getDataDefinition();
+     if (!empty($data_definition['deprecated'])) {
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error($data_definition['deprecated'], E_USER_DEPRECATED);
+     }
+ 
+diff --git a/core/lib/Drupal/Core/Database/Connection.php b/core/lib/Drupal/Core/Database/Connection.php
+index 39a03b9..f8e2ab5 100644
+--- a/core/lib/Drupal/Core/Database/Connection.php
++++ b/core/lib/Drupal/Core/Database/Connection.php
+@@ -224,14 +224,14 @@ abstract class Connection {
+    */
+   public function __construct(\PDO $connection, array $connection_options) {
+     if ($this->identifierQuotes === NULL) {
+-      @trigger_error('In drupal:10.0.0 not setting the $identifierQuotes property in the concrete Connection class will result in an RuntimeException. See https://www.drupal.org/node/2986894', E_USER_DEPRECATED);
++      @trigger_error('Not setting the $identifierQuotes property in the concrete Connection class is deprecated in drupal:9.0.0 and will result in a RuntimeException in drupal:10\.0\.0\. See https://www.drupal.org/node/2986894', E_USER_DEPRECATED);
+       $this->identifierQuotes = ['', ''];
+     }
+ 
+     assert(count($this->identifierQuotes) === 2 && Inspector::assertAllStrings($this->identifierQuotes), '\Drupal\Core\Database\Connection::$identifierQuotes must contain 2 string values');
+     // The 'transactions' option is deprecated.
+     if (isset($connection_options['transactions'])) {
+-      @trigger_error('Passing a \'transactions\' connection option to ' . __METHOD__ . ' is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. All database drivers must support transactions. See https://www.drupal.org/node/2278745', E_USER_DEPRECATED);
++      @trigger_error('Passing a \'transactions\' connection option to ' . __METHOD__ . '() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. All database drivers must support transactions. See https://www.drupal.org/node/2278745', E_USER_DEPRECATED);
+       unset($connection_options['transactions']);
+     }
+ 
+@@ -1654,7 +1654,7 @@ public function clientVersion() {
+    * @see https://www.drupal.org/node/2278745
+    */
+   public function supportsTransactions() {
+-    @trigger_error(__METHOD__ . ' is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. All database drivers must support transactions. See https://www.drupal.org/node/2278745', E_USER_DEPRECATED);
++    @trigger_error(__METHOD__ . '() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. All database drivers must support transactions. See https://www.drupal.org/node/2278745', E_USER_DEPRECATED);
+     return TRUE;
+   }
+ 
+diff --git a/core/lib/Drupal/Core/Database/Database.php b/core/lib/Drupal/Core/Database/Database.php
+index 82084ca..d440952 100644
+--- a/core/lib/Drupal/Core/Database/Database.php
++++ b/core/lib/Drupal/Core/Database/Database.php
+@@ -630,7 +630,7 @@ public static function getConnectionInfoAsUrl($key = 'default') {
+    * @see https://www.drupal.org/node/3127769
+    */
+   protected static function getDatabaseDriverNamespace(array $connection_info) {
+-    @trigger_error(__METHOD__ . " is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. There is no replacement as \$connection_info['namespace'] is always set. See https://www.drupal.org/node/3127769.", E_USER_DEPRECATED);
++    @trigger_error(__METHOD__ . "() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. There is no replacement as \$connection_info['namespace'] is always set. See https://www.drupal.org/node/3127769", E_USER_DEPRECATED);
+     if (isset($connection_info['namespace'])) {
+       return $connection_info['namespace'];
+     }
+diff --git a/core/lib/Drupal/Core/Database/StatementWrapper.php b/core/lib/Drupal/Core/Database/StatementWrapper.php
+index eff4010..74557c2 100644
+--- a/core/lib/Drupal/Core/Database/StatementWrapper.php
++++ b/core/lib/Drupal/Core/Database/StatementWrapper.php
+@@ -60,7 +60,7 @@ public function __construct(Connection $connection, $client_connection, string $
+    */
+   public function __get($name) {
+     if ($name === 'queryString') {
+-      @trigger_error("StatementWrapper::\${$name} should not be accessed in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
++      @trigger_error(sprintf('StatementWrapper::$%s is deprecated in drupal:9.1.0 and will error in drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', $name), E_USER_DEPRECATED);
+       return $this->getClientStatement()->queryString;
+     }
+   }
+@@ -75,7 +75,7 @@ public function __get($name) {
+    */
+   public function __call($method, $arguments) {
+     if (is_callable([$this->getClientStatement(), $method])) {
+-      @trigger_error("StatementWrapper::{$method} should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
++      @trigger_error(sprintf('StatementWrapper::%s() is deprecated in drupal:9.1.0 and will error in drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', $method), E_USER_DEPRECATED);
+       return call_user_func_array([$this->getClientStatement(), $method], $arguments);
+     }
+     throw new \BadMethodCallException($method);
+@@ -310,7 +310,7 @@ public function getIterator() {
+    * @see https://www.drupal.org/node/3177488
+    */
+   public function bindColumn($column, &$param, int $type = 0, int $maxlen = 0, $driverdata = NULL): bool {
+-    @trigger_error("StatementWrapper::bindColumn should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
++    @trigger_error('StatementWrapper::bindColumn() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', E_USER_DEPRECATED);
+     switch (func_num_args()) {
+       case 2:
+         return $this->clientStatement->bindColumn($column, $param);
+@@ -357,7 +357,7 @@ public function bindColumn($column, &$param, int $type = 0, int $maxlen = 0, $dr
+    * @see https://www.drupal.org/node/3177488
+    */
+   public function bindParam($parameter, &$variable, int $data_type = \PDO::PARAM_STR, int $length = 0, $driver_options = NULL) : bool {
+-    @trigger_error("StatementWrapper::bindParam should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488", E_USER_DEPRECATED);
++    @trigger_error('StatementWrapper::bindParam() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488', E_USER_DEPRECATED);
+     switch (func_num_args()) {
+       case 2:
+         return $this->clientStatement->bindParam($parameter, $variable);
+diff --git a/core/lib/Drupal/Core/DependencyInjection/DeprecatedServicePropertyTrait.php b/core/lib/Drupal/Core/DependencyInjection/DeprecatedServicePropertyTrait.php
+index a72c45c..66671fb 100644
+--- a/core/lib/Drupal/Core/DependencyInjection/DeprecatedServicePropertyTrait.php
++++ b/core/lib/Drupal/Core/DependencyInjection/DeprecatedServicePropertyTrait.php
+@@ -20,7 +20,8 @@ public function __get($name) {
+     if (isset($this->deprecatedProperties[$name])) {
+       $service_name = $this->deprecatedProperties[$name];
+       $class_name = static::class;
+-      @trigger_error("The property $name ($service_name service) is deprecated in $class_name and will be removed before Drupal 10.0.0.", E_USER_DEPRECATED);
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
++      @trigger_error("The property $name ($service_name service) is deprecated in $class_name and will be removed before Drupal 10\.0\.0\.", E_USER_DEPRECATED);
+       return \Drupal::service($service_name);
+     }
+   }
+diff --git a/core/lib/Drupal/Core/Entity/RevisionLogEntityTrait.php b/core/lib/Drupal/Core/Entity/RevisionLogEntityTrait.php
+index 4585155..5c59583 100644
+--- a/core/lib/Drupal/Core/Entity/RevisionLogEntityTrait.php
++++ b/core/lib/Drupal/Core/Entity/RevisionLogEntityTrait.php
+@@ -134,9 +134,14 @@ public function setRevisionLogMessage($revision_log_message) {
+    *
+    * @return string
+    *   The name of the field for the specified $key.
++   *
++   * @deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Use
++   *   $entity_type->getRevisionMetadataKey() instead.
++   *
++   * @see https://www.drupal.org/node/2831499
+    */
+   protected static function getRevisionMetadataKey(EntityTypeInterface $entity_type, $key) {
+-    @trigger_error(static::class . 'getRevisionMetadataKey() is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Use $entity_type->getRevisionMetadataKey() instead. See: https://www.drupal.org/node/2831499', E_USER_DEPRECATED);
++    @trigger_error(static::class . '::getRevisionMetadataKey() is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Use $entity_type->getRevisionMetadataKey() instead. See https://www.drupal.org/node/2831499', E_USER_DEPRECATED);
+     /** @var \Drupal\Core\Entity\ContentEntityTypeInterface $entity_type */
+     return $entity_type->getRevisionMetadataKey($key);
+   }
+diff --git a/core/lib/Drupal/Core/Extension/ModuleHandler.php b/core/lib/Drupal/Core/Extension/ModuleHandler.php
+index 74b0834..ae764e5 100644
+--- a/core/lib/Drupal/Core/Extension/ModuleHandler.php
++++ b/core/lib/Drupal/Core/Extension/ModuleHandler.php
+@@ -445,6 +445,7 @@ private function triggerDeprecationError($description, $hook) {
+       $implementations = array_map(function ($module) use ($hook) {
+         return $module . '_' . $hook . '()';
+       }, $modules);
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error($message . implode(', ', $implementations) . '. ' . $description, E_USER_DEPRECATED);
+     }
+   }
+@@ -558,6 +559,7 @@ public function alterDeprecated($description, $type, &$data, &$context1 = NULL,
+     }
+     if (!empty($this->alterFunctions[$cid])) {
+       $message = 'The deprecated alter hook hook_' . $type . '_alter() is implemented in these functions: ' . implode(', ', $this->alterFunctions[$cid]) . '.';
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error($message . ' ' . $description, E_USER_DEPRECATED);
+     }
+   }
+diff --git a/core/lib/Drupal/Core/Extension/ThemeInstaller.php b/core/lib/Drupal/Core/Extension/ThemeInstaller.php
+index 860d79f..a64fe9b 100644
+--- a/core/lib/Drupal/Core/Extension/ThemeInstaller.php
++++ b/core/lib/Drupal/Core/Extension/ThemeInstaller.php
+@@ -113,7 +113,7 @@ public function __construct(ThemeHandlerInterface $theme_handler, ConfigFactoryI
+     $this->logger = $logger;
+     $this->state = $state;
+     if ($module_extension_list === NULL) {
+-      @trigger_error('The extension.list.module service must be passed to ' . __NAMESPACE__ . '\ThemeInstaller::__construct(). It was added in drupal:8.9.0 and will be required before drupal:10.0.0.', E_USER_DEPRECATED);
++      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:8.9.0 and this argument will be required before drupal:10\.0\.0\. See https://www.drupal.org/node/2937955', E_USER_DEPRECATED);
+       $module_extension_list = \Drupal::service('extension.list.module');
+     }
+     $this->moduleExtensionList = $module_extension_list;
+diff --git a/core/lib/Drupal/Core/Security/DoTrustedCallbackTrait.php b/core/lib/Drupal/Core/Security/DoTrustedCallbackTrait.php
+index 5b37ea9..bb3836f 100644
+--- a/core/lib/Drupal/Core/Security/DoTrustedCallbackTrait.php
++++ b/core/lib/Drupal/Core/Security/DoTrustedCallbackTrait.php
+@@ -87,6 +87,7 @@ public function doTrustedCallback(callable $callback, array $args, $message, $er
+       }
+       $message = sprintf($message, $description);
+       if ($error_type === TrustedCallbackInterface::TRIGGER_SILENCED_DEPRECATION) {
++        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+         @trigger_error($message, E_USER_DEPRECATED);
+       }
+       elseif ($error_type === TrustedCallbackInterface::TRIGGER_WARNING) {
+diff --git a/core/lib/Drupal/Core/Site/Settings.php b/core/lib/Drupal/Core/Site/Settings.php
+index bcc0e4e..cee1a91 100644
+--- a/core/lib/Drupal/Core/Site/Settings.php
++++ b/core/lib/Drupal/Core/Site/Settings.php
+@@ -117,6 +117,7 @@ public static function get($name, $default = NULL) {
+     // If the caller is asking for the value of a deprecated setting, trigger a
+     // deprecation message about it.
+     if (isset(self::$deprecatedSettings[$name])) {
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error(self::$deprecatedSettings[$name]['message'], E_USER_DEPRECATED);
+     }
+     return isset(self::$instance->storage[$name]) ? self::$instance->storage[$name] : $default;
+@@ -239,6 +240,7 @@ public static function getApcuPrefix($identifier, $root, $site_path = '') {
+   private static function handleDeprecations(array &$settings): void {
+     foreach (self::$deprecatedSettings as $legacy => $deprecation) {
+       if (!empty($settings[$legacy])) {
++        // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+         @trigger_error($deprecation['message'], E_USER_DEPRECATED);
+         // Set the new key if needed.
+         if (!isset($settings[$deprecation['replacement']])) {
+diff --git a/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php b/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
+index ecb6293..f0e2ce2 100644
+--- a/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
++++ b/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
+@@ -45,6 +45,7 @@ public function __invoke() {
+                       // Fire the same deprecation message to allow it to be
+                       // collected by
+                       // \Symfony\Bridge\PhpUnit\DeprecationErrorHandler::collectDeprecations().
++                      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+                       @trigger_error((string) $parameters[0], E_USER_DEPRECATED);
+                     }
+                     else {
+diff --git a/core/lib/Drupal/Core/Theme/Registry.php b/core/lib/Drupal/Core/Theme/Registry.php
+index 094780a..b02bddd 100644
+--- a/core/lib/Drupal/Core/Theme/Registry.php
++++ b/core/lib/Drupal/Core/Theme/Registry.php
+@@ -495,7 +495,7 @@ protected function processExtension(array &$cache, $name, $type, $theme, $path)
+         // if the theme hook specifies a function callback instead, check to
+         // ensure the function actually exists.
+         if (isset($info['function'])) {
+-          trigger_error(sprintf('Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of %s(). See https://www.drupal.org/node/1831138', $info['function']), E_USER_DEPRECATED);
++          trigger_error(sprintf('Declaring theme functions is deprecated in drupal:8.0.0 and is removed from drupal:10\.0\.0\. Use Twig templates instead of %s(). See https://www.drupal.org/node/1831138', $info['function']), E_USER_DEPRECATED);
+           if (!function_exists($info['function'])) {
+             throw new \BadFunctionCallException(sprintf(
+               'Theme hook "%s" refers to a theme function callback that does not exist: "%s"',
+diff --git a/core/modules/image/src/Controller/ImageStyleDownloadController.php b/core/modules/image/src/Controller/ImageStyleDownloadController.php
+index 742886a..40bc8fa 100644
+--- a/core/modules/image/src/Controller/ImageStyleDownloadController.php
++++ b/core/modules/image/src/Controller/ImageStyleDownloadController.php
+@@ -70,7 +70,7 @@ public function __construct(LockBackendInterface $lock, ImageFactory $image_fact
+     $this->logger = $this->getLogger('image');
+ 
+     if (!isset($file_system)) {
+-      @trigger_error('Not defining the $file_system argument to ' . __METHOD__ . ' is deprecated in drupal:9.1.0 and will throw an error in drupal:10.0.0.', E_USER_DEPRECATED);
++      @trigger_error('Calling ' . __METHOD__ . '() without the $file_system argument is deprecated in drupal:9.1.0 and it is required in drupal:10\.0\.0\. See https://www.drupal.org/node/2630230', E_USER_DEPRECATED);
+       $file_system = \Drupal::service('file_system');
+     }
+     $this->fileSystem = $file_system;
+diff --git a/core/modules/layout_builder/src/Element/LayoutBuilder.php b/core/modules/layout_builder/src/Element/LayoutBuilder.php
+index 0814604..779d8b8 100644
+--- a/core/modules/layout_builder/src/Element/LayoutBuilder.php
++++ b/core/modules/layout_builder/src/Element/LayoutBuilder.php
+@@ -56,7 +56,7 @@ public function __construct(array $configuration, $plugin_id, $plugin_definition
+     parent::__construct($configuration, $plugin_id, $plugin_definition);
+ 
+     if (!($event_dispatcher instanceof EventDispatcherInterface)) {
+-      @trigger_error('The event_dispatcher service should be passed to LayoutBuilder::__construct() instead of the layout_builder.tempstore_repository service since 9.1.0. This will be required in Drupal 10.0.0. See https://www.drupal.org/node/3152690', E_USER_DEPRECATED);
++      @trigger_error('Passing the layout_builder.tempstore_repository service to LayoutBuilder::__construct() is deprecated in drupal:9.1.0 and is not allowed in drupal:10\.0\.0\. Instead pass the event_dispatcher service. See https://www.drupal.org/node/3152690', E_USER_DEPRECATED);
+       $event_dispatcher = \Drupal::service('event_dispatcher');
+     }
+     $this->eventDispatcher = $event_dispatcher;
+diff --git a/core/modules/layout_builder/tests/src/Kernel/LayoutBuilderElementTest.php b/core/modules/layout_builder/tests/src/Kernel/LayoutBuilderElementTest.php
+index a5d96bc..19c0877 100644
+--- a/core/modules/layout_builder/tests/src/Kernel/LayoutBuilderElementTest.php
++++ b/core/modules/layout_builder/tests/src/Kernel/LayoutBuilderElementTest.php
+@@ -21,7 +21,7 @@ class LayoutBuilderElementTest extends KernelTestBase {
+    * @group legacy
+    */
+   public function testConstructorTempStoreDeprecation() {
+-    $this->expectDeprecation('The event_dispatcher service should be passed to LayoutBuilder::__construct() instead of the layout_builder.tempstore_repository service since 9.1.0. This will be required in Drupal 10.0.0. See https://www.drupal.org/node/3152690');
++    $this->expectDeprecation('Passing the layout_builder.tempstore_repository service to LayoutBuilder::__construct() is deprecated in drupal:9.1.0 and is not allowed in drupal:10\.0\.0\. Instead pass the event_dispatcher service. See https://www.drupal.org/node/3152690');
+     $layout_temp_storage = $this->prophesize(LayoutTempstoreRepositoryInterface::class);
+     $element = new LayoutBuilder(
+       [],
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/field/NodeReference.php b/core/modules/migrate_drupal/src/Plugin/migrate/field/NodeReference.php
+index 314c459..de8d31e 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/field/NodeReference.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/field/NodeReference.php
+@@ -2,7 +2,7 @@
+ 
+ namespace Drupal\migrate_drupal\Plugin\migrate\field;
+ 
+-@trigger_error('The ' . __NAMESPACE__ . '\NodeReference is deprecated in drupal:9.1.0 and will be removed from drupal:10.0.0. Instead use \Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference. See https://www.drupal.org/node/3159537.', E_USER_DEPRECATED);
++@trigger_error('The ' . __NAMESPACE__ . '\NodeReference is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Instead use \Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference. See https://www.drupal.org/node/3159537', E_USER_DEPRECATED);
+ 
+ use Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference as NonLegacyNodeReference;
+ 
+diff --git a/core/modules/migrate_drupal/tests/src/Unit/Plugin/migrate/field/d6/NodeReferenceFieldTest.php b/core/modules/migrate_drupal/tests/src/Unit/Plugin/migrate/field/d6/NodeReferenceFieldTest.php
+index 8aec08e..64571ca 100644
+--- a/core/modules/migrate_drupal/tests/src/Unit/Plugin/migrate/field/d6/NodeReferenceFieldTest.php
++++ b/core/modules/migrate_drupal/tests/src/Unit/Plugin/migrate/field/d6/NodeReferenceFieldTest.php
+@@ -50,7 +50,7 @@ protected function setUp(): void {
+    * @runInSeparateProcess
+    */
+   public function testDefineValueProcessPipeline() {
+-    $this->expectDeprecation('The Drupal\migrate_drupal\Plugin\migrate\field\NodeReference is deprecated in drupal:9.1.0 and will be removed from drupal:10.0.0. Instead use \Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference. See https://www.drupal.org/node/3159537.');
++    $this->expectDeprecation('The Drupal\migrate_drupal\Plugin\migrate\field\NodeReference is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Instead use \Drupal\migrate_drupal\Plugin\migrate\field\d6\NodeReference. See https://www.drupal.org/node/3159537');
+     $this->plugin->defineValueProcessPipeline($this->migration, 'somefieldname', []);
+ 
+     $expected = [
+diff --git a/core/modules/rest/tests/src/Functional/BcTimestampNormalizerUnixTestTrait.php b/core/modules/rest/tests/src/Functional/BcTimestampNormalizerUnixTestTrait.php
+index 054ce7c..319c5f1 100644
+--- a/core/modules/rest/tests/src/Functional/BcTimestampNormalizerUnixTestTrait.php
++++ b/core/modules/rest/tests/src/Functional/BcTimestampNormalizerUnixTestTrait.php
+@@ -2,7 +2,7 @@
+ 
+ namespace Drupal\Tests\rest\Functional;
+ 
+-@trigger_error(__NAMESPACE__ . '\BcTimestampNormalizerUnixTestTrait is deprecated in Drupal 9.0.0 and will be removed before Drupal 10.0.0. Instead of BcTimestampNormalizerUnixTestTrait::formatExpectedTimestampItemValues(123456789), use (new \DateTime())->setTimestamp(123456789)->setTimezone(new \DateTimeZone("UTC"))->format(\DateTime::RFC3339), see https://www.drupal.org/node/2859657.', E_USER_DEPRECATED);
++@trigger_error(__NAMESPACE__ . '\BcTimestampNormalizerUnixTestTrait is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Instead of BcTimestampNormalizerUnixTestTrait::formatExpectedTimestampItemValues(123456789), use (new \DateTime())->setTimestamp(123456789)->setTimezone(new \DateTimeZone("UTC"))->format(\DateTime::RFC3339). See https://www.drupal.org/node/2859657', E_USER_DEPRECATED);
+ 
+ /**
+  * Trait for ResourceTestBase subclasses formatting expected timestamp data.
+diff --git a/core/modules/system/src/Controller/SystemController.php b/core/modules/system/src/Controller/SystemController.php
+index a04724f..79e5b7c 100644
+--- a/core/modules/system/src/Controller/SystemController.php
++++ b/core/modules/system/src/Controller/SystemController.php
+@@ -87,7 +87,7 @@ public function __construct(SystemManager $systemManager, ThemeAccessCheck $them
+     $this->themeHandler = $theme_handler;
+     $this->menuLinkTree = $menu_link_tree;
+     if ($module_extension_list === NULL) {
+-      @trigger_error('The extension.list.module service must be passed to ' . __NAMESPACE__ . '\SystemController::__construct. It was added in Drupal 8.9.0 and will be required before Drupal 10.0.0.', E_USER_DEPRECATED);
++      @trigger_error('Calling ' . __METHOD__ . '() without the $module_extension_list argument is deprecated in drupal:8.9.0 and this argument will be required in drupal:10\.0\.0\. See https://www.drupal.org/node/2937955', E_USER_DEPRECATED);
+       $module_extension_list = \Drupal::service('extension.list.module');
+     }
+     $this->moduleExtensionList = $module_extension_list;
+diff --git a/core/modules/system/tests/modules/deprecation_test/deprecation_test.module b/core/modules/system/tests/modules/deprecation_test/deprecation_test.module
+index 95aaa69..94fe44a 100644
+--- a/core/modules/system/tests/modules/deprecation_test/deprecation_test.module
++++ b/core/modules/system/tests/modules/deprecation_test/deprecation_test.module
+@@ -17,6 +17,7 @@
+  * @see https://www.drupal.org/project/drupal/issues/2870194
+  */
+ function deprecation_test_function() {
++  // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+   @trigger_error('This is the deprecation message for deprecation_test_function().', E_USER_DEPRECATED);
+   return 'known_return_value';
+ }
+diff --git a/core/modules/system/tests/modules/deprecation_test/src/Deprecation/DrupalStandardsListenerDeprecatedClass.php b/core/modules/system/tests/modules/deprecation_test/src/Deprecation/DrupalStandardsListenerDeprecatedClass.php
+index de4becb..71a2505 100644
+--- a/core/modules/system/tests/modules/deprecation_test/src/Deprecation/DrupalStandardsListenerDeprecatedClass.php
++++ b/core/modules/system/tests/modules/deprecation_test/src/Deprecation/DrupalStandardsListenerDeprecatedClass.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\deprecation_test\Deprecation;
+ 
++// phpcs:ignore Drupal.Semantics.FunctionTriggerError
+ @trigger_error(__NAMESPACE__ . '\DrupalStandardsListenerDeprecatedClass is deprecated.', E_USER_DEPRECATED);
+ 
+ /**
+diff --git a/core/modules/system/tests/modules/deprecation_test/src/Deprecation/FixtureDeprecatedClass.php b/core/modules/system/tests/modules/deprecation_test/src/Deprecation/FixtureDeprecatedClass.php
+index 65aea78..62e878b 100644
+--- a/core/modules/system/tests/modules/deprecation_test/src/Deprecation/FixtureDeprecatedClass.php
++++ b/core/modules/system/tests/modules/deprecation_test/src/Deprecation/FixtureDeprecatedClass.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\deprecation_test\Deprecation;
+ 
++// phpcs:ignore Drupal.Semantics.FunctionTriggerError
+ @trigger_error(__NAMESPACE__ . '\FixtureDeprecatedClass is deprecated.', E_USER_DEPRECATED);
+ 
+ /**
+diff --git a/core/modules/system/tests/modules/test_page_test/src/Controller/Test.php b/core/modules/system/tests/modules/test_page_test/src/Controller/Test.php
+index fecc9aa..d861209 100644
+--- a/core/modules/system/tests/modules/test_page_test/src/Controller/Test.php
++++ b/core/modules/system/tests/modules/test_page_test/src/Controller/Test.php
+@@ -226,7 +226,9 @@ public function renderPageWithoutDuplicateIds() {
+   public function deprecations() {
+     // Create 2 identical deprecation messages. This should only trigger a
+     // single response header.
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('Test deprecation message', E_USER_DEPRECATED);
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('Test deprecation message', E_USER_DEPRECATED);
+     return [
+       '#markup' => 'Content that triggers deprecation messages',
+diff --git a/core/modules/taxonomy/src/Plugin/views/filter/TaxonomyIndexTid.php b/core/modules/taxonomy/src/Plugin/views/filter/TaxonomyIndexTid.php
+index 24352de..87f8c14 100644
+--- a/core/modules/taxonomy/src/Plugin/views/filter/TaxonomyIndexTid.php
++++ b/core/modules/taxonomy/src/Plugin/views/filter/TaxonomyIndexTid.php
+@@ -67,7 +67,7 @@ public function __construct(array $configuration, $plugin_id, $plugin_definition
+     $this->vocabularyStorage = $vocabulary_storage;
+     $this->termStorage = $term_storage;
+     if (!$current_user) {
+-      @trigger_error('The current_user service must be passed to ' . __NAMESPACE__ . '\TaxonomyIndexTid::__construct(). It was added in drupal:8.9.0 and will be required before drupal:10.0.0.', E_USER_DEPRECATED);
++      @trigger_error('Calling ' . __NAMESPACE__ . '\TaxonomyIndexTid::__construct() without the current_user service parameter is deprecated in drupal:8.9.0 and this parameter is required in drupal:10\.0\.0\. See https://www.drupal.org/node/3101738', E_USER_DEPRECATED);
+       $current_user = \Drupal::service('current_user');
+     }
+     $this->currentUser = $current_user;
+diff --git a/core/modules/views/src/Plugin/views/relationship/RelationshipPluginBase.php b/core/modules/views/src/Plugin/views/relationship/RelationshipPluginBase.php
+index 05d6755..a9aae8e 100644
+--- a/core/modules/views/src/Plugin/views/relationship/RelationshipPluginBase.php
++++ b/core/modules/views/src/Plugin/views/relationship/RelationshipPluginBase.php
+@@ -126,6 +126,7 @@ public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    */
+   public function query() {
+     if (!empty($this->definition['deprecated'])) {
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error($this->definition['deprecated'], E_USER_DEPRECATED);
+     }
+ 
+diff --git a/core/modules/views/src/ViewsConfigUpdater.php b/core/modules/views/src/ViewsConfigUpdater.php
+index 88442d4..10c8eb6 100644
+--- a/core/modules/views/src/ViewsConfigUpdater.php
++++ b/core/modules/views/src/ViewsConfigUpdater.php
+@@ -244,7 +244,7 @@ protected function processEntityLinkUrlHandler(array &$handler, $handler_type, V
+     $deprecations_triggered = &$this->triggeredDeprecations['2857891'][$view->id()];
+     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+       $deprecations_triggered = TRUE;
+-      @trigger_error(sprintf('The entity link url update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.', $view->id()), E_USER_DEPRECATED);
++      @trigger_error(sprintf('The entity link url update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2857891', $view->id()), E_USER_DEPRECATED);
+     }
+ 
+     return $changed;
+@@ -301,7 +301,7 @@ protected function processOperatorDefaultsHandler(array &$handler, $handler_type
+     $deprecations_triggered = &$this->triggeredDeprecations['2869168'][$view->id()];
+     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+       $deprecations_triggered = TRUE;
+-      @trigger_error(sprintf('The operator defaults update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.', $view->id()), E_USER_DEPRECATED);
++      @trigger_error(sprintf('The operator defaults update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2869168', $view->id()), E_USER_DEPRECATED);
+     }
+ 
+     return $changed;
+@@ -449,7 +449,7 @@ protected function processMultivalueBaseFieldHandler(array &$handler, $handler_t
+     $deprecations_triggered = &$this->triggeredDeprecations['2900684'][$view->id()];
+     if ($this->deprecationsEnabled && $changed && !$deprecations_triggered) {
+       $deprecations_triggered = TRUE;
+-      @trigger_error(sprintf('The multivalue base field update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.', $view->id()), E_USER_DEPRECATED);
++      @trigger_error(sprintf('The multivalue base field update for the "%s" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2900684', $view->id()), E_USER_DEPRECATED);
+     }
+ 
+     return $changed;
+diff --git a/core/modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php b/core/modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
+index 2246ba1..ac8c3d3 100644
+--- a/core/modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
++++ b/core/modules/views/tests/src/Kernel/ViewsConfigUpdaterTest.php
+@@ -73,7 +73,7 @@ public function testNeedsEntityLinkUrlUpdate() {
+    * @covers ::needsEntityLinkUrlUpdate
+    */
+   public function testNeedsEntityLinkUrlUpdateDeprecation() {
+-    $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.');
++    $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2857891');
+     $test_view = $this->loadTestView('views.view.node_link_update_test');
+     $needs_update = $this->configUpdater->needsEntityLinkUrlUpdate($test_view);
+     $this->assertTrue($needs_update);
+@@ -93,7 +93,7 @@ public function testNeedsOperatorUpdateDefaults() {
+    * @covers ::needsOperatorDefaultsUpdate
+    */
+   public function testNeedsOperatorDefaultsUpdateDeprecation() {
+-    $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.');
++    $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2869168');
+     $test_view = $this->loadTestView('views.view.test_exposed_filters');
+     $needs_update = $this->configUpdater->needsOperatorDefaultsUpdate($test_view);
+     $this->assertTrue($needs_update);
+@@ -113,7 +113,7 @@ public function testNeedsFieldNamesForMultivalueBaseFieldsUpdate() {
+    * @covers ::needsMultivalueBaseFieldUpdate
+    */
+   public function testNeedsFieldNamesForMultivalueBaseUpdateFieldsDeprecation() {
+-    $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.');
++    $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2900684');
+     $test_view = $this->loadTestView('views.view.test_user_multi_value');
+     $needs_update = $this->configUpdater->needsMultivalueBaseFieldUpdate($test_view);
+     $this->assertTrue($needs_update);
+@@ -123,9 +123,9 @@ public function testNeedsFieldNamesForMultivalueBaseUpdateFieldsDeprecation() {
+    * @covers ::updateAll
+    */
+   public function testUpdateAll() {
+-    $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.');
+-    $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.');
+-    $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2900684.');
++    $this->expectDeprecation('The entity link url update for the "node_link_update_test" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2857891');
++    $this->expectDeprecation('The operator defaults update for the "test_exposed_filters" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2869168');
++    $this->expectDeprecation('The multivalue base field update for the "test_user_multi_value" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2900684');
+     $view_ids = [
+       'views.view.node_link_update_test',
+       'views.view.test_exposed_filters',
+diff --git a/core/phpcs.xml.dist b/core/phpcs.xml.dist
+index 7608fb6..38c19ff 100644
+--- a/core/phpcs.xml.dist
++++ b/core/phpcs.xml.dist
+@@ -123,6 +123,7 @@
+   <rule ref="Drupal.Semantics.FunctionT">
+     <exclude name="Drupal.Semantics.FunctionT.NotLiteralString"/>
+   </rule>
++  <rule ref="Drupal.Semantics.FunctionTriggerError"/>
+   <rule ref="Drupal.Semantics.FunctionWatchdog"/>
+   <rule ref="Drupal.Semantics.InstallHooks"/>
+   <rule ref="Drupal.Semantics.LStringTranslatable"/>
+diff --git a/core/tests/Drupal/FunctionalJavascriptTests/WebDriverTestBase.php b/core/tests/Drupal/FunctionalJavascriptTests/WebDriverTestBase.php
+index 1cc119f..5512e13 100644
+--- a/core/tests/Drupal/FunctionalJavascriptTests/WebDriverTestBase.php
++++ b/core/tests/Drupal/FunctionalJavascriptTests/WebDriverTestBase.php
+@@ -96,6 +96,7 @@ protected function tearDown() {
+       $warnings = $this->getSession()->evaluateScript("JSON.parse(sessionStorage.getItem('js_deprecation_log_test.warnings') || JSON.stringify([]))");
+       foreach ($warnings as $warning) {
+         if (strpos($warning, '[Deprecation]') === 0) {
++          // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+           @trigger_error('Javascript Deprecation:' . substr($warning, 13), E_USER_DEPRECATED);
+         }
+       }
+diff --git a/core/tests/Drupal/FunctionalTests/Image/ToolkitTestBase.php b/core/tests/Drupal/FunctionalTests/Image/ToolkitTestBase.php
+index 2d86844..16099bc 100644
+--- a/core/tests/Drupal/FunctionalTests/Image/ToolkitTestBase.php
++++ b/core/tests/Drupal/FunctionalTests/Image/ToolkitTestBase.php
+@@ -2,7 +2,7 @@
+ 
+ namespace Drupal\FunctionalTests\Image;
+ 
+-@trigger_error('The ' . __NAMESPACE__ . '\ToolkitTestBase class is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. . There is no replacement provided as functional test base class because toolkit operations should be tested as kernel tests. \Drupal\KernelTests\Core\Image\ToolkitTestTrait trait has been added to provide a similar functionality for toolkit kernel tests. See https://www.drupal.org/node/3035573.', E_USER_DEPRECATED);
++@trigger_error('The ' . __NAMESPACE__ . '\ToolkitTestBase class is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. There is no replacement provided as functional test base class because toolkit operations should be tested as kernel tests. \Drupal\KernelTests\Core\Image\ToolkitTestTrait trait has been added to provide a similar functionality for toolkit kernel tests. See https://www.drupal.org/node/3035573', E_USER_DEPRECATED);
+ 
+ use Drupal\Component\Render\FormattableMarkup;
+ use Drupal\Tests\BrowserTestBase;
+diff --git a/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php b/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+index c92ed67..0440c89 100644
+--- a/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+@@ -124,8 +124,8 @@ public function testConnectionOptions() {
+    * @group legacy
+    */
+   public function testTransactionsOptionDeprecation() {
+-    $this->expectDeprecation('Passing a \'transactions\' connection option to Drupal\Core\Database\Connection::__construct is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. All database drivers must support transactions. See https://www.drupal.org/node/2278745');
+-    $this->expectDeprecation('Drupal\Core\Database\Connection::supportsTransactions is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. All database drivers must support transactions. See https://www.drupal.org/node/2278745');
++    $this->expectDeprecation('Passing a \'transactions\' connection option to Drupal\Core\Database\Connection::__construct() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. All database drivers must support transactions. See https://www.drupal.org/node/2278745');
++    $this->expectDeprecation('Drupal\Core\Database\Connection::supportsTransactions() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. All database drivers must support transactions. See https://www.drupal.org/node/2278745');
+     $connection_info = Database::getConnectionInfo('default');
+     $connection_info['default']['transactions'] = FALSE;
+     Database::addConnectionInfo('default', 'foo', $connection_info['default']);
+diff --git a/core/tests/Drupal/KernelTests/Core/Database/StatementWrapperLegacyTest.php b/core/tests/Drupal/KernelTests/Core/Database/StatementWrapperLegacyTest.php
+index 56609ee..7edf5b0 100644
+--- a/core/tests/Drupal/KernelTests/Core/Database/StatementWrapperLegacyTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Database/StatementWrapperLegacyTest.php
+@@ -30,7 +30,7 @@ protected function setUp(): void {
+    * @covers ::getQueryString
+    */
+   public function testQueryString() {
+-    $this->expectDeprecation('StatementWrapper::$queryString should not be accessed in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
++    $this->expectDeprecation('StatementWrapper::$queryString is deprecated in drupal:9.1.0 and will error in drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+     $this->assertStringContainsString('SELECT * FROM ', $this->statement->queryString);
+     $this->assertStringContainsString('SELECT * FROM ', $this->statement->getQueryString());
+   }
+@@ -47,7 +47,7 @@ public function testMissingMethod() {
+    * Tests calling an existing \PDOStatement method.
+    */
+   public function testClientStatementMethod() {
+-    $this->expectDeprecation('StatementWrapper::columnCount should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
++    $this->expectDeprecation('StatementWrapper::columnCount() is deprecated in drupal:9.1.0 and will error in drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+     $this->statement->execute();
+     $this->assertEquals(4, $this->statement->columnCount());
+   }
+@@ -56,7 +56,7 @@ public function testClientStatementMethod() {
+    * @covers ::bindParam
+    */
+   public function testBindParam() {
+-    $this->expectDeprecation('StatementWrapper::bindParam should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
++    $this->expectDeprecation('StatementWrapper::bindParam() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+     $test = NULL;
+     $this->assertTrue($this->statement->bindParam(':name', $test));
+   }
+@@ -65,7 +65,7 @@ public function testBindParam() {
+    * @covers ::bindColumn
+    */
+   public function testBindColumn() {
+-    $this->expectDeprecation('StatementWrapper::bindColumn should not be called in drupal:9.1.0 and will error in drupal:10.0.0. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
++    $this->expectDeprecation('StatementWrapper::bindColumn() is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Access the client-level statement object via ::getClientStatement(). See https://www.drupal.org/node/3177488');
+     $test = NULL;
+     $this->assertTrue($this->statement->bindColumn(1, $test));
+   }
+diff --git a/core/tests/Drupal/KernelTests/Core/Theme/RegistryLegacyTest.php b/core/tests/Drupal/KernelTests/Core/Theme/RegistryLegacyTest.php
+index 5cfa3ca..15f93e0 100644
+--- a/core/tests/Drupal/KernelTests/Core/Theme/RegistryLegacyTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Theme/RegistryLegacyTest.php
+@@ -28,7 +28,7 @@ class RegistryLegacyTest extends KernelTestBase {
+    * Tests the theme registry with theme functions and multiple subthemes.
+    */
+   public function testMultipleSubThemes() {
+-    $this->expectDeprecation('Unsilenced deprecation: Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of theme_theme_test(). See https://www.drupal.org/node/1831138');
++    $this->expectDeprecation('Unsilenced deprecation: Declaring theme functions is deprecated in drupal:8.0.0 and is removed from drupal:10\.0\.0\. Use Twig templates instead of theme_theme_test_function_suggestions(). See https://www.drupal.org/node/1831138');
+     $theme_handler = \Drupal::service('theme_handler');
+     \Drupal::service('module_installer')->install(['theme_legacy_test']);
+     \Drupal::service('theme_installer')->install(['test_basetheme']);
+@@ -47,7 +47,7 @@ public function testMultipleSubThemes() {
+    * Tests the theme registry with theme functions with suggestions.
+    */
+   public function testSuggestionPreprocessFunctions() {
+-    $this->expectDeprecation('Unsilenced deprecation: Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of test_legacy_theme_theme_test_preprocess_suggestions__kitten__meerkat(). See https://www.drupal.org/node/1831138');
++    $this->expectDeprecation('Unsilenced deprecation: Declaring theme functions is deprecated in drupal:8.0.0 and is removed from drupal:10\.0\.0\. Use Twig templates instead of test_legacy_theme_theme_test_preprocess_suggestions__kitten__meerkat(). See https://www.drupal.org/node/1831138');
+     $theme_handler = \Drupal::service('theme_handler');
+     \Drupal::service('theme_installer')->install(['test_legacy_theme']);
+ 
+diff --git a/core/tests/Drupal/Tests/Component/EventDispatcher/ContainerAwareEventDispatcherTest.php b/core/tests/Drupal/Tests/Component/EventDispatcher/ContainerAwareEventDispatcherTest.php
+index 3a49bb6..c7653b4 100644
+--- a/core/tests/Drupal/Tests/Component/EventDispatcher/ContainerAwareEventDispatcherTest.php
++++ b/core/tests/Drupal/Tests/Component/EventDispatcher/ContainerAwareEventDispatcherTest.php
+@@ -151,7 +151,7 @@ public function testGetListenersWithServices() {
+    * @group legacy
+    */
+   public function testDispatchArgumentOrderDeprecation() {
+-    $this->expectDeprecation('Calling the Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch() method with a string event name as the first argument is deprecated in drupal:9.1.0 and an Event object will be required instead in drupal:10.0.0. See https://www.drupal.org/node/3154407');
++    $this->expectDeprecation('Calling the Symfony\Component\EventDispatcher\EventDispatcherInterface::dispatch() method with a string event name as the first argument is deprecated in drupal:9.1.0 and an Event object will be required instead in drupal:10\.0\.0\. See https://www.drupal.org/node/3154407');
+     $container = new ContainerBuilder();
+     $dispatcher = new ContainerAwareEventDispatcher($container, []);
+     $dispatcher->dispatch('foo');
+diff --git a/core/tests/Drupal/Tests/Component/Render/FormattableMarkupTest.php b/core/tests/Drupal/Tests/Component/Render/FormattableMarkupTest.php
+index fc28528..623f1b4 100644
+--- a/core/tests/Drupal/Tests/Component/Render/FormattableMarkupTest.php
++++ b/core/tests/Drupal/Tests/Component/Render/FormattableMarkupTest.php
+@@ -106,7 +106,7 @@ public function providerTestUnexpectedPlaceholder() {
+    * @group legacy
+    */
+   public function testNoReplacementUnsupportedVariable() {
+-    $this->expectDeprecation('Support for keys without a placeholder prefix is deprecated in Drupal 9.1.0 and will be removed in Drupal 10.0.0. Invalid placeholder (foo) with string: "No replacements"');
++    $this->expectDeprecation('Support for keys without a placeholder prefix is deprecated in drupal:9.1.0 and is removed from drupal:10\.0\.0\. Invalid placeholder (foo) with string: "No replacements". See https://www.drupal.org/node/2807743');
+     $markup = new FormattableMarkup('No replacements', ['foo' => 'bar']);
+     // Cast it to a string which will generate the deprecation notice.
+     $output = (string) $markup;
+diff --git a/core/tests/Drupal/Tests/Core/Database/ConnectionTest.php b/core/tests/Drupal/Tests/Core/Database/ConnectionTest.php
+index ab8ad7b..3d08a00 100644
+--- a/core/tests/Drupal/Tests/Core/Database/ConnectionTest.php
++++ b/core/tests/Drupal/Tests/Core/Database/ConnectionTest.php
+@@ -571,7 +571,7 @@ public function testEscapeDatabase($expected, $name, array $identifier_quote = [
+    * @group legacy
+    */
+   public function testIdentifierQuotesDeprecation() {
+-    $this->expectDeprecation('In drupal:10.0.0 not setting the $identifierQuotes property in the concrete Connection class will result in an RuntimeException. See https://www.drupal.org/node/2986894');
++    $this->expectDeprecation('Not setting the $identifierQuotes property in the concrete Connection class is deprecated in drupal:9.0.0 and will result in a RuntimeException in drupal:10\.0\.0\. See https://www.drupal.org/node/2986894');
+     $mock_pdo = $this->createMock(StubPDO::class);
+     new StubConnection($mock_pdo, [], NULL);
+   }
+diff --git a/core/tests/Drupal/Tests/Core/Theme/RegistryLegacyTest.php b/core/tests/Drupal/Tests/Core/Theme/RegistryLegacyTest.php
+index 638a0b1..696998f 100644
+--- a/core/tests/Drupal/Tests/Core/Theme/RegistryLegacyTest.php
++++ b/core/tests/Drupal/Tests/Core/Theme/RegistryLegacyTest.php
+@@ -84,7 +84,7 @@ protected function setUp(): void {
+    * Tests getting legacy theme function registry data defined by a module.
+    */
+   public function testGetLegacyThemeFunctionRegistryForModule() {
+-    $this->expectDeprecation('Unsilenced deprecation: Theme functions are deprecated in drupal:8.0.0 and are removed from drupal:10.0.0. Use Twig templates instead of theme_theme_test(). See https://www.drupal.org/node/1831138');
++    $this->expectDeprecation('Unsilenced deprecation: Declaring theme functions is deprecated in drupal:8.0.0 and is removed from drupal:10\.0\.0\. Use Twig templates instead of theme_theme_test_function_suggestions(). See https://www.drupal.org/node/1831138');
+     $test_theme = new ActiveTheme([
+       'name' => 'test_legacy_theme',
+       'path' => 'core/modules/system/tests/themes/test_legacy_theme/test_legacy_theme.info.yml',
+diff --git a/core/tests/Drupal/Tests/ExpectDeprecationTest.php b/core/tests/Drupal/Tests/ExpectDeprecationTest.php
+index ff2190b..ceb91aa 100644
+--- a/core/tests/Drupal/Tests/ExpectDeprecationTest.php
++++ b/core/tests/Drupal/Tests/ExpectDeprecationTest.php
+@@ -23,6 +23,7 @@ class ExpectDeprecationTest extends UnitTestCase {
+   public function testExpectDeprecation() {
+     $this->expectDeprecation('Drupal\Tests\Traits\ExpectDeprecationTrait::addExpectedDeprecationMessage() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use \Symfony\Bridge\PhpUnit\ExpectDeprecationTrait::expectDeprecation() instead. See https://www.drupal.org/node/3161901');
+     $this->addExpectedDeprecationMessage('Test deprecation');
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('Test deprecation', E_USER_DEPRECATED);
+   }
+ 
+@@ -36,7 +37,9 @@ public function testExpectDeprecationInIsolation() {
+     $this->expectDeprecation('Drupal\Tests\Traits\ExpectDeprecationTrait::expectedDeprecations() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. Use \Symfony\Bridge\PhpUnit\ExpectDeprecationTrait::expectDeprecation() instead. See https://www.drupal.org/node/3161901');
+     $this->addExpectedDeprecationMessage('Test isolated deprecation');
+     $this->expectedDeprecations(['Test isolated deprecation2']);
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('Test isolated deprecation', E_USER_DEPRECATED);
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('Test isolated deprecation2', E_USER_DEPRECATED);
+   }
+ 
+diff --git a/core/tests/Drupal/Tests/Listeners/DeprecationListenerTrait.php b/core/tests/Drupal/Tests/Listeners/DeprecationListenerTrait.php
+index 6ef3a4f..8d4dff9 100644
+--- a/core/tests/Drupal/Tests/Listeners/DeprecationListenerTrait.php
++++ b/core/tests/Drupal/Tests/Listeners/DeprecationListenerTrait.php
+@@ -74,8 +74,8 @@ public static function isDeprecationSkipped($message) {
+       '%The "PHPUnit\\\\Framework\\\\TestCase::addWarning\(\)" method is considered internal%',
+       // The following deprecations were not added as part of the original
+       // issues and thus were not addressed in time for the 9.0.0 release.
+-      '%The entity link url update for the "\w+" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2857891.%',
+-      '%The operator defaults update for the "\w+" view is deprecated in drupal:9.0.0 and is removed from drupal:10.0.0. Module-provided Views configuration should be updated to accommodate the changes described at https://www.drupal.org/node/2869168.%',
++      '%The entity link url update for the "\w+" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2857891%',
++      '%The operator defaults update for the "\w+" view is deprecated in drupal:9.0.0 and is removed from drupal:10\.0\.0\. Module-provided Views configuration should be updated to accommodate the changes described in the change record. See https://www.drupal.org/node/2869168%',
+     ];
+     return (bool) preg_filter($dynamic_skipped_deprecations, '$0', $message);
+   }
+diff --git a/core/tests/Drupal/Tests/Listeners/DrupalListener.php b/core/tests/Drupal/Tests/Listeners/DrupalListener.php
+index 0b288bc..c932a0b 100644
+--- a/core/tests/Drupal/Tests/Listeners/DrupalListener.php
++++ b/core/tests/Drupal/Tests/Listeners/DrupalListener.php
+@@ -97,14 +97,14 @@ public function startTest(Test $test): void {
+         $reflected_method = $class->getMethod($method);
+         if ($reflected_method->getDeclaringClass()->getName() === get_class($test)) {
+           if (!$reflected_method->hasReturnType() || $reflected_method->getReturnType()->getName() !== 'void') {
+-            @trigger_error("Declaring ::$method without a void return typehint in " . get_class($test) . " is deprecated in drupal:9.0.0. Typehinting will be required before drupal:10.0.0. See https://www.drupal.org/node/3114724", E_USER_DEPRECATED);
++            @trigger_error("Declaring ::$method without a void return typehint in " . get_class($test) . " is deprecated in drupal:9.0.0 and typehinting will be required before drupal:10\.0\.0\. See https://www.drupal.org/node/3114724", E_USER_DEPRECATED);
+           }
+         }
+       }
+     }
+     // Check for incorrect visibility of the $modules property.
+     if ($class->hasProperty('modules') && !$class->getProperty('modules')->isProtected()) {
+-      @trigger_error('The ' . get_class($test) . '::$modules property must be declared protected. See https://www.drupal.org/node/2909426', E_USER_DEPRECATED);
++      @trigger_error('Declaring ' . get_class($test) . '::$modules with public visibility is deprecated in drupal:9.1.0 and must be declared protected in drupal:10\.0\.0\. See https://www.drupal.org/node/2909426', E_USER_DEPRECATED);
+     }
+   }
+ 
+diff --git a/core/tests/Drupal/Tests/SkippedDeprecationTest.php b/core/tests/Drupal/Tests/SkippedDeprecationTest.php
+index b65bdd2..f7cc3f7 100644
+--- a/core/tests/Drupal/Tests/SkippedDeprecationTest.php
++++ b/core/tests/Drupal/Tests/SkippedDeprecationTest.php
+@@ -13,6 +13,7 @@ class SkippedDeprecationTest extends UnitTestCase {
+    * @see \Drupal\Tests\Listeners\DeprecationListenerTrait::getSkippedDeprecations()
+    */
+   public function testSkippingDeprecations() {
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('\Drupal\Tests\SkippedDeprecationTest deprecation', E_USER_DEPRECATED);
+     $this->addToAssertionCount(1);
+   }
+@@ -23,6 +24,7 @@ public function testSkippingDeprecations() {
+    * @see \Drupal\Tests\Listeners\DeprecationListenerTrait::getSkippedDeprecations()
+    */
+   public function testSkippingDeprecationsAgain() {
++    // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+     @trigger_error('\Drupal\Tests\SkippedDeprecationTest deprecation', E_USER_DEPRECATED);
+     $this->addToAssertionCount(1);
+   }
+diff --git a/core/tests/Drupal/Tests/Traits/PhpUnitWarnings.php b/core/tests/Drupal/Tests/Traits/PhpUnitWarnings.php
+index 9e16ae9..7030c20 100644
+--- a/core/tests/Drupal/Tests/Traits/PhpUnitWarnings.php
++++ b/core/tests/Drupal/Tests/Traits/PhpUnitWarnings.php
+@@ -63,6 +63,7 @@ public function addWarning(string $warning): void {
+     if (in_array($warning, self::$deprecationWarnings, TRUE)) {
+       // Convert listed PHPUnit deprecations into E_USER_DEPRECATED and prevent
+       // each from being raised as a test warning.
++      // phpcs:ignore Drupal.Semantics.FunctionTriggerError
+       @trigger_error($warning, E_USER_DEPRECATED);
+       return;
+     }

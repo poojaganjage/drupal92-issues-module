@@ -571,7 +571,7 @@ class ConnectionTest extends UnitTestCase {
    * @group legacy
    */
   public function testIdentifierQuotesDeprecation() {
-    $this->expectDeprecation('In drupal:10.0.0 not setting the $identifierQuotes property in the concrete Connection class will result in an RuntimeException. See https://www.drupal.org/node/2986894');
+    $this->expectDeprecation('Not setting the $identifierQuotes property in the concrete Connection class is deprecated in drupal:9.0.0 and will result in a RuntimeException in drupal:10.0.0. See https://www.drupal.org/node/2986894');
     $mock_pdo = $this->createMock(StubPDO::class);
     new StubConnection($mock_pdo, [], NULL);
   }
