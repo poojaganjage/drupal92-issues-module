@@ -1,0 +1,16 @@
+diff --git a/core/modules/layout_builder/tests/modules/layout_builder_overrides_test/layout_builder_overrides_test.info.yml b/core/modules/layout_builder/tests/modules/layout_builder_overrides_test/layout_builder_overrides_test.info.yml
+deleted file mode 100644
+index 5e2aaca..0000000
+--- a/core/modules/layout_builder/tests/modules/layout_builder_overrides_test/layout_builder_overrides_test.info.yml
++++ /dev/null
+@@ -1,10 +0,0 @@
+-name: 'Layout Builder overrides test'
+-type: module
+-description: 'Support module for testing overriding layout building.'
+-package: Testing
+-# version: VERSION
+-
+-# Information added by Drupal.org packaging script on 2020-10-22
+-version: '9.2.x-dev'
+-project: 'drupal'
+-datestamp: 1603367008
