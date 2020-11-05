@@ -1,0 +1,12 @@
+diff --git a/core/modules/layout_builder/src/SectionComponent.php b/core/modules/layout_builder/src/SectionComponent.php
+index c09492e..cc2f4d9 100644
+--- a/core/modules/layout_builder/src/SectionComponent.php
++++ b/core/modules/layout_builder/src/SectionComponent.php
+@@ -187,7 +187,7 @@ public function setWeight($weight) {
+    * @return mixed[]
+    *   The component plugin configuration.
+    */
+-  protected function getConfiguration() {
++  public function getConfiguration() {
+     return $this->configuration;
+   }
