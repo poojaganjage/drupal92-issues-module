@@ -796,7 +796,7 @@ abstract class Connection {
       // In either case, we want to end up with an executed statement object,
       // which we pass to PDOStatement::execute.
       if ($query instanceof StatementInterface) {
-        @trigger_error('Passing a StatementInterface object as a $query argument to ' . __METHOD__ . ' is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439', E_USER_DEPRECATED);
+        @trigger_error('Passing a StatementInterface object as a $query argument to ' . __METHOD__ . ' is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439', E_USER_DEPRECATED);
         $stmt = $query;
         $stmt->execute(NULL, $options);
       }
@@ -1089,7 +1089,8 @@ abstract class Connection {
    * If a sequence name is specified for the name parameter,
    * \PDO::lastInsertId() returns a string representing the last value retrieved
    * from the specified sequence object.
-   * If the PDO driver does not support this capability, \PDO::lastInsertId()
+   *
+   * @throws If the PDO driver does not support this capability, \PDO::lastInsertId()
    * triggers an IM001 SQLSTATE.
    *
    * @param string|null $name

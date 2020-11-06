@@ -125,7 +125,7 @@ class Insert extends QueryInsert {
         $exception = new IntegrityConstraintViolationException($message, $e->getCode(), $e);
       }
       else {
-        $exception = new DatabaseExceptionWrapper($message, 0, $e);
+        $exception = new DatabaseExceptionWrapper($message, 0, $e->getCode());
       }
       throw $exception;
     }

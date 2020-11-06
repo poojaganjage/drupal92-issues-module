@@ -1,0 +1,49 @@
+diff --git a/core/lib/Drupal/Core/Database/Connection.php b/core/lib/Drupal/Core/Database/Connection.php
+index 3761aca..82ac337 100644
+--- a/core/lib/Drupal/Core/Database/Connection.php
++++ b/core/lib/Drupal/Core/Database/Connection.php
+@@ -796,7 +796,7 @@ public function query($query, array $args = [], $options = []) {
+       // In either case, we want to end up with an executed statement object,
+       // which we pass to PDOStatement::execute.
+       if ($query instanceof StatementInterface) {
+-        @trigger_error('Passing a StatementInterface object as a $query argument to ' . __METHOD__ . ' is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439', E_USER_DEPRECATED);
++        @trigger_error('Passing a StatementInterface object as a $query argument to ' . __METHOD__ . ' is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439', E_USER_DEPRECATED);
+         $stmt = $query;
+         $stmt->execute(NULL, $options);
+       }
+@@ -1089,7 +1089,8 @@ public function insert($table, array $options = []) {
+    * If a sequence name is specified for the name parameter,
+    * \PDO::lastInsertId() returns a string representing the last value retrieved
+    * from the specified sequence object.
+-   * If the PDO driver does not support this capability, \PDO::lastInsertId()
++   *
++   * @throws If the PDO driver does not support this capability, \PDO::lastInsertId()
+    * triggers an IM001 SQLSTATE.
+    *
+    * @param string|null $name
+diff --git a/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php b/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
+index 4359d83..7399895 100644
+--- a/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
++++ b/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
+@@ -125,7 +125,7 @@ public function execute() {
+         $exception = new IntegrityConstraintViolationException($message, $e->getCode(), $e);
+       }
+       else {
+-        $exception = new DatabaseExceptionWrapper($message, 0, $e);
++        $exception = new DatabaseExceptionWrapper($message, 0, $e->getCode());
+       }
+       throw $exception;
+     }
+diff --git a/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php b/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+index a472da2..5906a43 100644
+--- a/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+@@ -140,7 +140,7 @@ public function testTransactionsOptionDeprecation() {
+    * @group legacy
+    */
+   public function testStatementQueryDeprecation() {
+-    $this->expectDeprecation('Passing a StatementInterface object as a $query argument to Drupal\Core\Database\Connection::query is deprecated in drupal:9.1.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439');
++    $this->expectDeprecation('Passing a StatementInterface object as a $query argument to Drupal\Core\Database\Connection::query is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439');
+     $db = Database::getConnection();
+     $stmt = $db->prepareStatement('SELECT * FROM {test}', []);
+     $this->assertNotNull($db->query($stmt));
