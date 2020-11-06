@@ -3,8 +3,6 @@
 namespace Drupal\Core\Database\Driver\pgsql;
 
 use Drupal\Core\Database\Database;
-use Drupal\Core\Database\DatabaseExceptionWrapper;
-use Drupal\Core\Database\IntegrityConstraintViolationException;
 use Drupal\Core\Database\Query\Insert as QueryInsert;
 
 // cSpell:ignore nextval setval
@@ -105,29 +103,14 @@ class Insert extends QueryInsert {
     // example, \Drupal\Core\Cache\DatabaseBackend.
     $this->connection->addSavepoint();
     try {
-      $stmt->execute(NULL, $options);
       // Only use the returned last_insert_id if it is not already set.
-      // PostgreSQL requires the table name to be specified explicitly when
-      // requesting the last insert ID.
-      if ($options['return'] === Database::RETURN_INSERT_ID && isset($options['sequence_name'])) {
-        $last_insert_id = $this->connection->lastInsertId($options['sequence_name']);
+      if (!empty($last_insert_id)) {
+        $this->connection->query($stmt, [], $options);
       }
       else {
-        $last_insert_id = NULL;
+        $last_insert_id = $this->connection->query($stmt, [], $options);
       }
       $this->connection->releaseSavepoint();
-    }
-    catch (\PDOException $e) {
-      $this->connection->rollbackSavepoint();
-      $message = $e->getMessage() . ": " . $stmt->getQueryString();
-      // Match all SQLSTATE 23xxx errors.
-      if (substr($e->getCode(), -6, -3) == '23') {
-        $exception = new IntegrityConstraintViolationException($message, $e->getCode(), $e);
-      }
-      else {
-        $exception = new DatabaseExceptionWrapper($message, 0, $e->getCode());
-      }
-      throw $exception;
     }
     catch (\Exception $e) {
       $this->connection->rollbackSavepoint();

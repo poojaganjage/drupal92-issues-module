@@ -75,10 +75,9 @@ class Update extends QueryUpdate {
 
     $this->connection->addSavepoint();
     try {
-      $stmt->execute(NULL, $options);
+      $result = $this->connection->query($stmt, [], $options);
       $this->connection->releaseSavepoint();
-      $stmt->allowRowCount = TRUE;
-      return $stmt->rowCount();
+      return $result;
     }
     catch (\Exception $e) {
       $this->connection->rollbackSavepoint();
