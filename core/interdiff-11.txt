@@ -1,0 +1,62 @@
+diff --git a/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php b/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
+index a5b0c2f..275f8e4 100644
+--- a/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
++++ b/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
+@@ -37,9 +37,6 @@ public function __invoke() {
+             foreach ($headers as $header_name => $header_values) {
+               if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $header_name, $matches)) {
+                 foreach ($header_values as $header_value) {
+-
+-                  // Call \Drupal\Tests\BrowserTestBase::error() with the parameters from
+-                  // the header.
+                   $parameters = unserialize(urldecode($header_value));
+                   if (count($parameters) === 3) {
+                     if ($parameters[1] === 'User deprecated function') {
+diff --git a/core/lib/Drupal/Core/Test/TestSetupTrait.php b/core/lib/Drupal/Core/Test/TestSetupTrait.php
+index f8b94bc..802c159 100644
+--- a/core/lib/Drupal/Core/Test/TestSetupTrait.php
++++ b/core/lib/Drupal/Core/Test/TestSetupTrait.php
+@@ -124,13 +124,13 @@ public static function getDatabaseConnection() {
+    *
+    * The generated database table prefix is used for the Drupal installation
+    * being performed for the test. It is also used as user agent HTTP header
+-   * value by the cURL-based browser of BrowserTestBase, which is sent to the Drupal
++   * value by the cURL-based browser of BrowserTestBase, which is sent to
++   * the Drupal
+    * installation of the test. During early Drupal bootstrap, the user agent
+    * HTTP header is parsed, and if it matches, all database queries use the
+    * database table prefix that has been generated here.
+    *
+    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
+-   * @see \Drupal\Tests\BrowserTestBase::curlInitialize()
+    * @see drupal_valid_test_ua()
+    */
+   protected function prepareDatabasePrefix() {
+diff --git a/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php b/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php
+index 3a7dcd3..498662d 100644
+--- a/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php
++++ b/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php
+@@ -50,7 +50,8 @@ protected function setUp(): void {
+     parent::setUp();
+ 
+     // Ignore the <meta> refresh that big_pipe.module sets. It causes a redirect
+-    // to a page that sets another cookie, which causes BrowserTestBase to lose the
++    // to a page that sets another cookie, which causes BrowserTestBase
++    // to lose the
+     // session cookie. To avoid this problem, tests should first call
+     // drupalGet() and then call checkForMetaRefresh() manually, and then reset
+     // $this->maximumMetaRefreshCount and $this->metaRefreshCount.
+diff --git a/core/modules/field/tests/src/Functional/EntityReference/EntityReferenceAutoCreateTest.php b/core/modules/field/tests/src/Functional/EntityReference/EntityReferenceAutoCreateTest.php
+index 9d5f652..8b5070e 100644
+--- a/core/modules/field/tests/src/Functional/EntityReference/EntityReferenceAutoCreateTest.php
++++ b/core/modules/field/tests/src/Functional/EntityReference/EntityReferenceAutoCreateTest.php
+@@ -220,9 +220,6 @@ public function testMultipleTargetBundles() {
+     // The second term is expected to be stored in the first vocabulary.
+     $this->assertEqual($vocabularies[0]->id(), $term->bundle());
+ 
+-    // @todo Re-enable this test when BrowserTestBase::curlHeaderCallback() provides
+-    //   a way to catch and assert user-triggered errors.
+-
+     // Test the case when the field config settings are inconsistent.
+     // unset($handler_settings['auto_create_bundle']);
+     // $field_config->setSetting('handler_settings', $handler_settings);
