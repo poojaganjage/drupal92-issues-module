@@ -31,6 +31,7 @@ class StatementTest extends DatabaseTestBase {
     $stmt = $this->connection->prepareStatement($sql, $options);
     $this->assertInstanceOf(StatementInterface::class, $stmt);
     $this->assertTrue($stmt->execute($args, $options));
+    $this->assertSame(5, (int) $this->connection->lastInsertId(), 'lastInsertId should return the latest value of the auto-increment id column.');
 
     // We should be able to specify values in any order if named.
     $args = [
@@ -38,6 +39,7 @@ class StatementTest extends DatabaseTestBase {
       ':name' => 'Curly',
     ];
     $this->assertTrue($stmt->execute($args, $options));
+    $this->assertSame(6, (int) $this->connection->lastInsertId(), 'lastInsertId should return the latest value of the auto-increment id column.');
 
     $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
     $this->assertEquals($num_records_before + 2, $num_records_after);
