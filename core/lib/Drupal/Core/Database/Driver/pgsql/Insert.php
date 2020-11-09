@@ -122,12 +122,11 @@ class Insert extends QueryInsert {
       $message = $e->getMessage() . ": " . $stmt->getQueryString();
       // Match all SQLSTATE 23xxx errors.
       if (substr($e->getCode(), -6, -3) == '23') {
-        $exception = new IntegrityConstraintViolationException($message, $e->getCode(), $e);
+        throw new IntegrityConstraintViolationException($message, $e->getCode(), $e);
       }
       else {
-        $exception = new DatabaseExceptionWrapper($message, 0, $e->getCode());
+        throw new DatabaseExceptionWrapper($message, 0, $e->getCode());
       }
-      throw $exception;
     }
     catch (\Exception $e) {
       $this->connection->rollbackSavepoint();

@@ -1,0 +1,19 @@
+diff --git a/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php b/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
+index 7399895..bfd679d 100644
+--- a/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
++++ b/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
+@@ -122,12 +122,11 @@ public function execute() {
+       $message = $e->getMessage() . ": " . $stmt->getQueryString();
+       // Match all SQLSTATE 23xxx errors.
+       if (substr($e->getCode(), -6, -3) == '23') {
+-        $exception = new IntegrityConstraintViolationException($message, $e->getCode(), $e);
++        throw new IntegrityConstraintViolationException($message, $e->getCode(), $e);
+       }
+       else {
+-        $exception = new DatabaseExceptionWrapper($message, 0, $e->getCode());
++        throw new DatabaseExceptionWrapper($message, 0, $e->getCode());
+       }
+-      throw $exception;
+     }
+     catch (\Exception $e) {
+       $this->connection->rollbackSavepoint();
