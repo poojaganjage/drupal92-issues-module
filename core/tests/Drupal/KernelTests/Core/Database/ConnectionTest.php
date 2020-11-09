@@ -135,6 +135,18 @@ class ConnectionTest extends DatabaseTestBase {
   }
 
   /**
+   * Tests the deprecation of passing a statement object to ::query.
+   *
+   * @group legacy
+   */
+  public function testStatementQueryDeprecation() {
+    $this->expectDeprecation('Passing a StatementInterface object as a $query argument to Drupal\Core\Database\Connection::query is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439');
+    $db = Database::getConnection();
+    $stmt = $db->prepareStatement('SELECT * FROM {test}', []);
+    $this->assertNotNull($db->query($stmt));
+  }
+
+  /**
    * Ensure that you cannot execute multiple statements on MySQL.
    */
   public function testMultipleStatementsForNewPhp() {

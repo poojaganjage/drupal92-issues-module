@@ -796,6 +796,7 @@ abstract class Connection {
       // In either case, we want to end up with an executed statement object,
       // which we pass to PDOStatement::execute.
       if ($query instanceof StatementInterface) {
+        @trigger_error('Passing a StatementInterface object as a $query argument to ' . __METHOD__ . ' is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439', E_USER_DEPRECATED);
         $stmt = $query;
         $stmt->execute(NULL, $options);
       }
@@ -836,7 +837,7 @@ abstract class Connection {
 
         case Database::RETURN_INSERT_ID:
           $sequence_name = isset($options['sequence_name']) ? $options['sequence_name'] : NULL;
-          return $this->connection->lastInsertId($sequence_name);
+          return $this->lastInsertId($sequence_name);
 
         case Database::RETURN_NULL:
           return NULL;
@@ -1076,6 +1077,36 @@ abstract class Connection {
   public function insert($table, array $options = []) {
     $class = $this->getDriverClass('Insert');
     return new $class($this, $table, $options);
+  }
+
+  /**
+   * Returns the ID of the last inserted row or sequence value.
+   *
+   * This is a proxy to invoke lastInsertId() from the wrapped PDO connection.
+   * If a sequence name is not specified for the name parameter,
+   * \PDO::lastInsertId() returns a string representing the row ID of the last
+   * row that was inserted into the database.
+   * If a sequence name is specified for the name parameter,
+   * \PDO::lastInsertId() returns a string representing the last value retrieved
+   * from the specified sequence object.
+   *
+   * @param string|null $name
+   *   (Optional) Name of the sequence object from which the ID should be
+   *   returned.
+   *
+   * @throws IM001 SQLSTATE
+   *    If the PDO driver does not support this capability, \PDO::lastInsertId()
+   *    triggers an IM001 SQLSTATE.
+   *
+   * @return string|false
+   *   The value returned by the wrapped PDO connection.
+   *
+   * @internal
+   *
+   * @see \PDO::lastInsertId
+   */
+  public function lastInsertId(?string $name = NULL) {
+    return $this->connection->lastInsertId($name);
   }
 
   /**
