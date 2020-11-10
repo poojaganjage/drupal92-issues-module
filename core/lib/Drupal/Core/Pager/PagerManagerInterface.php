@@ -136,7 +136,7 @@ interface PagerManagerInterface {
    *   even though the default pager implementation adjusts for this and still
    *   displays the third page of search results at that URL.
    */
-  public function findPage($pager_id = 0): int;
+  public function findPage(int $pager_id = 0): int;
 
   /**
    * Gets the URL query parameter array of a pager link.

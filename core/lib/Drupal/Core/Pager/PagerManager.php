@@ -61,7 +61,7 @@ class PagerManager implements PagerManagerInterface {
   /**
    * {@inheritdoc}
    */
-  public function findPage($pager_id = 0): int {
+  public function findPage(int $pager_id = 0): int {
     return $this->pagerParams->findPage($pager_id);
   }
 
