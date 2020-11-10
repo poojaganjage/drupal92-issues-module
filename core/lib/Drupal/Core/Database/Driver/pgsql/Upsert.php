@@ -80,7 +80,7 @@ class Upsert extends QueryUpsert {
     // example, \Drupal\Core\Cache\DatabaseBackend.
     $this->connection->addSavepoint();
     try {
-      $stmt->execute(NULL, $options);
+      $this->connection->query($stmt, [], $options);
       $this->connection->releaseSavepoint();
     }
     catch (\Exception $e) {
