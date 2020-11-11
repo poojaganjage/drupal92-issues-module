@@ -1,0 +1,174 @@
+diff --git a/core/lib/Drupal/Core/Database/Connection.php b/core/lib/Drupal/Core/Database/Connection.php
+index 338515a..6e7a4ee 100644
+--- a/core/lib/Drupal/Core/Database/Connection.php
++++ b/core/lib/Drupal/Core/Database/Connection.php
+@@ -796,6 +796,7 @@ public function query($query, array $args = [], $options = []) {
+       // In either case, we want to end up with an executed statement object,
+       // which we pass to PDOStatement::execute.
+       if ($query instanceof StatementInterface) {
++        @trigger_error('Passing a StatementInterface object as a $query argument to ' . __METHOD__ . ' is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439', E_USER_DEPRECATED);
+         $stmt = $query;
+         $stmt->execute(NULL, $options);
+       }
+@@ -836,7 +837,7 @@ public function query($query, array $args = [], $options = []) {
+ 
+         case Database::RETURN_INSERT_ID:
+           $sequence_name = isset($options['sequence_name']) ? $options['sequence_name'] : NULL;
+-          return $this->connection->lastInsertId($sequence_name);
++          return $this->lastInsertId($sequence_name);
+ 
+         case Database::RETURN_NULL:
+           return NULL;
+@@ -1078,6 +1079,33 @@ public function insert($table, array $options = []) {
+     return new $class($this, $table, $options);
+   }
+ 
++  /**
++   * Returns the ID of the last inserted row or sequence value.
++   *
++   * This is a proxy to invoke lastInsertId() from the wrapped PDO connection.
++   * If a sequence name is not specified for the name parameter,
++   * \PDO::lastInsertId() returns a string representing the row ID of the last
++   * row that was inserted into the database.
++   * If a sequence name is specified for the name parameter,
++   * \PDO::lastInsertId() returns a string representing the last value retrieved
++   * from the specified sequence object.
++   *
++   * @param string|null $name
++   *   (Optional) Name of the sequence object from which the ID should be
++   *   returned.
++   *
++   * @return string|false
++   *   The value returned by the wrapped PDO connection.
++   *
++   * @internal
++   *   This method should normally be used only within database driver code.
++   *
++   * @see \PDO::lastInsertId
++   */
++  public function lastInsertId(?string $name = NULL) {
++    return $this->connection->lastInsertId($name);
++  }
++
+   /**
+    * Prepares and returns a MERGE query object.
+    *
+diff --git a/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php b/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
+index bbab92b..bfd679d 100644
+--- a/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
++++ b/core/lib/Drupal/Core/Database/Driver/pgsql/Insert.php
+@@ -3,6 +3,8 @@
+ namespace Drupal\Core\Database\Driver\pgsql;
+ 
+ use Drupal\Core\Database\Database;
++use Drupal\Core\Database\DatabaseExceptionWrapper;
++use Drupal\Core\Database\IntegrityConstraintViolationException;
+ use Drupal\Core\Database\Query\Insert as QueryInsert;
+ 
+ // cSpell:ignore nextval setval
+@@ -103,15 +105,29 @@ public function execute() {
+     // example, \Drupal\Core\Cache\DatabaseBackend.
+     $this->connection->addSavepoint();
+     try {
++      $stmt->execute(NULL, $options);
+       // Only use the returned last_insert_id if it is not already set.
+-      if (!empty($last_insert_id)) {
+-        $this->connection->query($stmt, [], $options);
++      // PostgreSQL requires the table name to be specified explicitly when
++      // requesting the last insert ID.
++      if ($options['return'] === Database::RETURN_INSERT_ID && isset($options['sequence_name'])) {
++        $last_insert_id = $this->connection->lastInsertId($options['sequence_name']);
+       }
+       else {
+-        $last_insert_id = $this->connection->query($stmt, [], $options);
++        $last_insert_id = NULL;
+       }
+       $this->connection->releaseSavepoint();
+     }
++    catch (\PDOException $e) {
++      $this->connection->rollbackSavepoint();
++      $message = $e->getMessage() . ": " . $stmt->getQueryString();
++      // Match all SQLSTATE 23xxx errors.
++      if (substr($e->getCode(), -6, -3) == '23') {
++        throw new IntegrityConstraintViolationException($message, $e->getCode(), $e);
++      }
++      else {
++        throw new DatabaseExceptionWrapper($message, 0, $e->getCode());
++      }
++    }
+     catch (\Exception $e) {
+       $this->connection->rollbackSavepoint();
+       throw $e;
+diff --git a/core/lib/Drupal/Core/Database/Driver/pgsql/Update.php b/core/lib/Drupal/Core/Database/Driver/pgsql/Update.php
+index 7e49310..8a3d918 100644
+--- a/core/lib/Drupal/Core/Database/Driver/pgsql/Update.php
++++ b/core/lib/Drupal/Core/Database/Driver/pgsql/Update.php
+@@ -75,9 +75,10 @@ public function execute() {
+ 
+     $this->connection->addSavepoint();
+     try {
+-      $result = $this->connection->query($stmt, [], $options);
++      $stmt->execute(NULL, $options);
+       $this->connection->releaseSavepoint();
+-      return $result;
++      $stmt->allowRowCount = TRUE;
++      return $stmt->rowCount();
+     }
+     catch (\Exception $e) {
+       $this->connection->rollbackSavepoint();
+diff --git a/core/lib/Drupal/Core/Database/Driver/pgsql/Upsert.php b/core/lib/Drupal/Core/Database/Driver/pgsql/Upsert.php
+index 4aa51e5..c5ffacd 100644
+--- a/core/lib/Drupal/Core/Database/Driver/pgsql/Upsert.php
++++ b/core/lib/Drupal/Core/Database/Driver/pgsql/Upsert.php
+@@ -80,7 +80,7 @@ public function execute() {
+     // example, \Drupal\Core\Cache\DatabaseBackend.
+     $this->connection->addSavepoint();
+     try {
+-      $this->connection->query($stmt, [], $options);
++      $stmt->execute(NULL, $options);
+       $this->connection->releaseSavepoint();
+     }
+     catch (\Exception $e) {
+diff --git a/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php b/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+index 0b9cb20..19477b7 100644
+--- a/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Database/ConnectionTest.php
+@@ -134,6 +134,18 @@ public function testTransactionsOptionDeprecation() {
+     $this->assertTrue($foo_connection->supportsTransactions());
+   }
+ 
++  /**
++   * Tests the deprecation of passing a statement object to ::query.
++   *
++   * @group legacy
++   */
++  public function testStatementQueryDeprecation(): void {
++    $this->expectDeprecation('Passing a StatementInterface object as a $query argument to Drupal\Core\Database\Connection::query is deprecated in drupal:9.2.0 and is removed in drupal:10.0.0. Call the execute method from the StatementInterface object directly instead. See https://www.drupal.org/node/3154439');
++    $db = Database::getConnection();
++    $stmt = $db->prepareStatement('SELECT * FROM {test}', []);
++    $this->assertNotNull($db->query($stmt));
++  }
++
+   /**
+    * Ensure that you cannot execute multiple statements on MySQL.
+    */
+diff --git a/core/tests/Drupal/KernelTests/Core/Database/StatementTest.php b/core/tests/Drupal/KernelTests/Core/Database/StatementTest.php
+index 6cf7bf9..0d8944f 100644
+--- a/core/tests/Drupal/KernelTests/Core/Database/StatementTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Database/StatementTest.php
+@@ -31,6 +31,7 @@ public function testRepeatedInsertStatementReuse() {
+     $stmt = $this->connection->prepareStatement($sql, $options);
+     $this->assertInstanceOf(StatementInterface::class, $stmt);
+     $this->assertTrue($stmt->execute($args, $options));
++    $this->assertSame('5', $this->connection->lastInsertId(), 'lastInsertId should return the latest value of the auto-increment id column.');
+ 
+     // We should be able to specify values in any order if named.
+     $args = [
+@@ -38,6 +39,7 @@ public function testRepeatedInsertStatementReuse() {
+       ':name' => 'Curly',
+     ];
+     $this->assertTrue($stmt->execute($args, $options));
++    $this->assertSame('6', $this->connection->lastInsertId(), 'lastInsertId should return the latest value of the auto-increment id column.');
+ 
+     $num_records_after = $this->connection->select('test')->countQuery()->execute()->fetchField();
+     $this->assertEquals($num_records_before + 2, $num_records_after);
