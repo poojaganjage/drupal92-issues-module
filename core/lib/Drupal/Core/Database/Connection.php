@@ -1098,6 +1098,7 @@ abstract class Connection {
    *   The value returned by the wrapped PDO connection.
    *
    * @internal
+   *   This method should normally be used only within database driver code.
    *
    * @see \PDO::lastInsertId
    */

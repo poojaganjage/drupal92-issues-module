@@ -1,0 +1,12 @@
+diff --git a/core/lib/Drupal/Core/Database/Connection.php b/core/lib/Drupal/Core/Database/Connection.php
+index ddb00a1..6e7a4ee 100644
+--- a/core/lib/Drupal/Core/Database/Connection.php
++++ b/core/lib/Drupal/Core/Database/Connection.php
+@@ -1098,6 +1098,7 @@ public function insert($table, array $options = []) {
+    *   The value returned by the wrapped PDO connection.
+    *
+    * @internal
++   *   This method should normally be used only within database driver code.
+    *
+    * @see \PDO::lastInsertId
+    */
