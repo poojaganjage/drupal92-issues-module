@@ -86,7 +86,7 @@ class UninstallTest extends BrowserTestBase {
     $edit = [];
     $edit['uninstall[module_test]'] = TRUE;
     $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
-    $this->assertNoText(\Drupal::translation()->translate('Configuration deletions'), 'No configuration deletions listed on the module install confirmation page.');
+    $this->assertNoText('Configuration deletions');
     $this->assertText(\Drupal::translation()->translate('Configuration updates'), 'Configuration updates listed on the module install confirmation page.');
     $this->assertText($node_type->label());
     $this->drupalPostForm(NULL, [], t('Uninstall'));
@@ -99,7 +99,7 @@ class UninstallTest extends BrowserTestBase {
     $edit['uninstall[node]'] = TRUE;
     $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
     $this->assertText(\Drupal::translation()->translate('Configuration deletions'), 'Configuration deletions listed on the module install confirmation page.');
-    $this->assertNoText(\Drupal::translation()->translate('Configuration updates'), 'No configuration updates listed on the module install confirmation page.');
+    $this->assertNoText('Configuration updates');
 
     $entity_types = [];
     foreach ($node_dependencies as $entity) {

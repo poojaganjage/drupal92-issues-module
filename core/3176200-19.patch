@@ -1,0 +1,88 @@
+diff --git a/core/modules/block/tests/src/Functional/BlockTest.php b/core/modules/block/tests/src/Functional/BlockTest.php
+index a7ab47a..03ca89c 100644
+--- a/core/modules/block/tests/src/Functional/BlockTest.php
++++ b/core/modules/block/tests/src/Functional/BlockTest.php
+@@ -220,7 +220,7 @@ public function testBlock() {
+ 
+     // Confirm that the block instance title and markup are not displayed.
+     $this->drupalGet('node');
+-    $this->assertNoText(t($block['settings[label]']));
++    $this->assertNoText($block['settings[label]']);
+     // Check for <div id="block-my-block-instance-name"> if the machine name
+     // is my_block_instance_name.
+     $xpath = $this->assertSession()->buildXPathQuery('//div[@id=:id]/*', [':id' => 'block-' . str_replace('_', '-', strtolower($block['id']))]);
+diff --git a/core/modules/config/tests/src/Functional/ConfigImportUITest.php b/core/modules/config/tests/src/Functional/ConfigImportUITest.php
+index dfd12fa..9829827 100644
+--- a/core/modules/config/tests/src/Functional/ConfigImportUITest.php
++++ b/core/modules/config/tests/src/Functional/ConfigImportUITest.php
+@@ -486,11 +486,11 @@ public function testEntityBundleDelete() {
+     $this->drupalPostForm(NULL, [], t('Import all'));
+     $this->assertNoRaw($validation_message);
+     $this->assertText(t('There are no configuration changes to import.'));
+-    $this->assertNoText(new FormattableMarkup('node.type.@type', ['@type' => $node_type->id()]));
+-    $this->assertNoText(new FormattableMarkup('field.field.node.@type.body', ['@type' => $node_type->id()]));
+-    $this->assertNoText(new FormattableMarkup('core.entity_view_display.node.@type.teaser', ['@type' => $node_type->id()]));
+-    $this->assertNoText(new FormattableMarkup('core.entity_view_display.node.@type.default', ['@type' => $node_type->id()]));
+-    $this->assertNoText(new FormattableMarkup('core.entity_form_display.node.@type.default', ['@type' => $node_type->id()]));
++    $this->assertNoText('node.type.' . $node_type->id());
++    $this->assertNoText('field.field.node.' . $node_type->id() . '.body');
++    $this->assertNoText('core.entity_view_display.node.' . $node_type->id() . '.teaser');
++    $this->assertNoText('core.entity_view_display.node.' . $node_type->id() . '.default');
++    $this->assertNoText('core.entity_form_display.node.' . $node_type->id() . '.default');
+   }
+ 
+   /**
+diff --git a/core/modules/node/tests/src/Functional/NodeRSSContentTest.php b/core/modules/node/tests/src/Functional/NodeRSSContentTest.php
+index 42cb7ef..ab5faa1 100644
+--- a/core/modules/node/tests/src/Functional/NodeRSSContentTest.php
++++ b/core/modules/node/tests/src/Functional/NodeRSSContentTest.php
+@@ -51,12 +51,12 @@ public function testNodeRSSContent() {
+     $this->drupalGet('rss.xml');
+ 
+     // Check that content added in 'rss' view mode appear in RSS feed.
+-    $rss_only_content = t('Extra data that should appear only in the RSS feed for node @nid.', ['@nid' => $node->id()]);
++    $rss_only_content = 'Extra data that should appear only in the RSS feed for node ' . $node->id() . '.';
+     $this->assertText($rss_only_content, 'Node content designated for RSS appear in RSS feed.');
+ 
+     // Check that content added in view modes other than 'rss' doesn't
+     // appear in RSS feed.
+-    $non_rss_content = t('Extra data that should appear everywhere except the RSS feed for node @nid.', ['@nid' => $node->id()]);
++    $non_rss_content = 'Extra data that should appear everywhere except the RSS feed for node ' . $node->id() . '.';
+     $this->assertNoText($non_rss_content, 'Node content not designed for RSS does not appear in RSS feed.');
+ 
+     // Check that extra RSS elements and namespaces are added to RSS feed.
+diff --git a/core/modules/system/tests/src/Functional/Module/UninstallTest.php b/core/modules/system/tests/src/Functional/Module/UninstallTest.php
+index 32ea0c2..b79580c 100644
+--- a/core/modules/system/tests/src/Functional/Module/UninstallTest.php
++++ b/core/modules/system/tests/src/Functional/Module/UninstallTest.php
+@@ -86,7 +86,7 @@ public function testUninstallPage() {
+     $edit = [];
+     $edit['uninstall[module_test]'] = TRUE;
+     $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
+-    $this->assertNoText(\Drupal::translation()->translate('Configuration deletions'), 'No configuration deletions listed on the module install confirmation page.');
++    $this->assertNoText('Configuration deletions');
+     $this->assertText(\Drupal::translation()->translate('Configuration updates'), 'Configuration updates listed on the module install confirmation page.');
+     $this->assertText($node_type->label());
+     $this->drupalPostForm(NULL, [], t('Uninstall'));
+@@ -99,7 +99,7 @@ public function testUninstallPage() {
+     $edit['uninstall[node]'] = TRUE;
+     $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
+     $this->assertText(\Drupal::translation()->translate('Configuration deletions'), 'Configuration deletions listed on the module install confirmation page.');
+-    $this->assertNoText(\Drupal::translation()->translate('Configuration updates'), 'No configuration updates listed on the module install confirmation page.');
++    $this->assertNoText('Configuration updates');
+ 
+     $entity_types = [];
+     foreach ($node_dependencies as $entity) {
+diff --git a/core/modules/system/tests/src/Functional/System/SiteMaintenanceTest.php b/core/modules/system/tests/src/Functional/System/SiteMaintenanceTest.php
+index 96d2768..2389459 100644
+--- a/core/modules/system/tests/src/Functional/System/SiteMaintenanceTest.php
++++ b/core/modules/system/tests/src/Functional/System/SiteMaintenanceTest.php
+@@ -73,7 +73,7 @@ public function testSiteMaintenance() {
+ 
+     $admin_message = t('Operating in maintenance mode. <a href=":url">Go online.</a>', [':url' => Url::fromRoute('system.site_maintenance_mode')->toString()]);
+     $user_message = t('Operating in maintenance mode.');
+-    $offline_message = t('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', ['@site' => $this->config('system.site')->get('name')]);
++    $offline_message = $this->config('system.site')->get('name') . ' is currently under maintenance. We should be back shortly. Thank you for your patience.';
+ 
+     $this->drupalGet(Url::fromRoute('user.page'));
+     // JS should not be aggregated, so drupal.js is expected in the page source.

@@ -486,11 +486,11 @@ class ConfigImportUITest extends BrowserTestBase {
     $this->drupalPostForm(NULL, [], t('Import all'));
     $this->assertNoRaw($validation_message);
     $this->assertText(t('There are no configuration changes to import.'));
-    $this->assertNoText(new FormattableMarkup('node.type.@type', ['@type' => $node_type->id()]));
-    $this->assertNoText(new FormattableMarkup('field.field.node.@type.body', ['@type' => $node_type->id()]));
-    $this->assertNoText(new FormattableMarkup('core.entity_view_display.node.@type.teaser', ['@type' => $node_type->id()]));
-    $this->assertNoText(new FormattableMarkup('core.entity_view_display.node.@type.default', ['@type' => $node_type->id()]));
-    $this->assertNoText(new FormattableMarkup('core.entity_form_display.node.@type.default', ['@type' => $node_type->id()]));
+    $this->assertNoText('node.type.' . $node_type->id());
+    $this->assertNoText('field.field.node.' . $node_type->id() . '.body');
+    $this->assertNoText('core.entity_view_display.node.' . $node_type->id() . '.teaser');
+    $this->assertNoText('core.entity_view_display.node.' . $node_type->id() . '.default');
+    $this->assertNoText('core.entity_form_display.node.' . $node_type->id() . '.default');
   }
 
   /**
