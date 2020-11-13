@@ -1,0 +1,97 @@
+diff --git a/core/themes/olivero/js/comments.es6.js b/core/themes/olivero/js/comments.es6.js
+index 5117d8e..7ce1e65 100644
+--- a/core/themes/olivero/js/comments.es6.js
++++ b/core/themes/olivero/js/comments.es6.js
+@@ -17,12 +17,12 @@
+ 
+   indentedComments.forEach((commentGroup) => {
+     const showHideWrapper = document.createElement('div');
+-    showHideWrapper.setAttribute('class', 'show-hide-wrapper');
++    showHideWrapper.setAttribute('data-show-hide-wrapper', 'show-hide-wrapper');
+ 
+     const toggleCommentsBtn = document.createElement('button');
+     toggleCommentsBtn.setAttribute('type', 'button');
+     toggleCommentsBtn.setAttribute('aria-expanded', 'true');
+-    toggleCommentsBtn.setAttribute('class', 'show-hide-btn');
++    toggleCommentsBtn.setAttribute('data-show-hide-btn', 'show-hide-btn');
+     toggleCommentsBtn.innerText = Drupal.t('Replies');
+ 
+     commentGroup.parentNode.insertBefore(showHideWrapper, commentGroup);
+diff --git a/core/themes/olivero/js/comments.js b/core/themes/olivero/js/comments.js
+index 8376ad2..7f3a08d 100644
+--- a/core/themes/olivero/js/comments.js
++++ b/core/themes/olivero/js/comments.js
+@@ -14,11 +14,11 @@
+   });
+   indentedComments.forEach(function (commentGroup) {
+     var showHideWrapper = document.createElement('div');
+-    showHideWrapper.setAttribute('class', 'show-hide-wrapper');
++    showHideWrapper.setAttribute('data-show-hide-wrapper', 'show-hide-wrapper');
+     var toggleCommentsBtn = document.createElement('button');
+     toggleCommentsBtn.setAttribute('type', 'button');
+     toggleCommentsBtn.setAttribute('aria-expanded', 'true');
+-    toggleCommentsBtn.setAttribute('class', 'show-hide-btn');
++    toggleCommentsBtn.setAttribute('data-show-hide-btn', 'show-hide-btn');
+     toggleCommentsBtn.innerText = Drupal.t('Replies');
+     commentGroup.parentNode.insertBefore(showHideWrapper, commentGroup);
+     showHideWrapper.appendChild(toggleCommentsBtn);
+diff --git a/core/themes/olivero/js/messages.es6.js b/core/themes/olivero/js/messages.es6.js
+index cf1fdd8..cb9d9ab 100644
+--- a/core/themes/olivero/js/messages.es6.js
++++ b/core/themes/olivero/js/messages.es6.js
+@@ -14,14 +14,14 @@
+     const messageContainer = message.querySelector('.messages__container');
+ 
+     const closeBtnWrapper = document.createElement('div');
+-    closeBtnWrapper.setAttribute('class', 'messages__button');
++    closeBtnWrapper.setAttribute('data-messages__button', 'messages__button');
+ 
+     const closeBtn = document.createElement('button');
+     closeBtn.setAttribute('type', 'button');
+-    closeBtn.setAttribute('class', 'messages__close');
++    closeBtn.setAttribute('data-messages__close', 'messages__close');
+ 
+     const closeBtnText = document.createElement('span');
+-    closeBtnText.setAttribute('class', 'visually-hidden');
++    closeBtnText.setAttribute('data-visually-hidden', 'visually-hidden');
+     closeBtnText.innerText = Drupal.t('Close message');
+ 
+     messageContainer.appendChild(closeBtnWrapper);
+@@ -57,7 +57,7 @@
+     const messageWrapper = document.createElement('div');
+ 
+     messageWrapper.setAttribute(
+-      'class',
++      'data-messages-list__item messages messages--',
+       `messages-list__item messages messages--${type} messages-processed`,
+     );
+     messageWrapper.setAttribute(
+diff --git a/core/themes/olivero/js/messages.js b/core/themes/olivero/js/messages.js
+index aadb74b..dcc8093 100644
+--- a/core/themes/olivero/js/messages.js
++++ b/core/themes/olivero/js/messages.js
+@@ -9,12 +9,12 @@
+   var closeMessage = function closeMessage(message) {
+     var messageContainer = message.querySelector('.messages__container');
+     var closeBtnWrapper = document.createElement('div');
+-    closeBtnWrapper.setAttribute('class', 'messages__button');
++    closeBtnWrapper.setAttribute('data-messages__button', 'messages__button');
+     var closeBtn = document.createElement('button');
+     closeBtn.setAttribute('type', 'button');
+-    closeBtn.setAttribute('class', 'messages__close');
++    closeBtn.setAttribute('data-messages__close', 'messages__close');
+     var closeBtnText = document.createElement('span');
+-    closeBtnText.setAttribute('class', 'visually-hidden');
++    closeBtnText.setAttribute('data-visually-hidden', 'visually-hidden');
+     closeBtnText.innerText = Drupal.t('Close message');
+     messageContainer.appendChild(closeBtnWrapper);
+     closeBtnWrapper.appendChild(closeBtn);
+@@ -31,7 +31,7 @@
+         id = _ref2.id;
+     var messagesTypes = Drupal.Message.getMessageTypeLabels();
+     var messageWrapper = document.createElement('div');
+-    messageWrapper.setAttribute('class', "messages-list__item messages messages--".concat(type, " messages-processed"));
++    messageWrapper.setAttribute('data-messages-list__item messages messages--', "messages-list__item messages messages--".concat(type, " messages-processed"));
+     messageWrapper.setAttribute('role', type === 'error' || type === 'warning' ? 'alert' : 'status');
+     messageWrapper.setAttribute('aria-labelledby', "".concat(id, "-title"));
+     messageWrapper.setAttribute('data-drupal-message-id', id);
