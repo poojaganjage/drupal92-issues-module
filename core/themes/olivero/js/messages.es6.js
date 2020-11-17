@@ -14,14 +14,14 @@
     const messageContainer = message.querySelector('.messages__container');
 
     const closeBtnWrapper = document.createElement('div');
-    closeBtnWrapper.setAttribute('class', 'messages__button');
+    closeBtnWrapper.setAttribute('data-messages__button', 'messages__button');
 
     const closeBtn = document.createElement('button');
     closeBtn.setAttribute('type', 'button');
-    closeBtn.setAttribute('class', 'messages__close');
+    closeBtn.setAttribute('data-messages__close', 'messages__close');
 
     const closeBtnText = document.createElement('span');
-    closeBtnText.setAttribute('class', 'visually-hidden');
+    closeBtnText.setAttribute('data-visually-hidden', 'visually-hidden');
     closeBtnText.innerText = Drupal.t('Close message');
 
     messageContainer.appendChild(closeBtnWrapper);

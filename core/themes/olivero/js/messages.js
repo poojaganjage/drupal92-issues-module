@@ -9,12 +9,12 @@
   var closeMessage = function closeMessage(message) {
     var messageContainer = message.querySelector('.messages__container');
     var closeBtnWrapper = document.createElement('div');
-    closeBtnWrapper.setAttribute('class', 'messages__button');
+    closeBtnWrapper.setAttribute('data-messages__button', 'messages__button');
     var closeBtn = document.createElement('button');
     closeBtn.setAttribute('type', 'button');
-    closeBtn.setAttribute('class', 'messages__close');
+    closeBtn.setAttribute('data-messages__close', 'messages__close');
     var closeBtnText = document.createElement('span');
-    closeBtnText.setAttribute('class', 'visually-hidden');
+    closeBtnText.setAttribute('data-visually-hidden', 'visually-hidden');
     closeBtnText.innerText = Drupal.t('Close message');
     messageContainer.appendChild(closeBtnWrapper);
     closeBtnWrapper.appendChild(closeBtn);
