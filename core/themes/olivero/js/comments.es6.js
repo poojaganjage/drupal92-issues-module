@@ -17,12 +17,12 @@
 
   indentedComments.forEach((commentGroup) => {
     const showHideWrapper = document.createElement('div');
-    showHideWrapper.setAttribute('data-show-hide-wrapper', 'show-hide-wrapper');
+    showHideWrapper.setAttribute('class', 'show-hide-wrapper');
 
     const toggleCommentsBtn = document.createElement('button');
     toggleCommentsBtn.setAttribute('type', 'button');
     toggleCommentsBtn.setAttribute('aria-expanded', 'true');
-    toggleCommentsBtn.setAttribute('data-show-hide-btn', 'show-hide-btn');
+    toggleCommentsBtn.setAttribute('class', 'show-hide-btn');
     toggleCommentsBtn.innerText = Drupal.t('Replies');
 
     commentGroup.parentNode.insertBefore(showHideWrapper, commentGroup);
