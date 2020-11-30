@@ -294,9 +294,8 @@ class ForumController extends ControllerBase {
       if ($this->nodeAccess->createAccess($type)) {
         $node_type = $this->nodeTypeStorage->load($type);
         $links[$type] = [
+          '#attributes' => ['class' => ['action-links']],
           '#theme' => 'menu_local_action',
-          '#prefix' => '<ul class="action-links">',
-          '#suffix' => '</ul>',
           '#link' => [
             'title' => $this->t('Add new @node_type', [
               '@node_type' => $this->nodeTypeStorage->load($type)->label(),
@@ -324,19 +323,14 @@ class ForumController extends ControllerBase {
       // Anonymous user does not have access to create new topics.
       else {
         $links['login'] = [
+          '#attributes' => ['class' => ['action-links']],
           '#theme' => 'menu_local_action',
-          '#prefix' => '<ul class="action-links">',
-          '#suffix' => '</ul>',
           '#link' => [
             'title' => $this->t('Log in to post new content in the forum.'),
             'url' => Url::fromRoute('user.login', [], ['query' => $this->getDestinationArray()]),
           ],
         ];
       }
-    }
-    else {
-      $links['#prefix'] = '<ul class="action-links">';
-      $links['#suffix'] = '</ul>';
     }
     return $links;
   }
