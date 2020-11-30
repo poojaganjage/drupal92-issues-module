@@ -11,6 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\KernelEvents;
 
@@ -28,7 +29,8 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
   /**
    * The event dispatcher service.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $dispatcher;
 
@@ -48,12 +50,16 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
    *   The plugin ID for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $dispatcher
    *   The tempstore factory.
    * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $url_assembler
    *   The unrouted URL assembler service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $dispatcher, UnroutedUrlAssemblerInterface $url_assembler) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, $dispatcher, UnroutedUrlAssemblerInterface $url_assembler) {
+    if (!$dispatcher instanceof EventDispatcherInterface && !$dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->dispatcher = $dispatcher;

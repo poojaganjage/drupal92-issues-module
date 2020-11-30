@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\FieldableEntityStorageInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 /**
  * Reacts to field storage definition CRUD on behalf of the Entity system.
@@ -25,7 +26,8 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -55,7 +57,8 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
@@ -64,7 +67,10 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
    * @param \Drupal\Core\Field\DeletedFieldsRepositoryInterface $deleted_fields_repository
    *   The deleted fields repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository) {
+    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     $this->entityTypeManager = $entity_type_manager;
     $this->eventDispatcher = $event_dispatcher;
     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;

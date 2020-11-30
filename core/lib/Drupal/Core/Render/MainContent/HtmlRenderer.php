@@ -17,6 +17,7 @@ use Drupal\Core\Render\RenderEvents;
 use Drupal\Core\Routing\RouteMatchInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -48,7 +49,8 @@ class HtmlRenderer implements MainContentRendererInterface {
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
   /**
@@ -95,7 +97,8 @@ class HtmlRenderer implements MainContentRendererInterface {
    *   The title resolver.
    * @param \Drupal\Component\Plugin\PluginManagerInterface $display_variant_manager
    *   The display variant manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
@@ -108,7 +111,10 @@ class HtmlRenderer implements MainContentRendererInterface {
    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
    *   The theme manager.
    */
-  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager = NULL) {
+  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager = NULL) {
+    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     $this->titleResolver = $title_resolver;
     $this->displayVariantManager = $display_variant_manager;
     $this->eventDispatcher = $event_dispatcher;

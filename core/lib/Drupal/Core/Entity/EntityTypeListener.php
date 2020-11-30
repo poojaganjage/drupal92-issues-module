@@ -3,6 +3,7 @@
 namespace Drupal\Core\Entity;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 /**
  * Reacts to entity type CRUD on behalf of the Entity system.
@@ -28,7 +29,8 @@ class EntityTypeListener implements EntityTypeListenerInterface {
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -46,12 +48,16 @@ class EntityTypeListener implements EntityTypeListenerInterface {
    *   The entity type manager.
    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
    *   The entity field manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
    *   The entity last installed schema repository.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
+    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->eventDispatcher = $event_dispatcher;

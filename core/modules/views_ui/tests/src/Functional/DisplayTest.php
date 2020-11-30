@@ -21,7 +21,7 @@ class DisplayTest extends UITestBase {
   public static $testViews = ['test_display'];
 
   /**
-   * Modules to enable
+   * Modules to enable.
    *
    * @var array
    */
@@ -36,7 +36,7 @@ class DisplayTest extends UITestBase {
    * Tests adding a display.
    */
   public function testAddDisplay() {
-    $view = $this->randomView();
+    $this->randomView();
     $this->assertNoText('Block');
     $this->assertNoText('Block 2');
 
@@ -153,7 +153,7 @@ class DisplayTest extends UITestBase {
     $path = 'admin/structure/views/view/test_display/edit/block_1';
     $link_display_path = 'admin/structure/views/nojs/display/test_display/block_1/link_display';
 
-    // Test the link text displays 'None' and not 'Block 1'
+    // Test the link text displays 'None' and not 'Block 1'.
     $this->drupalGet($path);
     $result = $this->xpath("//a[contains(@href, :path)]", [':path' => $link_display_path]);
     $this->assertEqual($result[0]->getHtml(), t('None'), 'Make sure that the link option summary shows "None" by default.');
@@ -166,17 +166,19 @@ class DisplayTest extends UITestBase {
     // The form redirects to the master display.
     $this->drupalGet($path);
 
-    $result = $this->xpath("//a[contains(@href, :path)]", [':path' => $link_display_path]);
+    $result = $this->xpath("//a[contains(@href, :path)]", [
+      ':path' => $link_display_path,
+    ]);
     $this->assertEqual($result[0]->getHtml(), 'Page', 'Make sure that the link option summary shows the right linked display.');
 
-    $this->drupalPostForm($link_display_path, ['link_display' => 'custom_url', 'link_url' => 'a-custom-url'], t('Apply'));
+    $this->drupalPostForm($link_display_path, ['link_display' => 'custom_url', 'link_url' => 'a-custom-url'], 'Apply');
     // The form redirects to the master display.
     $this->drupalGet($path);
 
     $this->assertSession()->linkExists('Custom URL', 0, 'The link option has custom URL as summary.');
 
-    // Test the default link_url value for new display
-    $this->drupalPostForm(NULL, [], t('Add Block'));
+    // Test the default link_url value for new display.
+    $this->submitForm([], 'Add Block');
     $this->assertSession()->addressEquals('admin/structure/views/view/test_display/edit/block_2');
     $this->clickLink(t('Custom URL'));
     $this->assertSession()->fieldValueEquals('link_url', 'a-custom-url');
@@ -191,14 +193,20 @@ class DisplayTest extends UITestBase {
 
     // The view should initially have the enabled class on its form wrapper.
     $this->drupalGet('admin/structure/views/view/' . $id);
-    $elements = $this->xpath('//div[contains(@class, :edit) and contains(@class, :status)]', [':edit' => 'views-edit-view', ':status' => 'enabled']);
+    $elements = $this->xpath('//div[contains(@class, :edit) and contains(@class, :status)]', [
+      ':edit' => 'views-edit-view',
+      ':status' => 'enabled',
+    ]);
     $this->assertNotEmpty($elements, 'The enabled class was found on the form wrapper');
 
     $view = Views::getView($id);
     $view->storage->disable()->save();
 
     $this->drupalGet('admin/structure/views/view/' . $id);
-    $elements = $this->xpath('//div[contains(@class, :edit) and contains(@class, :status)]', [':edit' => 'views-edit-view', ':status' => 'disabled']);
+    $elements = $this->xpath('//div[contains(@class, :edit) and contains(@class, :status)]', [
+      ':edit' => 'views-edit-view',
+      ':status' => 'disabled',
+    ]);
     $this->assertNotEmpty($elements, 'The disabled class was found on the form wrapper.');
   }
 

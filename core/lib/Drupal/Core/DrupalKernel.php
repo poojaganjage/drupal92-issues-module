@@ -496,7 +496,6 @@ class DrupalKernel implements DrupalKernelInterface, TerminableInterface {
         // @see \Drupal\Core\Extension\ModuleInstaller::install()
       }
       stream_wrapper_unregister('phar');
-      stream_wrapper_register('phar', PharStreamWrapper::class);
     }
 
     $this->booted = TRUE;

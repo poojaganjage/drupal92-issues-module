@@ -5,6 +5,7 @@ namespace Drupal\Core\Config;
 use Drupal\Core\Database\Connection;
 use Drupal\Core\Lock\LockBackendInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 /**
  * The import storage transformer helps to use the configuration management api.
@@ -26,7 +27,8 @@ final class ImportStorageTransformer {
   /**
    * The event dispatcher to get changes to the configuration.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -56,7 +58,8 @@ final class ImportStorageTransformer {
   /**
    * ImportStorageTransformer constructor.
    *
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param \Drupal\Core\Database\Connection $connection
    *   The database connection.
@@ -65,7 +68,10 @@ final class ImportStorageTransformer {
    * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
    *   The persistent lock used by the config importer.
    */
-  public function __construct(EventDispatcherInterface $event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
+  public function __construct($event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
+    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     $this->eventDispatcher = $event_dispatcher;
     $this->connection = $connection;
     $this->requestLock = $requestLock;

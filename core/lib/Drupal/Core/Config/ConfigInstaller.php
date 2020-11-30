@@ -6,6 +6,7 @@ use Drupal\Component\Utility\Crypt;
 use Drupal\Core\Config\Entity\ConfigDependencyManager;
 use Drupal\Core\Installer\InstallerKernel;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 class ConfigInstaller implements ConfigInstallerInterface {
 
@@ -40,7 +41,8 @@ class ConfigInstaller implements ConfigInstallerInterface {
   /**
    * The event dispatcher.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $eventDispatcher;
 
@@ -76,12 +78,16 @@ class ConfigInstaller implements ConfigInstallerInterface {
    *   The typed configuration manager.
    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
    *   The configuration manager.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
    *   The event dispatcher.
    * @param string $install_profile
    *   The name of the currently active installation profile.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, EventDispatcherInterface $event_dispatcher, $install_profile) {
+  public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, $event_dispatcher, $install_profile) {
+    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     $this->configFactory = $config_factory;
     $this->activeStorages[$active_storage->getCollectionName()] = $active_storage;
     $this->typedConfig = $typed_config;

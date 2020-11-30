@@ -1,0 +1,12 @@
+diff --git a/core/lib/Drupal/Core/DrupalKernel.php b/core/lib/Drupal/Core/DrupalKernel.php
+index a19197f..c7ef494 100644
+--- a/core/lib/Drupal/Core/DrupalKernel.php
++++ b/core/lib/Drupal/Core/DrupalKernel.php
+@@ -496,7 +496,6 @@ public function boot() {
+         // @see \Drupal\Core\Extension\ModuleInstaller::install()
+       }
+       stream_wrapper_unregister('phar');
+-      stream_wrapper_register('phar', PharStreamWrapper::class);
+     }
+ 
+     $this->booted = TRUE;

@@ -1,0 +1,20 @@
+diff --git a/core/modules/views_ui/tests/src/Functional/FieldUITest.php b/core/modules/views_ui/tests/src/Functional/FieldUITest.php
+index 4183deb..4de0524 100644
+--- a/core/modules/views_ui/tests/src/Functional/FieldUITest.php
++++ b/core/modules/views_ui/tests/src/Functional/FieldUITest.php
+@@ -32,13 +32,13 @@ public function testFieldUI() {
+     // Ensure the field is not marked as hidden on the first run.
+     $this->drupalGet('admin/structure/views/view/test_view/edit');
+     $this->assertText('Views test: Name');
+-    $this->assertNoText('Views test: Name [' . t('hidden') . ']');
++    $this->assertNoText('Views test: Name [' . 'hidden' . ']');
+ 
+     // Hides the field and check whether the hidden label is appended.
+     $edit_handler_url = 'admin/structure/views/nojs/handler/test_view/default/field/name';
+     $this->drupalPostForm($edit_handler_url, ['options[exclude]' => TRUE], t('Apply'));
+ 
+-    $this->assertText('Views test: Name [' . t('hidden') . ']');
++    $this->assertText('Views test: Name [' . 'hidden' . ']');
+ 
+     // Ensure that the expected tokens appear in the UI.
+     $edit_handler_url = 'admin/structure/views/nojs/handler/test_view/default/field/age';

@@ -10,6 +10,7 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\DestructableInterface;
 use Drupal\Component\EventDispatcher\Event;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Route;
 
@@ -35,7 +36,8 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
   /**
    * The event dispatcher to notify of routes.
    *
-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
+   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected $dispatcher;
 
@@ -88,7 +90,8 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
    *   The matcher dumper used to store the route information.
    * @param \Drupal\Core\Lock\LockBackendInterface $lock
    *   The lock backend.
-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
+   *   EventDispatcher\EventDispatcherInterface $dispatcher
    *   The event dispatcher to notify of routes.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
@@ -98,6 +101,9 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
    *   The check provider.
    */
   public function __construct(MatcherDumperInterface $dumper, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, ModuleHandlerInterface $module_handler, ControllerResolverInterface $controller_resolver, CheckProviderInterface $check_provider) {
+    if (!$dispatcher instanceof EventDispatcherInterface && !$dispatcher instanceof ContractsEventDispatcherInterface) {
+      throw new \InvalidArgumentException('$dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
+    }
     $this->dumper = $dumper;
     $this->lock = $lock;
     $this->dispatcher = $dispatcher;

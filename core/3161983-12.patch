@@ -1,0 +1,341 @@
+diff --git a/core/lib/Drupal/Core/Action/Plugin/Action/GotoAction.php b/core/lib/Drupal/Core/Action/Plugin/Action/GotoAction.php
+index b19a3d9..bb7c981 100644
+--- a/core/lib/Drupal/Core/Action/Plugin/Action/GotoAction.php
++++ b/core/lib/Drupal/Core/Action/Plugin/Action/GotoAction.php
+@@ -11,6 +11,7 @@
+ use Drupal\Core\Utility\UnroutedUrlAssemblerInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ use Symfony\Component\HttpFoundation\RedirectResponse;
+ use Symfony\Component\HttpKernel\KernelEvents;
+ 
+@@ -28,7 +29,8 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
+   /**
+    * The event dispatcher service.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $dispatcher;
+ 
+@@ -48,12 +50,16 @@ class GotoAction extends ConfigurableActionBase implements ContainerFactoryPlugi
+    *   The plugin ID for the plugin instance.
+    * @param mixed $plugin_definition
+    *   The plugin implementation definition.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $dispatcher
+    *   The tempstore factory.
+    * @param \Drupal\Core\Utility\UnroutedUrlAssemblerInterface $url_assembler
+    *   The unrouted URL assembler service.
+    */
+-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $dispatcher, UnroutedUrlAssemblerInterface $url_assembler) {
++  public function __construct(array $configuration, $plugin_id, $plugin_definition, $dispatcher, UnroutedUrlAssemblerInterface $url_assembler) {
++    if (!$dispatcher instanceof EventDispatcherInterface && !$dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     parent::__construct($configuration, $plugin_id, $plugin_definition);
+ 
+     $this->dispatcher = $dispatcher;
+diff --git a/core/lib/Drupal/Core/Config/ConfigInstaller.php b/core/lib/Drupal/Core/Config/ConfigInstaller.php
+index 235a7c1..6cf2d63 100644
+--- a/core/lib/Drupal/Core/Config/ConfigInstaller.php
++++ b/core/lib/Drupal/Core/Config/ConfigInstaller.php
+@@ -6,6 +6,7 @@
+ use Drupal\Core\Config\Entity\ConfigDependencyManager;
+ use Drupal\Core\Installer\InstallerKernel;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ 
+ class ConfigInstaller implements ConfigInstallerInterface {
+ 
+@@ -40,7 +41,8 @@ class ConfigInstaller implements ConfigInstallerInterface {
+   /**
+    * The event dispatcher.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $eventDispatcher;
+ 
+@@ -76,12 +78,16 @@ class ConfigInstaller implements ConfigInstallerInterface {
+    *   The typed configuration manager.
+    * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
+    *   The configuration manager.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
+    *   The event dispatcher.
+    * @param string $install_profile
+    *   The name of the currently active installation profile.
+    */
+-  public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, EventDispatcherInterface $event_dispatcher, $install_profile) {
++  public function __construct(ConfigFactoryInterface $config_factory, StorageInterface $active_storage, TypedConfigManagerInterface $typed_config, ConfigManagerInterface $config_manager, $event_dispatcher, $install_profile) {
++    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->configFactory = $config_factory;
+     $this->activeStorages[$active_storage->getCollectionName()] = $active_storage;
+     $this->typedConfig = $typed_config;
+diff --git a/core/lib/Drupal/Core/Config/ImportStorageTransformer.php b/core/lib/Drupal/Core/Config/ImportStorageTransformer.php
+index fcd5a12..5b70f21 100644
+--- a/core/lib/Drupal/Core/Config/ImportStorageTransformer.php
++++ b/core/lib/Drupal/Core/Config/ImportStorageTransformer.php
+@@ -5,6 +5,7 @@
+ use Drupal\Core\Database\Connection;
+ use Drupal\Core\Lock\LockBackendInterface;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ 
+ /**
+  * The import storage transformer helps to use the configuration management api.
+@@ -26,7 +27,8 @@ final class ImportStorageTransformer {
+   /**
+    * The event dispatcher to get changes to the configuration.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $eventDispatcher;
+ 
+@@ -56,7 +58,8 @@ final class ImportStorageTransformer {
+   /**
+    * ImportStorageTransformer constructor.
+    *
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
+    *   The event dispatcher.
+    * @param \Drupal\Core\Database\Connection $connection
+    *   The database connection.
+@@ -65,7 +68,10 @@ final class ImportStorageTransformer {
+    * @param \Drupal\Core\Lock\LockBackendInterface $persistentLock
+    *   The persistent lock used by the config importer.
+    */
+-  public function __construct(EventDispatcherInterface $event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
++  public function __construct($event_dispatcher, Connection $connection, LockBackendInterface $requestLock, LockBackendInterface $persistentLock) {
++    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->eventDispatcher = $event_dispatcher;
+     $this->connection = $connection;
+     $this->requestLock = $requestLock;
+diff --git a/core/lib/Drupal/Core/Entity/EntityTypeListener.php b/core/lib/Drupal/Core/Entity/EntityTypeListener.php
+index 32e7f47..6bd8e1f 100644
+--- a/core/lib/Drupal/Core/Entity/EntityTypeListener.php
++++ b/core/lib/Drupal/Core/Entity/EntityTypeListener.php
+@@ -3,6 +3,7 @@
+ namespace Drupal\Core\Entity;
+ 
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ 
+ /**
+  * Reacts to entity type CRUD on behalf of the Entity system.
+@@ -28,7 +29,8 @@ class EntityTypeListener implements EntityTypeListenerInterface {
+   /**
+    * The event dispatcher.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $eventDispatcher;
+ 
+@@ -46,12 +48,16 @@ class EntityTypeListener implements EntityTypeListenerInterface {
+    *   The entity type manager.
+    * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
+    *   The entity field manager.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
+    *   The event dispatcher.
+    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
+    *   The entity last installed schema repository.
+    */
+-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
++  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
++    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->entityTypeManager = $entity_type_manager;
+     $this->entityFieldManager = $entity_field_manager;
+     $this->eventDispatcher = $event_dispatcher;
+diff --git a/core/lib/Drupal/Core/Field/FieldStorageDefinitionListener.php b/core/lib/Drupal/Core/Field/FieldStorageDefinitionListener.php
+index 8e52ec6..1fd3efa 100644
+--- a/core/lib/Drupal/Core/Field/FieldStorageDefinitionListener.php
++++ b/core/lib/Drupal/Core/Field/FieldStorageDefinitionListener.php
+@@ -7,6 +7,7 @@
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
+ use Drupal\Core\Entity\FieldableEntityStorageInterface;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ 
+ /**
+  * Reacts to field storage definition CRUD on behalf of the Entity system.
+@@ -25,7 +26,8 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
+   /**
+    * The event dispatcher.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $eventDispatcher;
+ 
+@@ -55,7 +57,8 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
+    *
+    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+    *   The entity type manager.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
+    *   The event dispatcher.
+    * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
+    *   The entity last installed schema repository.
+@@ -64,7 +67,10 @@ class FieldStorageDefinitionListener implements FieldStorageDefinitionListenerIn
+    * @param \Drupal\Core\Field\DeletedFieldsRepositoryInterface $deleted_fields_repository
+    *   The deleted fields repository.
+    */
+-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EventDispatcherInterface $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository) {
++  public function __construct(EntityTypeManagerInterface $entity_type_manager, $event_dispatcher, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository, EntityFieldManagerInterface $entity_field_manager, DeletedFieldsRepositoryInterface $deleted_fields_repository) {
++    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->entityTypeManager = $entity_type_manager;
+     $this->eventDispatcher = $event_dispatcher;
+     $this->entityLastInstalledSchemaRepository = $entity_last_installed_schema_repository;
+diff --git a/core/lib/Drupal/Core/Form/FormBuilder.php b/core/lib/Drupal/Core/Form/FormBuilder.php
+index cc680fa..d3179ee 100644
+--- a/core/lib/Drupal/Core/Form/FormBuilder.php
++++ b/core/lib/Drupal/Core/Form/FormBuilder.php
+@@ -18,6 +18,7 @@
+ use Drupal\Core\Security\TrustedCallbackInterface;
+ use Drupal\Core\Theme\ThemeManagerInterface;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ use Symfony\Component\HttpFoundation\FileBag;
+ use Symfony\Component\HttpFoundation\ParameterBag;
+ use Symfony\Component\HttpFoundation\RequestStack;
+@@ -40,7 +41,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
+   /**
+    * The event dispatcher.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $eventDispatcher;
+ 
+@@ -157,7 +159,8 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
+    *   The form cache.
+    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+    *   The module handler.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
+    *   The event dispatcher.
+    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
+    *   The request stack.
+@@ -170,7 +173,10 @@ class FormBuilder implements FormBuilderInterface, FormValidatorInterface, FormS
+    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrf_token
+    *   The CSRF token generator.
+    */
+-  public function __construct(FormValidatorInterface $form_validator, FormSubmitterInterface $form_submitter, FormCacheInterface $form_cache, ModuleHandlerInterface $module_handler, EventDispatcherInterface $event_dispatcher, RequestStack $request_stack, ClassResolverInterface $class_resolver, ElementInfoManagerInterface $element_info, ThemeManagerInterface $theme_manager, CsrfTokenGenerator $csrf_token = NULL) {
++  public function __construct(FormValidatorInterface $form_validator, FormSubmitterInterface $form_submitter, FormCacheInterface $form_cache, ModuleHandlerInterface $module_handler, $event_dispatcher, RequestStack $request_stack, ClassResolverInterface $class_resolver, ElementInfoManagerInterface $element_info, ThemeManagerInterface $theme_manager, CsrfTokenGenerator $csrf_token = NULL) {
++    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->formValidator = $form_validator;
+     $this->formSubmitter = $form_submitter;
+     $this->formCache = $form_cache;
+diff --git a/core/lib/Drupal/Core/Render/MainContent/HtmlRenderer.php b/core/lib/Drupal/Core/Render/MainContent/HtmlRenderer.php
+index 66af0a8..de3666c 100644
+--- a/core/lib/Drupal/Core/Render/MainContent/HtmlRenderer.php
++++ b/core/lib/Drupal/Core/Render/MainContent/HtmlRenderer.php
+@@ -17,6 +17,7 @@
+ use Drupal\Core\Routing\RouteMatchInterface;
+ use Drupal\Core\Theme\ThemeManagerInterface;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ use Symfony\Component\HttpFoundation\Request;
+ 
+ /**
+@@ -48,7 +49,8 @@ class HtmlRenderer implements MainContentRendererInterface {
+   /**
+    * The event dispatcher.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $eventDispatcher;
+   /**
+@@ -95,7 +97,8 @@ class HtmlRenderer implements MainContentRendererInterface {
+    *   The title resolver.
+    * @param \Drupal\Component\Plugin\PluginManagerInterface $display_variant_manager
+    *   The display variant manager.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $event_dispatcher
+    *   The event dispatcher.
+    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+    *   The module handler.
+@@ -108,7 +111,10 @@ class HtmlRenderer implements MainContentRendererInterface {
+    * @param \Drupal\Core\Theme\ThemeManagerInterface $theme_manager
+    *   The theme manager.
+    */
+-  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, EventDispatcherInterface $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager = NULL) {
++  public function __construct(TitleResolverInterface $title_resolver, PluginManagerInterface $display_variant_manager, $event_dispatcher, ModuleHandlerInterface $module_handler, RendererInterface $renderer, RenderCacheInterface $render_cache, array $renderer_config, ThemeManagerInterface $theme_manager = NULL) {
++    if (!$event_dispatcher instanceof EventDispatcherInterface && !$event_dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$event_dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->titleResolver = $title_resolver;
+     $this->displayVariantManager = $display_variant_manager;
+     $this->eventDispatcher = $event_dispatcher;
+diff --git a/core/lib/Drupal/Core/Routing/RouteBuilder.php b/core/lib/Drupal/Core/Routing/RouteBuilder.php
+index b0f785f..5432615 100644
+--- a/core/lib/Drupal/Core/Routing/RouteBuilder.php
++++ b/core/lib/Drupal/Core/Routing/RouteBuilder.php
+@@ -10,6 +10,7 @@
+ use Drupal\Core\DestructableInterface;
+ use Drupal\Component\EventDispatcher\Event;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
++use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
+ use Symfony\Component\Routing\RouteCollection;
+ use Symfony\Component\Routing\Route;
+ 
+@@ -35,7 +36,8 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
+   /**
+    * The event dispatcher to notify of routes.
+    *
+-   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
++   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface|
++   * \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+    */
+   protected $dispatcher;
+ 
+@@ -88,7 +90,8 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
+    *   The matcher dumper used to store the route information.
+    * @param \Drupal\Core\Lock\LockBackendInterface $lock
+    *   The lock backend.
+-   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
++   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface|\Symfony\Contracts\
++   *   EventDispatcher\EventDispatcherInterface $dispatcher
+    *   The event dispatcher to notify of routes.
+    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+    *   The module handler.
+@@ -98,6 +101,9 @@ class RouteBuilder implements RouteBuilderInterface, DestructableInterface {
+    *   The check provider.
+    */
+   public function __construct(MatcherDumperInterface $dumper, LockBackendInterface $lock, EventDispatcherInterface $dispatcher, ModuleHandlerInterface $module_handler, ControllerResolverInterface $controller_resolver, CheckProviderInterface $check_provider) {
++    if (!$dispatcher instanceof EventDispatcherInterface && !$dispatcher instanceof ContractsEventDispatcherInterface) {
++      throw new \InvalidArgumentException('$dispatcher must be an instance of ' . ContractsEventDispatcherInterface::class . ' or ' . EventDispatcherInterface::class);
++    }
+     $this->dumper = $dumper;
+     $this->lock = $lock;
+     $this->dispatcher = $dispatcher;
