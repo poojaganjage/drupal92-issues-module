@@ -18,7 +18,7 @@ use Drupal\views\ViewExecutable;
  * include the same methods.
  *
  * @see \Drupal\Tests\views\Kernel\ViewsKernelTestBase
- * @see \Drupal\Tests\BrowserTestBase
+ * @see \Drupal\simpletest\WebTestBase
  */
 abstract class ViewTestBase extends BrowserTestBase {
 

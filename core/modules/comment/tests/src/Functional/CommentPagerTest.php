@@ -422,7 +422,7 @@ class CommentPagerTest extends CommentTestBase {
    * @return string|false
    *   Page contents on success, or FALSE on failure.
    *
-   * @see BrowserTestBase::clickLink()
+   * @see WebTestBase::clickLink()
    */
   protected function clickLinkWithXPath($xpath, $arguments = [], $index = 0) {
     $url_before = $this->getUrl();

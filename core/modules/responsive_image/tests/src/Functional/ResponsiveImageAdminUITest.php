@@ -28,7 +28,7 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
   protected $defaultTheme = 'stark';
 
   /**
-   * \Drupal\Tests\BrowserTestBase::setUp().
+   * Drupal\simpletest\WebTestBase\setUp().
    */
   protected function setUp(): void {
     parent::setUp();

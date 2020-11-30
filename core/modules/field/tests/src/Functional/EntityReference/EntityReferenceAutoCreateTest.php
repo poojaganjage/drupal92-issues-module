@@ -220,6 +220,8 @@ class EntityReferenceAutoCreateTest extends BrowserTestBase {
     // The second term is expected to be stored in the first vocabulary.
     $this->assertEqual($vocabularies[0]->id(), $term->bundle());
 
+    // @todo Re-enable this test when WebTestBase::curlHeaderCallback() provides
+    //   a way to catch and assert user-triggered errors.
     // Test the case when the field config settings are inconsistent.
     // unset($handler_settings['auto_create_bundle']);
     // $field_config->setSetting('handler_settings', $handler_settings);

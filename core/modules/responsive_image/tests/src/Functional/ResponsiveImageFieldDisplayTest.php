@@ -47,7 +47,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
   ];
 
   /**
-   * \Drupal\Tests\BrowserTestBase::setUp().
+   * Drupal\simpletest\WebTestBase\setUp().
    */
   protected function setUp(): void {
     parent::setUp();
