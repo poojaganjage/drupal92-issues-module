@@ -1,0 +1,40 @@
+diff --git a/core/modules/forum/src/Controller/ForumController.php b/core/modules/forum/src/Controller/ForumController.php
+index 347013b..f3722e5 100644
+--- a/core/modules/forum/src/Controller/ForumController.php
++++ b/core/modules/forum/src/Controller/ForumController.php
+@@ -294,7 +294,6 @@ protected function buildActionLinks($vid, TermInterface $forum_term = NULL) {
+       if ($this->nodeAccess->createAccess($type)) {
+         $node_type = $this->nodeTypeStorage->load($type);
+         $links[$type] = [
+-          '#attributes' => ['class' => ['action-links']],
+           '#theme' => 'menu_local_action',
+           '#link' => [
+             'title' => $this->t('Add new @node_type', [
+@@ -323,15 +322,26 @@ protected function buildActionLinks($vid, TermInterface $forum_term = NULL) {
+       // Anonymous user does not have access to create new topics.
+       else {
+         $links['login'] = [
+-          '#attributes' => ['class' => ['action-links']],
+           '#theme' => 'menu_local_action',
+           '#link' => [
+             'title' => $this->t('Log in to post new content in the forum.'),
+             'url' => Url::fromRoute('user.login', [], ['query' => $this->getDestinationArray()]),
+           ],
++          // Without this workaround, the action links will be rendered as <li>
++          // with no wrapping <ul> element.
++          // @todo Find a better way for this in https://www.drupal.org/node/3181052.
++          '#prefix' => '<ul class="action-links">',
++          '#suffix' => '</ul>',
+         ];
+       }
+     }
++    else {
++      // Without this workaround, the action links will be rendered as <li> with
++      // no wrapping <ul> element.
++      // @todo Find a better way for this in https://www.drupal.org/node/3181052.
++      $links['#prefix'] = '<ul class="action-links">';
++      $links['#suffix'] = '</ul>';
++    }
+     return $links;
+   }
+ 
