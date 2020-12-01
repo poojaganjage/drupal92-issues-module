@@ -124,14 +124,14 @@ trait TestSetupTrait {
    *
    * The generated database table prefix is used for the Drupal installation
    * being performed for the test. It is also used as user agent HTTP header
-   * value by the cURL-based browser of WebTestBase, which is sent to the Drupal
-   * installation of the test. During early Drupal bootstrap, the user agent
+   * it is also used in the user agent HTTP header value by BrowserTestBase,
+   * which is sent to the Drupal installation of the test.
+   * During early Drupal bootstrap, the user agent
    * HTTP header is parsed, and if it matches, all database queries use the
    * database table prefix that has been generated here.
    *
    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
-   * @see \Drupal\simpletest\WebTestBase::curlInitialize()
-   * @see \Drupal\simpletest\TestBase::prepareEnvironment()
+   * @see \Drupal\Core\Test\FunctionalTestSetupTrait::prepareEnvironment()
    * @see drupal_valid_test_ua()
    */
   protected function prepareDatabasePrefix() {

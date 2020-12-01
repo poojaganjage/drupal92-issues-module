@@ -50,7 +50,7 @@ class EntityOperationsTest extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function createRole(array $permissions, $rid = NULL, $name = NULL, $weight = NULL) {
-    // WebTestBase::drupalCreateRole() by default uses random strings which may
+    // The parent method uses random strings by default, which may
     // include HTML entities for the entity label. Since in this test the entity
     // label is used to generate a link, and AssertContentTrait::assertLink() is
     // not designed to deal with links potentially containing HTML entities this

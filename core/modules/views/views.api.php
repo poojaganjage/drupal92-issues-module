@@ -844,8 +844,8 @@ function hook_views_pre_render(ViewExecutable $view) {
  *
  * @param \Drupal\views\ViewExecutable $view
  *   The view object about to be processed.
- * @param string $output
- *   A flat string with the rendered output of the view.
+ * @param array $output
+ *   An array of renderable arrays containing the output of the view.
  * @param \Drupal\views\Plugin\views\cache\CachePluginBase $cache
  *   The cache settings.
  *

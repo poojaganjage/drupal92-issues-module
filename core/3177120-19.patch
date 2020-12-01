@@ -1,0 +1,369 @@
+diff --git a/core/lib/Drupal/Core/Config/Development/ConfigSchemaChecker.php b/core/lib/Drupal/Core/Config/Development/ConfigSchemaChecker.php
+index 6963d26..acd39b4 100644
+--- a/core/lib/Drupal/Core/Config/Development/ConfigSchemaChecker.php
++++ b/core/lib/Drupal/Core/Config/Development/ConfigSchemaChecker.php
+@@ -20,9 +20,7 @@
+  * is invalid.
+  *
+  * @see \Drupal\KernelTests\KernelTestBase::register()
+- * @see \Drupal\simpletest\WebTestBase::setUp()
+- * @see \Drupal\simpletest\KernelTestBase::containerBuild()
+- * @see \Drupal\Tests\BrowserTestBase::setUp()
++ * @see \Drupal\Core\Test\FunctionalTestSetupTrait::prepareSettings()
+  */
+ class ConfigSchemaChecker implements EventSubscriberInterface {
+   use SchemaCheckTrait;
+diff --git a/core/lib/Drupal/Core/Extension/ExtensionDiscovery.php b/core/lib/Drupal/Core/Extension/ExtensionDiscovery.php
+index 39536f6..7abe67e 100644
+--- a/core/lib/Drupal/Core/Extension/ExtensionDiscovery.php
++++ b/core/lib/Drupal/Core/Extension/ExtensionDiscovery.php
+@@ -174,7 +174,7 @@ public function scan($type, $include_tests = NULL) {
+     // test site environment, because the site directories are not the same.
+     // Therefore, add the site directory of the parent site to the search paths,
+     // so that contained extensions are still discovered.
+-    // @see \Drupal\simpletest\WebTestBase::setUp()
++    // \Drupal\Core\Test\FunctionalTestSetupTrait::prepareSettings().
+     if ($parent_site = Settings::get('test_parent_site')) {
+       $searchdirs[static::ORIGIN_PARENT_SITE] = $parent_site;
+     }
+diff --git a/core/lib/Drupal/Core/StreamWrapper/StreamWrapperManager.php b/core/lib/Drupal/Core/StreamWrapper/StreamWrapperManager.php
+index d9de063..4799a37 100644
+--- a/core/lib/Drupal/Core/StreamWrapper/StreamWrapperManager.php
++++ b/core/lib/Drupal/Core/StreamWrapper/StreamWrapperManager.php
+@@ -174,7 +174,7 @@ public function register() {
+    */
+   public function unregister() {
+     // Normally, there are definitely wrappers set for the ALL filter. However,
+-    // in some cases involving many container rebuilds (e.g. WebTestBase),
++    // in some cases involving many container rebuilds (e.g. BrowserTestBase),
+     // $this->wrappers may be empty although wrappers are still registered
+     // globally. Thus an isset() check is needed before iterating.
+     if (isset($this->wrappers[StreamWrapperInterface::ALL])) {
+diff --git a/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php b/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php
+index 5728e62..7cd367b 100644
+--- a/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php
++++ b/core/lib/Drupal/Core/Test/FunctionalTestSetupTrait.php
+@@ -211,7 +211,7 @@ protected function rebuildContainer() {
+    *
+    * @see \Drupal\Core\Test\FunctionalTestSetupTrait::rebuildAll()
+    * @see \Drupal\Tests\BrowserTestBase::installDrupal()
+-   * @see \Drupal\simpletest\WebTestBase::setUp()
++   * @see \Drupal\Tests\BrowserTestBase::resetAll()
+    */
+   protected function resetAll() {
+     // Clear all database and static caches and rebuild data structures.
+diff --git a/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php b/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
+index f0e2ce2..275f8e4 100644
+--- a/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
++++ b/core/lib/Drupal/Core/Test/HttpClientMiddleware/TestHttpClientMiddleware.php
+@@ -37,8 +37,6 @@ public function __invoke() {
+             foreach ($headers as $header_name => $header_values) {
+               if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $header_name, $matches)) {
+                 foreach ($header_values as $header_value) {
+-                  // Call \Drupal\simpletest\WebTestBase::error() with the parameters from
+-                  // the header.
+                   $parameters = unserialize(urldecode($header_value));
+                   if (count($parameters) === 3) {
+                     if ($parameters[1] === 'User deprecated function') {
+diff --git a/core/lib/Drupal/Core/Test/TestSetupTrait.php b/core/lib/Drupal/Core/Test/TestSetupTrait.php
+index 08d1e09..dc9a0e1 100644
+--- a/core/lib/Drupal/Core/Test/TestSetupTrait.php
++++ b/core/lib/Drupal/Core/Test/TestSetupTrait.php
+@@ -124,14 +124,14 @@ public static function getDatabaseConnection() {
+    *
+    * The generated database table prefix is used for the Drupal installation
+    * being performed for the test. It is also used as user agent HTTP header
+-   * value by the cURL-based browser of WebTestBase, which is sent to the Drupal
+-   * installation of the test. During early Drupal bootstrap, the user agent
++   * it is also used in the user agent HTTP header value by BrowserTestBase,
++   * which is sent to the Drupal installation of the test.
++   * During early Drupal bootstrap, the user agent
+    * HTTP header is parsed, and if it matches, all database queries use the
+    * database table prefix that has been generated here.
+    *
+    * @see \Drupal\Tests\BrowserTestBase::prepareEnvironment()
+-   * @see \Drupal\simpletest\WebTestBase::curlInitialize()
+-   * @see \Drupal\simpletest\TestBase::prepareEnvironment()
++   * @see \Drupal\Core\Test\FunctionalTestSetupTrait::prepareEnvironment()
+    * @see drupal_valid_test_ua()
+    */
+   protected function prepareDatabasePrefix() {
+diff --git a/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php b/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php
+index c6ae925..08e7ac2 100644
+--- a/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php
++++ b/core/modules/big_pipe/tests/src/Functional/BigPipeTest.php
+@@ -50,8 +50,8 @@ protected function setUp(): void {
+     parent::setUp();
+ 
+     // Ignore the <meta> refresh that big_pipe.module sets. It causes a redirect
+-    // to a page that sets another cookie, which causes WebTestBase to lose the
+-    // session cookie. To avoid this problem, tests should first call
++    // to a page that sets another cookie, which causes BrowserTestBase to lose
++    // the session cookie. To avoid this problem, tests should first call
+     // drupalGet() and then call checkForMetaRefresh() manually, and then reset
+     // $this->maximumMetaRefreshCount and $this->metaRefreshCount.
+     // @see doMetaRefresh()
+diff --git a/core/modules/comment/tests/src/Functional/CommentPagerTest.php b/core/modules/comment/tests/src/Functional/CommentPagerTest.php
+index 7a8406f..58cf4f5 100644
+--- a/core/modules/comment/tests/src/Functional/CommentPagerTest.php
++++ b/core/modules/comment/tests/src/Functional/CommentPagerTest.php
+@@ -422,7 +422,7 @@ public function testTwoPagers() {
+    * @return string|false
+    *   Page contents on success, or FALSE on failure.
+    *
+-   * @see WebTestBase::clickLink()
++   * @see \Drupal\Tests\UiHelperTrait::clickLink()
+    */
+   protected function clickLinkWithXPath($xpath, $arguments = [], $index = 0) {
+     $url_before = $this->getUrl();
+diff --git a/core/modules/config/tests/config_test/src/SchemaListenerController.php b/core/modules/config/tests/config_test/src/SchemaListenerController.php
+index e028e1e..c6ad527 100644
+--- a/core/modules/config/tests/config_test/src/SchemaListenerController.php
++++ b/core/modules/config/tests/config_test/src/SchemaListenerController.php
+@@ -32,7 +32,7 @@ public static function create(ContainerInterface $container) {
+   }
+ 
+   /**
+-   * Tests the WebTestBase tests can use strict schema checking.
++   * Tests the BrowserTestBase tests can use strict schema checking.
+    */
+   public function test() {
+     try {
+diff --git a/core/modules/config/tests/src/Functional/SchemaConfigListenerWebTest.php b/core/modules/config/tests/src/Functional/SchemaConfigListenerWebTest.php
+index 6812c7d..8dc7019 100644
+--- a/core/modules/config/tests/src/Functional/SchemaConfigListenerWebTest.php
++++ b/core/modules/config/tests/src/Functional/SchemaConfigListenerWebTest.php
+@@ -6,7 +6,7 @@
+ use Drupal\Tests\BrowserTestBase;
+ 
+ /**
+- * Tests the functionality of ConfigSchemaChecker in WebTestBase tests.
++ * Tests the functionality of ConfigSchemaChecker in BrowserTestBase tests.
+  *
+  * @group config
+  */
+diff --git a/core/modules/field/tests/src/Functional/Boolean/BooleanFormatterSettingsTest.php b/core/modules/field/tests/src/Functional/Boolean/BooleanFormatterSettingsTest.php
+index 739516a..bdcdf9c 100644
+--- a/core/modules/field/tests/src/Functional/Boolean/BooleanFormatterSettingsTest.php
++++ b/core/modules/field/tests/src/Functional/Boolean/BooleanFormatterSettingsTest.php
+@@ -91,7 +91,7 @@ protected function setUp(): void {
+   public function testBooleanFormatterSettings() {
+     // List the options we expect to see on the settings form. Omit the one
+     // with the Unicode check/x characters, which does not appear to work
+-    // well in WebTestBase.
++    // well in BrowserTestBase.
+     $options = [
+       'Yes / No',
+       'True / False',
+diff --git a/core/modules/field/tests/src/FunctionalJavascript/Boolean/BooleanFormatterSettingsTest.php b/core/modules/field/tests/src/FunctionalJavascript/Boolean/BooleanFormatterSettingsTest.php
+index a8629e0..bd31ae2 100644
+--- a/core/modules/field/tests/src/FunctionalJavascript/Boolean/BooleanFormatterSettingsTest.php
++++ b/core/modules/field/tests/src/FunctionalJavascript/Boolean/BooleanFormatterSettingsTest.php
+@@ -90,7 +90,7 @@ protected function setUp(): void {
+   public function testBooleanFormatterSettings() {
+     // List the options we expect to see on the settings form. Omit the one
+     // with the Unicode check/x characters, which does not appear to work
+-    // well in WebTestBase.
++    // well in BrowserTestBase.
+     $options = [
+       'Yes / No',
+       'True / False',
+diff --git a/core/modules/responsive_image/tests/src/Functional/ResponsiveImageAdminUITest.php b/core/modules/responsive_image/tests/src/Functional/ResponsiveImageAdminUITest.php
+index dfdfc20..8004797 100644
+--- a/core/modules/responsive_image/tests/src/Functional/ResponsiveImageAdminUITest.php
++++ b/core/modules/responsive_image/tests/src/Functional/ResponsiveImageAdminUITest.php
+@@ -28,7 +28,7 @@ class ResponsiveImageAdminUITest extends BrowserTestBase {
+   protected $defaultTheme = 'stark';
+ 
+   /**
+-   * Drupal\simpletest\WebTestBase\setUp().
++   * {@inheritdoc}
+    */
+   protected function setUp(): void {
+     parent::setUp();
+diff --git a/core/modules/responsive_image/tests/src/Functional/ResponsiveImageFieldDisplayTest.php b/core/modules/responsive_image/tests/src/Functional/ResponsiveImageFieldDisplayTest.php
+index d3cc450..1a3df22 100644
+--- a/core/modules/responsive_image/tests/src/Functional/ResponsiveImageFieldDisplayTest.php
++++ b/core/modules/responsive_image/tests/src/Functional/ResponsiveImageFieldDisplayTest.php
+@@ -47,7 +47,7 @@ class ResponsiveImageFieldDisplayTest extends ImageFieldTestBase {
+   ];
+ 
+   /**
+-   * Drupal\simpletest\WebTestBase\setUp().
++   * {@inheritdoc}
+    */
+   protected function setUp(): void {
+     parent::setUp();
+diff --git a/core/modules/statistics/tests/src/Functional/StatisticsLoggingTest.php b/core/modules/statistics/tests/src/Functional/StatisticsLoggingTest.php
+index f0f660e..85e599c 100644
+--- a/core/modules/statistics/tests/src/Functional/StatisticsLoggingTest.php
++++ b/core/modules/statistics/tests/src/Functional/StatisticsLoggingTest.php
+@@ -9,7 +9,7 @@
+ /**
+  * Tests request logging for cached and uncached pages.
+  *
+- * We subclass WebTestBase rather than StatisticsTestBase, because we
++ * We subclass BrowserTestBase rather than StatisticsTestBase, because we
+  * want to test requests from an anonymous user.
+  *
+  * @group statistics
+diff --git a/core/modules/system/tests/modules/ajax_test/src/Form/AjaxTestDialogForm.php b/core/modules/system/tests/modules/ajax_test/src/Form/AjaxTestDialogForm.php
+index a0b6060..5e17d39 100644
+--- a/core/modules/system/tests/modules/ajax_test/src/Form/AjaxTestDialogForm.php
++++ b/core/modules/system/tests/modules/ajax_test/src/Form/AjaxTestDialogForm.php
+@@ -27,8 +27,8 @@ public function getFormId() {
+    * {@inheritdoc}
+    */
+   public function buildForm(array $form, FormStateInterface $form_state) {
+-    // In order to use WebTestBase::drupalPostAjaxForm() to POST from a link, we need
+-    // to have a dummy field we can set in WebTestBase::drupalPostForm() else it won't
++    // In order to use BrowserTestBase::drupalPostAjaxForm() to POST from a link, we need
++    // to have a dummy field we can set in BrowserTestBase::drupalPostForm() else it won't
+     // submit anything.
+     $form['textfield'] = [
+       '#type' => 'hidden',
+diff --git a/core/modules/system/tests/src/Functional/Entity/EntityOperationsTest.php b/core/modules/system/tests/src/Functional/Entity/EntityOperationsTest.php
+index d367ce4..3cb2f1a 100644
+--- a/core/modules/system/tests/src/Functional/Entity/EntityOperationsTest.php
++++ b/core/modules/system/tests/src/Functional/Entity/EntityOperationsTest.php
+@@ -50,7 +50,7 @@ public function testEntityOperationAlter() {
+    * {@inheritdoc}
+    */
+   protected function createRole(array $permissions, $rid = NULL, $name = NULL, $weight = NULL) {
+-    // WebTestBase::drupalCreateRole() by default uses random strings which may
++    // The parent method uses random strings by default, which may
+     // include HTML entities for the entity label. Since in this test the entity
+     // label is used to generate a link, and AssertContentTrait::assertLink() is
+     // not designed to deal with links potentially containing HTML entities this
+diff --git a/core/modules/system/tests/src/Functional/Menu/AssertBreadcrumbTrait.php b/core/modules/system/tests/src/Functional/Menu/AssertBreadcrumbTrait.php
+index 552bec8..c7544fe 100644
+--- a/core/modules/system/tests/src/Functional/Menu/AssertBreadcrumbTrait.php
++++ b/core/modules/system/tests/src/Functional/Menu/AssertBreadcrumbTrait.php
+@@ -18,13 +18,13 @@ trait AssertBreadcrumbTrait {
+    *
+    * @param \Drupal\Core\Url|string $goto
+    *   (optional) A path or URL to pass to
+-   *   Drupal\simpletest\WebTestBase::drupalGet().
++   *   \Drupal\Tests\UiHelperTrait::drupalGet().
+    * @param array $trail
+    *   An associative array whose keys are expected breadcrumb link paths and
+    *   whose values are expected breadcrumb link texts (not sanitized).
+    * @param string $page_title
+    *   (optional) A page title to additionally assert via
+-   *   Drupal\simpletest\WebTestBase::assertTitle(). Without site name suffix.
++   *   \Drupal\Tests\WebAssert::titleEquals(). Without site name suffix.
+    * @param array $tree
+    *   (optional) An associative array whose keys are link paths and whose
+    *   values are link titles (not sanitized) of an expected active trail in a
+diff --git a/core/modules/system/tests/src/Kernel/Common/FormElementsRenderTest.php b/core/modules/system/tests/src/Kernel/Common/FormElementsRenderTest.php
+index 9874efa..c9d1cdc 100644
+--- a/core/modules/system/tests/src/Kernel/Common/FormElementsRenderTest.php
++++ b/core/modules/system/tests/src/Kernel/Common/FormElementsRenderTest.php
+@@ -143,7 +143,6 @@ public function testDrupalRenderFormElements() {
+   protected function assertRenderedElement(array $element, $xpath, array $xpath_args = []) {
+     $this->render($element);
+ 
+-    // @see \Drupal\simpletest\WebTestBase::xpath()
+     $xpath = $this->buildXPathQuery($xpath, $xpath_args);
+     $element += ['#value' => NULL];
+     $this->assertFieldByXPath($xpath, $element['#value'], new FormattableMarkup('#type @type was properly rendered.', [
+diff --git a/core/modules/views/tests/src/Functional/ViewTestBase.php b/core/modules/views/tests/src/Functional/ViewTestBase.php
+index 5d91dfc..ce6f3bd 100644
+--- a/core/modules/views/tests/src/Functional/ViewTestBase.php
++++ b/core/modules/views/tests/src/Functional/ViewTestBase.php
+@@ -18,7 +18,6 @@
+  * include the same methods.
+  *
+  * @see \Drupal\Tests\views\Kernel\ViewsKernelTestBase
+- * @see \Drupal\simpletest\WebTestBase
+  */
+ abstract class ViewTestBase extends BrowserTestBase {
+ 
+diff --git a/core/modules/views/tests/src/Functional/ViewsEscapingTest.php b/core/modules/views/tests/src/Functional/ViewsEscapingTest.php
+index 29b2b29..62eb728 100644
+--- a/core/modules/views/tests/src/Functional/ViewsEscapingTest.php
++++ b/core/modules/views/tests/src/Functional/ViewsEscapingTest.php
+@@ -22,13 +22,13 @@ class ViewsEscapingTest extends ViewTestBase {
+   protected $defaultTheme = 'stark';
+ 
+   /**
+-   * Used by WebTestBase::setUp()
++   * {@inheritdoc}
+    *
+    * We need theme_test for testing against test_basetheme and test_subtheme.
+    *
+    * @var array
+    *
+-   * @see \Drupal\simpletest\WebTestBase::setUp()
++   * {@inheritdoc}
+    */
+   protected static $modules = ['views', 'theme_test'];
+ 
+diff --git a/core/modules/views/tests/src/Functional/ViewsThemeIntegrationTest.php b/core/modules/views/tests/src/Functional/ViewsThemeIntegrationTest.php
+index 8184fa0..4f33c9c 100644
+--- a/core/modules/views/tests/src/Functional/ViewsThemeIntegrationTest.php
++++ b/core/modules/views/tests/src/Functional/ViewsThemeIntegrationTest.php
+@@ -25,13 +25,13 @@ class ViewsThemeIntegrationTest extends ViewTestBase {
+ 
+ 
+   /**
+-   * Used by WebTestBase::setUp()
++   * {@inheritdoc}
+    *
+    * We need theme_test for testing against test_basetheme and test_subtheme.
+    *
+    * @var array
+    *
+-   * @see \Drupal\simpletest\WebTestBase::setUp()
++   * {@inheritdoc}
+    */
+   protected static $modules = ['views', 'theme_test'];
+ 
+diff --git a/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php b/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
+index ac7e0df..7f9464a 100644
+--- a/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
++++ b/core/tests/Drupal/FunctionalTests/BrowserTestBaseTest.php
+@@ -876,8 +876,6 @@ public function testDeprecationHeaders() {
+     foreach ($this->getSession()->getResponseHeaders() as $name => $values) {
+       if (preg_match('/^X-Drupal-Assertion-[0-9]+$/', $name, $matches)) {
+         foreach ($values as $value) {
+-          // Call \Drupal\simpletest\WebTestBase::error() with the parameters from
+-          // the header.
+           $parameters = unserialize(urldecode($value));
+           if (count($parameters) === 3) {
+             if ($parameters[1] === 'User deprecated function') {
+diff --git a/core/tests/Drupal/FunctionalTests/Update/UpdatePathTestBase.php b/core/tests/Drupal/FunctionalTests/Update/UpdatePathTestBase.php
+index 407938d..23614c7 100644
+--- a/core/tests/Drupal/FunctionalTests/Update/UpdatePathTestBase.php
++++ b/core/tests/Drupal/FunctionalTests/Update/UpdatePathTestBase.php
+@@ -118,7 +118,7 @@ abstract class UpdatePathTestBase extends BrowserTestBase {
+   protected $strictConfigSchema = FALSE;
+ 
+   /**
+-   * Overrides WebTestBase::setUp() for update testing.
++   * Overrides BrowserTestBase::setUp() for update testing.
+    *
+    * The main difference in this method is that rather than performing the
+    * installation via the installer, a database is loaded. Additional work is
+diff --git a/core/tests/Drupal/FunctionalTests/UserHelpersTest.php b/core/tests/Drupal/FunctionalTests/UserHelpersTest.php
+index ad053e3..b870a95 100644
+--- a/core/tests/Drupal/FunctionalTests/UserHelpersTest.php
++++ b/core/tests/Drupal/FunctionalTests/UserHelpersTest.php
+@@ -5,7 +5,7 @@
+ use Drupal\Tests\BrowserTestBase;
+ 
+ /**
+- * Tests User related helper methods of WebTestBase.
++ * Tests User related helper methods of BrowserTestBase.
+  *
+  * @group browsertestbase
+  */
+@@ -17,7 +17,7 @@ class UserHelpersTest extends BrowserTestBase {
+   protected $defaultTheme = 'stark';
+ 
+   /**
+-   * Tests WebTestBase::drupalUserIsLoggedIn().
++   * Tests BrowserTestBase::drupalUserIsLoggedIn().
+    */
+   public function testDrupalUserIsLoggedIn() {
+     $first_user = $this->drupalCreateUser();
