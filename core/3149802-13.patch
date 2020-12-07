@@ -1,0 +1,28 @@
+diff --git a/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php b/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php
+index 448035d..60868fa 100644
+--- a/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php
++++ b/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php
+@@ -76,7 +76,7 @@ public function transform($value, MigrateExecutableInterface $migrate_executable
+       list($module, $delta) = $value;
+       switch ($module) {
+         case 'aggregator':
+-          list($type) = explode('-', $delta);
++          $type = explode('-', $delta)[0];
+           if ($type == 'feed') {
+             return 'aggregator_feed_block';
+           }
+diff --git a/core/modules/block/tests/src/Functional/BlockTest.php b/core/modules/block/tests/src/Functional/BlockTest.php
+index 4d804f1..e4ad638 100644
+--- a/core/modules/block/tests/src/Functional/BlockTest.php
++++ b/core/modules/block/tests/src/Functional/BlockTest.php
+@@ -158,8 +158,8 @@ public function testAddBlockFromLibraryWithWeight() {
+       $this->assertCount(1, $links, 'Found one matching link.');
+       $this->assertEqual(t('Place block'), $links[0]->getText(), 'Found the expected link text.');
+ 
+-      $query_string = explode('?', $links[0]->getAttribute('href'), 2);
+-      parse_str($query_string[1], $query_parts);
++      $query_string = explode('?', $links[0]->getAttribute('href'), 2)[1];
++      parse_str($query_string, $query_parts);
+       $this->assertEqual($weight, $query_parts['weight'], 'Found the expected weight query string.');
+ 
+       // Create a random title for the block.
