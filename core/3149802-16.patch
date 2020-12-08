@@ -1,0 +1,26 @@
+diff --git a/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php b/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php
+index 348c89c..2c34fde 100644
+--- a/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php
++++ b/core/modules/block/src/Plugin/migrate/process/BlockPluginId.php
+@@ -73,7 +73,7 @@ public static function create(ContainerInterface $container, array $configuratio
+    */
+   public function transform($value, MigrateExecutableInterface $migrate_executable, Row $row, $destination_property) {
+     if (is_array($value)) {
+-      list($type) = explode('-', $delta);
++      $type = explode('-', $delta)[0];
+       switch ($module) {
+         case 'aggregator':
+           $type = explode('-', $delta)[0];
+diff --git a/core/modules/block/tests/src/Functional/BlockTest.php b/core/modules/block/tests/src/Functional/BlockTest.php
+index 897394e..e4ad638 100644
+--- a/core/modules/block/tests/src/Functional/BlockTest.php
++++ b/core/modules/block/tests/src/Functional/BlockTest.php
+@@ -158,7 +158,7 @@ public function testAddBlockFromLibraryWithWeight() {
+       $this->assertCount(1, $links, 'Found one matching link.');
+       $this->assertEqual(t('Place block'), $links[0]->getText(), 'Found the expected link text.');
+ 
+-      $query_string = explode('?', $links[0]->getAttribute('href'), 2);
++      $query_string = explode('?', $links[0]->getAttribute('href'), 2)[1];
+       parse_str($query_string, $query_parts);
+       $this->assertEqual($weight, $query_parts['weight'], 'Found the expected weight query string.');
+ 
