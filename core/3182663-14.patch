@@ -1,0 +1,202 @@
+diff --git a/core/modules/update/src/Form/UpdateManagerInstall.php b/core/modules/update/src/Form/UpdateManagerInstall.php
+index ca41b78..251665d 100644
+--- a/core/modules/update/src/Form/UpdateManagerInstall.php
++++ b/core/modules/update/src/Form/UpdateManagerInstall.php
+@@ -233,6 +233,7 @@ public function submitForm(array &$form, FormStateInterface $form_state) {
+       'project' => $project,
+       'updater_name' => get_class($updater),
+       'local_url' => $project_real_location,
++      'project_title' => $project_title,
+     ];
+ 
+     // This process is inherently difficult to test therefore use a state flag.
+diff --git a/core/modules/update/src/Form/UpdateManagerUpdate.php b/core/modules/update/src/Form/UpdateManagerUpdate.php
+index 6e23903..d77005b 100644
+--- a/core/modules/update/src/Form/UpdateManagerUpdate.php
++++ b/core/modules/update/src/Form/UpdateManagerUpdate.php
+@@ -242,6 +242,7 @@ public function buildForm(array $form, FormStateInterface $form_state) {
+             $projects['disabled'][$name] = $entry;
+             break;
+         }
++        $projects['available'][$name] = strip_tags($entry['title']['data']['#title']);
+       }
+     }
+ 
+@@ -285,6 +286,12 @@ public function buildForm(array $form, FormStateInterface $form_state) {
+     // If either table has been printed yet, we need a submit button and to
+     // validate the checkboxes.
+     if (!empty($projects['enabled']) || !empty($projects['disabled'])) {
++      if (!empty($projects['available'])) {
++        $form['available_projects'] = [
++          '#type' => 'value',
++          '#value' => serialize($projects['available']),
++        ];
++      }
+       $form['actions'] = ['#type' => 'actions'];
+       $form['actions']['submit'] = [
+         '#type' => 'submit',
+@@ -369,6 +376,7 @@ public function submitForm(array &$form, FormStateInterface $form_state) {
+         $projects = array_merge($projects, array_keys(array_filter($form_state->getValue($type))));
+       }
+     }
++    $available_projects = unserialize($form_state->getValue('available_projects'));
+     $operations = [];
+     foreach ($projects as $project) {
+       $operations[] = [
+@@ -376,6 +384,7 @@ public function submitForm(array &$form, FormStateInterface $form_state) {
+         [
+           $project,
+           $form_state->getValue(['project_downloads', $project]),
++          $available_projects[$project],
+         ],
+       ];
+     }
+diff --git a/core/modules/update/src/Form/UpdateReady.php b/core/modules/update/src/Form/UpdateReady.php
+index d8e5fdc..c3fa2dc 100644
+--- a/core/modules/update/src/Form/UpdateReady.php
++++ b/core/modules/update/src/Form/UpdateReady.php
+@@ -134,14 +134,15 @@ public function submitForm(array &$form, FormStateInterface $form_state) {
+       $directory = _update_manager_extract_directory();
+ 
+       $project_real_location = NULL;
+-      foreach ($projects as $project => $url) {
+-        $project_location = $directory . '/' . $project;
++      foreach ($projects as $project_name => $project) {
++        $project_location = $directory . '/' . $project_name;
+         $updater = Updater::factory($project_location, $this->root);
+         $project_real_location = \Drupal::service('file_system')->realpath($project_location);
+         $updates[] = [
+-          'project' => $project,
++          'project' => $project_name,
+           'updater_name' => get_class($updater),
+           'local_url' => $project_real_location,
++          'project_title' => $project['title'],
+         ];
+       }
+ 
+diff --git a/core/modules/update/tests/src/Functional/UpdateUploadTest.php b/core/modules/update/tests/src/Functional/UpdateUploadTest.php
+index b4c984f..63572ec 100644
+--- a/core/modules/update/tests/src/Functional/UpdateUploadTest.php
++++ b/core/modules/update/tests/src/Functional/UpdateUploadTest.php
+@@ -88,7 +88,7 @@ public function testUploadModule() {
+     $this->assertSession()->titleEquals('Update manager | Drupal');
+     // Check for a success message on the page, and check that the installed
+     // module now exists in the expected place in the filesystem.
+-    $this->assertRaw(t('Installed %project_name successfully', ['%project_name' => 'update_test_new_module']));
++    $this->assertRaw(t('Installed %project_title (%project) successfully', ['%project_title' => 'Update test new module', '%project' => 'update_test_new_module']));
+     $this->assertFileExists($installedInfoFilePath);
+     // Ensure the links are relative to the site root and not
+     // core/authorize.php.
+@@ -133,7 +133,7 @@ public function testUploadModule() {
+     $this->drupalPostForm('admin/reports/updates/update', ['projects[update_test_new_module]' => TRUE], t('Download these updates'));
+     $this->drupalPostForm(NULL, ['maintenance_mode' => FALSE], t('Continue'));
+     $this->assertText(t('Update was completed successfully.'));
+-    $this->assertRaw(t('Installed %project_name successfully', ['%project_name' => 'update_test_new_module']));
++    $this->assertRaw(t('Installed %project_title (%project) successfully', ['%project_title' => 'Update test new module', '%project' => 'update_test_new_module']));
+ 
+     // Parse the info file again to check that the module has been updated to
+     // 8.x-1.1.
+diff --git a/core/modules/update/update.authorize.inc b/core/modules/update/update.authorize.inc
+index 18b356d..b32575f 100644
+--- a/core/modules/update/update.authorize.inc
++++ b/core/modules/update/update.authorize.inc
+@@ -45,6 +45,7 @@ function update_authorize_run_update($filetransfer, $projects) {
+         $project_info['updater_name'],
+         $project_info['local_url'],
+         $filetransfer,
++        $project_info['project_title'],
+       ],
+     ];
+   }
+@@ -84,13 +85,17 @@ function update_authorize_run_update($filetransfer, $projects) {
+  * @param string $local_url
+  *   The URL to the locally installed temp directory where the project has
+  *   already been downloaded and extracted into.
++ * @param string $project_title
++ *   The project name; i.e., the name of the module, theme, or profile.
++ *
++ * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0.
+  *
+  * @return \Symfony\Component\HttpFoundation\Response|null
+  *   The result of processing the batch that installs the project. If this is
+  *   an instance of \Symfony\Component\HttpFoundation\Response the calling code
+  *   should use that response for the current page request.
+  */
+-function update_authorize_run_install($filetransfer, $project, $updater_name, $local_url) {
++function update_authorize_run_install($filetransfer, $project, $updater_name, $local_url, $project_title) {
+   $operations[] = [
+     'update_authorize_batch_copy_project',
+     [
+@@ -98,6 +103,7 @@ function update_authorize_run_install($filetransfer, $project, $updater_name, $l
+       $updater_name,
+       $local_url,
+       $filetransfer,
++      $project_title,
+     ],
+   ];
+ 
+@@ -135,10 +141,14 @@ function update_authorize_run_install($filetransfer, $project, $updater_name, $l
+  *   already been downloaded and extracted into.
+  * @param FileTransfer $filetransfer
+  *   The FileTransfer object to use for performing this operation.
++ * @param string $project_title
++ *   The name of the project being installed.
+  * @param array $context
+  *   Reference to an array used for Batch API storage.
++ *
++ * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0.
+  */
+-function update_authorize_batch_copy_project($project, $updater_name, $local_url, $filetransfer, &$context) {
++function update_authorize_batch_copy_project($project, $updater_name, $local_url, $filetransfer, $project_title, &$context) {
+ 
+   // Initialize some variables in the Batch API $context array.
+   if (!isset($context['results']['log'])) {
+@@ -184,7 +194,7 @@ function update_authorize_batch_copy_project($project, $updater_name, $local_url
+     return;
+   }
+ 
+-  _update_batch_create_message($context['results']['log'][$project], t('Installed %project_name successfully', ['%project_name' => $project]));
++  _update_batch_create_message($context['results']['log'][$project_title], t('Installed %project_title (%project) successfully', ['%project_title' => $project_title, '%project'=> $project]));
+   if (!empty($tasks)) {
+     $context['results']['tasks'] += $tasks;
+   }
+diff --git a/core/modules/update/update.manager.inc b/core/modules/update/update.manager.inc
+index 50272e1..bbbbdbb 100644
+--- a/core/modules/update/update.manager.inc
++++ b/core/modules/update/update.manager.inc
+@@ -250,20 +250,22 @@ function update_manager_file_get($url) {
+  * @param array $context
+  *   Reference to an array used for Batch API storage.
+  *
++ * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0.
++ *
+  * @see update_manager_download_page()
+  */
+-function update_manager_batch_project_get($project, $url, &$context) {
++function update_manager_batch_project_get($project, $url, $project_title, &$context) {
+   // This is here to show the user that we are in the process of downloading.
+   if (!isset($context['sandbox']['started'])) {
+     $context['sandbox']['started'] = TRUE;
+-    $context['message'] = t('Downloading %project', ['%project' => $project]);
++    $context['message'] = t('Downloading %project_title(%project)', ['%project' => $project, 'project_title'=>$project_title]);
+     $context['finished'] = 0;
+     return;
+   }
+ 
+   // Actually try to download the file.
+   if (!($local_cache = update_manager_file_get($url))) {
+-    $context['results']['errors'][$project] = t('Failed to download %project from %url', ['%project' => $project, '%url' => $url]);
++    $context['results']['errors'][$project] = t('Failed to download %project_title(%project) from %url', ['%project' => $project, '%url' => $url, 'project_title'=>$project_title]);
+     return;
+   }
+ 
+@@ -289,7 +291,8 @@ function update_manager_batch_project_get($project, $url, &$context) {
+   }
+ 
+   // Yay, success.
+-  $context['results']['projects'][$project] = $url;
++  $context['results']['projects'][$project]['url'] = $url;
++  $context['results']['projects'][$project]['title'] = $project_title;
+   $context['finished'] = 1;
+ }
+ 
