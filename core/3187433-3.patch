@@ -1,0 +1,105 @@
+diff --git a/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php b/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php
+index 674eb04..6893551 100644
+--- a/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php
++++ b/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php
+@@ -56,7 +56,9 @@ public function query() {
+    * {@inheritdoc}
+    */
+   public function prepareRow(Row $row) {
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+     // Set the i18n string table for use in I18nQueryTrait.
+     $this->i18nStringTable = static::I18N_STRING_TABLE;
+     // Save the translation for this property.
+diff --git a/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php b/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php
+index 2e0767a..088c2a3 100644
+--- a/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php
++++ b/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php
+@@ -55,7 +55,9 @@ public function query() {
+    * {@inheritdoc}
+    */
+   public function prepareRow(Row $row) {
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+ 
+     // Save the translation for this property.
+     $property_in_row = $row->getSourceProperty('property');
+diff --git a/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php b/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php
+index b57b793..c7832ba 100644
+--- a/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php
++++ b/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php
+@@ -44,7 +44,9 @@ public function query() {
+    * {@inheritdoc}
+    */
+   public function prepareRow(Row $row) {
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+ 
+     // Put the language on the row as 'language'.
+     $row->setSourceProperty('language', $row->getSourceProperty('lt_language'));
+diff --git a/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php b/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php
+index 81e44d8..6aba4ed 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php
++++ b/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php
+@@ -67,7 +67,9 @@ public function prepareRow(Row $row) {
+       $row->setSourceProperty('revision_uid', $row->getSourceProperty('etr_uid'));
+       $row->setSourceProperty('source_langcode', $row->getSourceProperty('source'));
+     }
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+   }
+ 
+   /**
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php
+index d8308c7..ec0260b 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php
+@@ -78,7 +78,9 @@ public function prepareRow(Row $row) {
+       $row->setSourceProperty($other_property . '_translated', NULL);
+     }
+ 
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+   }
+ 
+   /**
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php
+index 970e1b8..e94685f 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php
+@@ -50,7 +50,9 @@ public function query() {
+    * {@inheritdoc}
+    */
+   public function prepareRow(Row $row) {
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+ 
+     // Override language with ltlanguage.
+     $language = $row->getSourceProperty('ltlanguage');
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php
+index b738c93..52250f4 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php
+@@ -35,7 +35,9 @@ public function query() {
+    * {@inheritdoc}
+    */
+   public function prepareRow(Row $row) {
+-    parent::prepareRow($row);
++    if (!parent::prepareRow($row)) {
++      return FALSE;
++    }
+     $row->setSourceProperty('language', $row->getSourceProperty('td_language'));
+   }
+ 
