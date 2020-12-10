@@ -15,6 +15,13 @@ use Drupal\node\NodeStorageInterface;
 class Vid extends NumericArgument {
 
   /**
+   * Database Service Object.
+   *
+   * @var \Drupal\Core\Database\Connection
+   */
+  protected $database;
+
+  /**
    * The node storage.
    *
    * @var \Drupal\node\NodeStorageInterface
@@ -30,11 +37,15 @@ class Vid extends NumericArgument {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param \Drupal\Core\Database\Connection $database
+   *   Database Service Object.
    * @param \Drupal\node\NodeStorageInterface $node_storage
    *   The node storage.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, NodeStorageInterface $node_storage) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, Connection $database, NodeStorageInterface $node_storage) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->database = $database;
     $this->nodeStorage = $node_storage;
   }
 
@@ -57,7 +68,7 @@ class Vid extends NumericArgument {
   public function titleQuery() {
     $titles = [];
 
-    $results = $container->query('SELECT nr.vid, nr.nid, npr.title FROM {node_revision} nr WHERE nr.vid IN ( :vids[] )', [':vids[]' => $this->value])->fetchAllAssoc('vid', PDO::FETCH_ASSOC);
+    $results = $this->database->query('SELECT nr.vid, nr.nid, npr.title FROM {node_revision} nr WHERE nr.vid IN ( :vids[] )', [':vids[]' => $this->value])->fetchAllAssoc('vid', PDO::FETCH_ASSOC);
     $nids = [];
     foreach ($results as $result) {
       $nids[] = $result['nid'];
