@@ -5,36 +5,15 @@ namespace Drupal\toolbar\Controller;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Menu\MenuTreeParameters;
 use Drupal\Core\Security\TrustedCallbackInterface;
 use Drupal\toolbar\Ajax\SetSubtreesCommand;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Defines a controller for the toolbar module.
  */
 class ToolbarController extends ControllerBase implements TrustedCallbackInterface {
-
-  /**
-   * Constructs the ToolbarController object.
-   *
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
-   */
-  public function __construct(ConfigFactoryInterface $config_factory) {
-    $this->configFactory = $config_factory;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('config.factory')
-    );
-  }
 
   /**
    * Returns an AJAX response to render the toolbar subtrees.
@@ -86,15 +65,15 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
    *
    * @see \Drupal\Core\Render\RendererInterface::render()
    */
-  public function preRenderAdministrationTray(array $element) {
+  public static function preRenderAdministrationTray(array $element) {
     $menu_tree = \Drupal::service('toolbar.menu_tree');
     // Load the administrative menu. The first level is the "Administration"
     // link. In order to load the children of that link, start and end on the
     // second level.
     $parameters = new MenuTreeParameters();
     $parameters->setMinDepth(2)->setMaxDepth(2)->onlyEnabledLinks();
-    $admin_tray_menu = $this->configFactory->get('toolbar.settings')->get('admin_tray.menu_name') ?: 'admin';
-    $tree = $menu_tree->load($admin_tray_menu, $parameters);
+    // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
+    $tree = $menu_tree->load('admin', $parameters);
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
@@ -110,15 +89,15 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
    *
    * @internal
    */
-  public function preRenderGetRenderedSubtrees(array $data) {
+  public static function preRenderGetRenderedSubtrees(array $data) {
     $menu_tree = \Drupal::service('toolbar.menu_tree');
     // Load the administration menu. The first level is the "Administration"
     // link. In order to load the children of that link and the subsequent two
     // levels, start at the second level and end at the fourth.
     $parameters = new MenuTreeParameters();
     $parameters->setMinDepth(2)->setMaxDepth(4)->onlyEnabledLinks();
-    $admin_tray_menu = $this->configFactory->get('toolbar.settings')->get('admin_tray.menu_name') ?: 'admin';
-    $tree = $menu_tree->load($admin_tray_menu, $parameters);
+    // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
+    $tree = $menu_tree->load('admin', $parameters);
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
@@ -157,7 +136,7 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
   /**
    * {@inheritdoc}
    */
-  public function trustedCallbacks() {
+  public static function trustedCallbacks() {
     return ['preRenderAdministrationTray', 'preRenderGetRenderedSubtrees'];
   }
 

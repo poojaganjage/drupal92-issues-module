@@ -1,7 +1,0 @@
-name: 'Custom toolbar admin tray menu'
-type: module
-description: 'Support module for testing toolbar with a custom admin tray menu.'
-package: Testing
-version: VERSION
-dependencies:
-  - toolbar

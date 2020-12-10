@@ -1,8 +1,0 @@
-custom.base:
-  title: Custom menu base link
-  menu_name: custom
-  route_name: '<nolink>'
-custom.link:
-  title: Custom menu link
-  parent: custom.base
-  route_name: '<front>'
