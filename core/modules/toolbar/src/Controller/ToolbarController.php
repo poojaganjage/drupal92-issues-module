@@ -72,8 +72,8 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
     // second level.
     $parameters = new MenuTreeParameters();
     $parameters->setMinDepth(2)->setMaxDepth(2)->onlyEnabledLinks();
-    // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
-    $tree = $menu_tree->load('admin', $parameters);
+    $admin_tray_menu = \Drupal::config('toolbar.settings')->get('admin_tray.menu_name') ?: 'admin';
+    $tree = $menu_tree->load($admin_tray_menu, $parameters);
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
@@ -96,8 +96,8 @@ class ToolbarController extends ControllerBase implements TrustedCallbackInterfa
     // levels, start at the second level and end at the fourth.
     $parameters = new MenuTreeParameters();
     $parameters->setMinDepth(2)->setMaxDepth(4)->onlyEnabledLinks();
-    // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
-    $tree = $menu_tree->load('admin', $parameters);
+    $admin_tray_menu = \Drupal::config('toolbar.settings')->get('admin_tray.menu_name') ?: 'admin';
+    $tree = $menu_tree->load($admin_tray_menu, $parameters);
     $manipulators = [
       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
