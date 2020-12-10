@@ -543,7 +543,4 @@ participate in mentoring.
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 - Matthew Radcliffe 'mradcliffe' https://www.drupal.org/u/mradcliffe
 
-Provisional mentoring coordinators
-----------------------------------
-
-- Brian Gilbert 'realityloop' https://www.drupal.org/u/realityloop
+-Provisional membership: None at this time.
