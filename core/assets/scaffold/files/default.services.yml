@@ -53,8 +53,7 @@ parameters:
     # For more information about debugging Twig templates, see
     # https://www.drupal.org/node/1906392.
     #
-    # Use true in production environments.
-    # False is not recommended in production environments.
+    # Not recommended in production environments
     # @default false
     debug: false
     # Twig auto-reload:
@@ -63,7 +62,7 @@ parameters:
     # If you don't provide a value for auto_reload, it will be determined
     # based on the value of debug.
     #
-    # Null is not recommended in production environments.
+    # Not recommended in production environments
     # @default null
     auto_reload: null
     # Twig cache:
@@ -74,8 +73,7 @@ parameters:
     # auto_reload setting above should be enabled rather than disabling the
     # Twig cache.
     #
-    # Use false in production environments.
-    # True is not recommended in production environments.
+    # Not recommended in production environments
     # @default true
     cache: true
   renderer.config:
@@ -126,8 +124,7 @@ parameters:
   # For more information about debugging cacheable responses, see
   # https://www.drupal.org/developing/api/8/response/cacheable-response-interface
   #
-  # Use true in production environments.
-  # False is not recommended in production environments.
+  # Not recommended in production environments
   # @default false
   http.response.debug_cacheability_headers: false
   factory.keyvalue: {}
