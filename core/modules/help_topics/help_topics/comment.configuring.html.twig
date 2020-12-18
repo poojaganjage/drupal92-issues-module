@@ -8,7 +8,7 @@ related:
 ---
 {% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
 <h2>{% trans %}Goal{% endtrans %}</h2>
-<p>{% trans %}Configure a content entity type/subtype to allow commenting. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</p>
+<p>{% trans %}Configure a content entity type/subtype to allow commenting. See <a href="{{ content_structure }}">Managing content structure<a> for more about content entities and fields.{% endtrans %}</p>
 <h2>{% trans %}Who can configure comments?{% endtrans %}</h2>
 <p>{% trans %}In order to follow these steps, the core Field UI module will need to be installed. You'll need the Comment module's <em><a href="{{ comment_permission_url }}">Administer comments and comment settings</a></em> permission, to change comment settings for a comment field. You'll also need to have the appropriate permission for adding fields to the entity type or subtype that the comments are attached to. For example, to attach comments to content items provided by the Node module, you would need the Node module's <em>Administer content types</em> permission.{% endtrans %}</p>
 <h2>{% trans %}Steps{% endtrans %}</h2>

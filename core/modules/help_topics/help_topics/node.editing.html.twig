@@ -6,7 +6,6 @@ related:
 ---
 {% set content = render_var(url('system.admin_content')) %}
 {% set permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-node'})) %}
-{% set overview = render_var(url('help.help_topic', {'id': 'node.overview'})) %}
 <h2>{% trans %}Goal{% endtrans %}</h2>
 <p>{% trans %}Find a content item and edit it, or update a group of content items in bulk. See <a href="{{ overview }}">Managing content</a> for more about content types and content items.{% endtrans %}</p>
 <h2>{% trans %}Who can find and edit content?{% endtrans %}</h2>

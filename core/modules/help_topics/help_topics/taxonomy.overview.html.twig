@@ -2,6 +2,9 @@
 label: 'Managing taxonomy'
 top_level: true
 ---
+{% set taxonomy_permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-taxonomy'})) %}
+{% set taxonomy_admin = render_var(url('entity.taxonomy_vocabulary.collection')) %}
+{% set entity_reference = render_var(url('help.help_topic', {'id':'field_ui.reference_field'})) %}
 {% set content_structure = render_var(url('help.help_topic', {'id':'core.content_structure'})) %}
 <h2>{% trans %}What is Taxonomy?{% endtrans %}</h2>
 <p>{% trans %}<em>Taxonomy</em> is used to classify website content. One common example of taxonomy is the tags used to classify or categorize posts in a blog website; a cooking website could use an ingredients taxonomy to classify recipes. Individual taxonomy items are known as <em>terms</em> (the blog tags or recipe ingredients in these examples); and a set of terms is known as a <em>vocabulary</em> (the set of all blog post tags, or the set of all recipe ingredients in these examples). Technically, taxonomy terms are an entity type and the entity subtypes are the vocabularies; see <a href="{{ content_structure }}">Managing content structure</a> for more on content entities. Like other entities, taxonomy terms can have fields attached; for instance, you could set up an image field to contain an icon for each term.{% endtrans %}</p>
