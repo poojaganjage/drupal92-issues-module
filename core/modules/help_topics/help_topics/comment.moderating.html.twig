@@ -5,6 +5,8 @@ related:
   - comment.configuring
   - comment.disabling
 ---
+{% set comment_types = render_var(url('entity.comment_type.collection')) %}
+{% set content = render_var(url('system.admin_content')) %}
 {% set comment_unpublished_url = render_var(url('comment.admin_approval')) %}
 {% set comment_published_url = render_var(url('comment.admin')) %}
 {% set comment_permission_url = render_var(url('user.admin_permissions', {},{'fragment': 'module-comment'})) %}
