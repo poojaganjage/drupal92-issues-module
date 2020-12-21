@@ -1,0 +1,39 @@
+---
+label: 'Configuring content commenting'
+related:
+  - comment.overview
+  - comment.creating_type
+  - comment.disabling
+  - field_ui.add_field
+---
+{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
+{% set comment_permission_url = render_var(url('user.admin_permissions', {}, {'fragment': 'module-comment'})) %}
+<h2>{% trans %}Goal{% endtrans %}</h2>
+<p>{% trans %}Configure a content entity type/subtype to allow commenting. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</p>
+<h2>{% trans %}Who can configure comments?{% endtrans %}</h2>
+<p>{% trans %}In order to follow these steps, the core Field UI module will need to be installed. You'll need the Comment module's <em><a href="{{ comment_permission_url }}">Administer comments and comment settings</a></em> permission, to change comment settings for a comment field. You'll also need to have the appropriate permission for adding fields to the entity type or subtype that the comments are attached to. For example, to attach comments to content items provided by the Node module, you would need the Node module's <em>Administer content types</em> permission.{% endtrans %}</p>
+<h2>{% trans %}Steps{% endtrans %}</h2>
+<ol>
+  <li>{% trans %}Follow the steps in the related <em>Adding a field to an entity sub-type</em> topic to add a field of type <em>Comment</em> to the desired entity type or sub-type.{% endtrans %}</li>
+  <li>{% trans %}Click <em>Manage fields</em> from the dropdown button for the content type where you want to enable commenting.{% endtrans %}</li>
+  <li>{% trans %}When you get to the field settings page, enter the desired settings for the comment field:{% endtrans %}
+    <ul>
+      <li>{% trans %}<em>Threading</em>: whether or not the comments are collected by threads, with people able to reply to particular comments instead of to the content entity itself. (Note that not all themes support the display of comment threads with indentation.){% endtrans %}</li>
+      <li>{% trans %}<em>Comments per page</em>: the maximum number of comments displayed on one page (additional pages will be added if you exceed this limit).{% endtrans %}</li>
+      <li>{% trans %}<em>Anonymous commenting</em>: whether or not anonymous commenters are allowed or required to leave contact information with their comments (only applies if anonymous users have permission to post comments).{% endtrans %}</li>
+      <li>{% trans %}<em>Show reply form on the same page as comments</em>: whether the comment reply form is displayed on the same page as the comments. If this is not selected, clicking <em>Reply</em> will open a new page with the reply form.{% endtrans %}</li>
+      <li>{% trans %}<em>Preview comments</em>: whether previewing comments before submission is <em>Required</em>, <em>Optional</em>, or <em>Disabled</em>.{% endtrans %}</li>
+      <li>{% trans %}<em>Default value</em>: each content item will have its own comment settings, but here you can set defaults for the comment settings for this entity type or subtype. The comment settings values are:{% endtrans %}
+        <ul>
+          <li>{% trans %}<em>Open</em>: comments are allowed.{% endtrans %}</li>
+          <li>{% trans %}<em>Closed</em>: no new comments are allowed, but any past comments remain visible.{% endtrans %}</li>
+          <li>{% trans %}<em>Hidden</em>: no comments are allowed, and past comments are hidden.{% endtrans %}</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ol>
+<h2>{% trans %}Additional resources{% endtrans %}</h2>
+<ul>
+  <li><a href="https://www.drupal.org/docs/8/core/modules/comment/administering-a-content-types-comment-settings">{% trans %}Online documentation for content comment settings{% endtrans %}</a></li>
+</ul>

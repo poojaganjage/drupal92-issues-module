@@ -1,0 +1,30 @@
+---
+label: 'Configuring taxonomy'
+related:
+  - taxonomy.overview
+  - field_ui.reference_field
+  - field_ui.manage_display
+  - field_ui.manage_form
+---
+{% set taxonomy_permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-taxonomy'})) %}
+{% set taxonomy_admin = render_var(url('entity.taxonomy_vocabulary.collection')) %}
+{% set overview = render_var(url('help.help_topic', {'id':'taxonomy.overview'})) %}
+{% set content_structure = render_var(url('help.help_topic', {'id':'core.content_structure'})) %}
+<h2>{% trans %}Goal{% endtrans %}</h2>
+<p>{% trans %}Create a taxonomy vocabulary and add a reference field for that vocabulary to a content entity. See <a href="{{ overview }}">Managing taxonomy</a> for information about taxonomy and <a href="{{ content_structure }}">Managing content structure</a> for more on content entities.{% endtrans %}</p>
+<h2>{% trans %}Who can configure a taxonomy vocabulary?{% endtrans %}</h2>
+<p>{% trans %}Users with the <em><a href="{{ taxonomy_permissions }}">Administer vocabularies and terms</a></em> permission can configure a vocabulary. To add a field using the Field UI module, you will also need the <em>Administer fields</em> permission for the entity you are adding the field to.{% endtrans %}</p>
+<h2>{% trans %}Steps{% endtrans %}</h2>
+<ol>
+  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Structure</em> &gt; <a href="{{ taxonomy_admin }}"><em>Taxonomy</em></a>.{% endtrans %}</li>
+  <li>{% trans %}Click <em>Add vocabulary</em>.{% endtrans %}</li>
+  <li>{% trans %}In the <em>Name</em> field, enter a name for the vocabulary (for example "Ingredients"), which is how it will be shown in the administrative interface. Optionally, add a description.{% endtrans %}</li>
+  <li>{% trans %}Click <em>Save</em>. Your vocabulary will be created and you will see the page that lists all the terms in this vocabulary.{% endtrans %}</li>
+  <li>{% trans %}Optionally, click <em>Add term</em> to add a term to the new vocabulary. In the <em>Name</em> field, enter the term name (for example "Butter"). Click <em>Save</em>. You will receive a confirmation about the term you created. You may optionally continue to add more terms.{% endtrans %}</li>
+  <li>{% trans %}If you have the Field UI module installed, follow the instructions on the related <em>Adding a reference field to an entity sub-type</em> topic to add a taxonomy reference field to the entity type of your choice. The settings page will allow you to choose the <em>Vocabulary</em> that you created as the vocabulary to reference.{% endtrans %}</li>
+  <li>{% trans %}You may also want to configure the display and form display of the new field (see related topics).{% endtrans %}</li>
+</ol>
+<h2>{% trans %}Additional resources{% endtrans %}</h2>
+<ul>
+  <li><a href="https://www.drupal.org/docs/user_guide/en/structure-taxonomy-setup.html">{% trans %}User Guide: Setting up a taxonomy{% endtrans %}</a></li>
+</ul>
