@@ -1,0 +1,69 @@
+diff --git a/core/modules/tour/css/tour.module.css b/core/modules/tour/css/tour.module.css
+index 16c849a..7182574 100644
+--- a/core/modules/tour/css/tour.module.css
++++ b/core/modules/tour/css/tour.module.css
+@@ -5,7 +5,13 @@
+ 
+ /* Tab appearance. */
+ .toolbar .toolbar-bar .tour-toolbar-tab.toolbar-tab {
+-  float: right; /* LTR */
++  position: fixed;
++  top: 220px;
++  right: 270px;
++  margin-left: 0px;
++  margin-right: 270px;
++  background-color: #0074bd;
++  border-radius: 4%;
+ }
+ [dir="rtl"] .toolbar .toolbar-bar .tour-toolbar-tab.toolbar-tab {
+   float: left;
+diff --git a/core/modules/tour/js/tour.es6.js b/core/modules/tour/js/tour.es6.js
+index 52fe8d7..bc412fb 100644
+--- a/core/modules/tour/js/tour.es6.js
++++ b/core/modules/tour/js/tour.es6.js
+@@ -30,7 +30,7 @@
+         .each(() => {
+           const model = new Drupal.tour.models.StateModel();
+           new Drupal.tour.views.ToggleTourView({
+-            el: $(context).find('#toolbar-tab-tour'),
++            el: $(context).find('#toolbar-tab'),
+             model,
+           });
+ 
+diff --git a/core/modules/tour/js/tour.js b/core/modules/tour/js/tour.js
+index 1b5be37..3e50ac8 100644
+--- a/core/modules/tour/js/tour.js
++++ b/core/modules/tour/js/tour.js
+@@ -12,7 +12,7 @@
+       $('body').once('tour').each(function () {
+         var model = new Drupal.tour.models.StateModel();
+         new Drupal.tour.views.ToggleTourView({
+-          el: $(context).find('#toolbar-tab-tour'),
++          el: $(context).find('#toolbar-tab'),
+           model: model
+         });
+         model.on('change:isActive', function (model, isActive) {
+diff --git a/core/modules/tour/tour.module b/core/modules/tour/tour.module
+index e6bbd2a..75e3d91 100644
+--- a/core/modules/tour/tour.module
++++ b/core/modules/tour/tour.module
+@@ -50,7 +50,7 @@ function tour_toolbar() {
+     'tab' => [
+       '#type' => 'html_tag',
+       '#tag' => 'button',
+-      '#value' => t('Tour'),
++      '#value' => t('Take a tour of this page'),
+       '#attributes' => [
+         'class' => ['toolbar-icon', 'toolbar-icon-help'],
+         'aria-pressed' => 'false',
+@@ -58,8 +58,8 @@ function tour_toolbar() {
+       ],
+     ],
+     '#wrapper_attributes' => [
+-      'class' => ['tour-toolbar-tab', 'hidden'],
+-      'id' => 'toolbar-tab-tour',
++      'class' => ['tour-toolbar-tab'],
++      'id' => 'toolbar-tab',
+     ],
+     '#attached' => [
+       'library' => [

@@ -93,8 +93,7 @@ class EditorAdminTest extends BrowserTestBase {
       'editor[editor]' => '',
     ];
     $this->drupalPostForm(NULL, $edit, 'Configure');
-    $unicorn_setting = $this->xpath('//input[@name="editor[settings][ponies_too]" and @type="checkbox" and @checked]');
-    $this->assertCount(0, $unicorn_setting, "Unicorn Editor's settings form is no longer present.");
+    $this->assertSession()->fieldNotExists('editor[settings][ponies_too]');
   }
 
   /**
@@ -210,8 +209,7 @@ class EditorAdminTest extends BrowserTestBase {
       'editor[editor]' => 'unicorn',
     ];
     $this->drupalPostForm(NULL, $edit, 'Configure');
-    $unicorn_setting = $this->xpath('//input[@name="editor[settings][ponies_too]" and @type="checkbox" and @checked]');
-    $this->assertCount(1, $unicorn_setting, "Unicorn Editor's settings form is present.");
+    $this->assertSession()->checkboxChecked('editor[settings][ponies_too]');
 
     return $edit;
   }

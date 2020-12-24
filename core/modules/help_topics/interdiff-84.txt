@@ -1,0 +1,87 @@
+diff --git a/core/modules/help_topics/help_topics/comment.configuring.html.twig b/core/modules/help_topics/help_topics/comment.configuring.html.twig
+index 635dfca..256db36 100644
+--- a/core/modules/help_topics/help_topics/comment.configuring.html.twig
++++ b/core/modules/help_topics/help_topics/comment.configuring.html.twig
+@@ -7,6 +7,7 @@ related:
+   - field_ui.add_field
+ ---
+ {% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
++{% set comment_permission_url = render_var(url('user.admin_permissions', {}, {'fragment': 'module-comment'})) %}
+ <h2>{% trans %}Goal{% endtrans %}</h2>
+ <p>{% trans %}Configure a content entity type/subtype to allow commenting. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</p>
+ <h2>{% trans %}Who can configure comments?{% endtrans %}</h2>
+diff --git a/core/modules/help_topics/help_topics/comment.disabling.html.twig b/core/modules/help_topics/help_topics/comment.disabling.html.twig
+index d78fba6..76453d7 100644
+--- a/core/modules/help_topics/help_topics/comment.disabling.html.twig
++++ b/core/modules/help_topics/help_topics/comment.disabling.html.twig
+@@ -4,9 +4,9 @@ related:
+   - comment.overview
+   - comment.configuring
+ ---
+-{% set content = render_var(url('system.admin_content')) %}
+ {% set comment_permission_url = render_var(url('user.admin_permissions', {}, {'fragment': 'module-comment'})) %}
+ {% set comment_config = render_var(url('help.help_topic', {'id': 'comment.configuring'})) %}
++{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
+ <h2>{% trans %}Goal{% endtrans %}</h2>
+ <p>{% trans %}Turn off commenting for a particular content entity. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields. Note that if you want to turn off commenting for all entities of an entity type or subtype, you will need to edit the field settings for the comment field; see the <a href="{{ comment_config }}">Configuring content commenting</a> topic for more about the comment field.{% endtrans %}</p>
+ <h2>{% trans %}Who can disable comments?{% endtrans %}</h2>
+diff --git a/core/modules/help_topics/help_topics/comment.moderating.html.twig b/core/modules/help_topics/help_topics/comment.moderating.html.twig
+index 3ab7c2b..e98840f 100644
+--- a/core/modules/help_topics/help_topics/comment.moderating.html.twig
++++ b/core/modules/help_topics/help_topics/comment.moderating.html.twig
+@@ -5,8 +5,6 @@ related:
+   - comment.configuring
+   - comment.disabling
+ ---
+-{% set comment_types = render_var(url('entity.comment_type.collection')) %}
+-{% set content = render_var(url('system.admin_content')) %}
+ {% set comment_unpublished_url = render_var(url('comment.admin_approval')) %}
+ {% set comment_published_url = render_var(url('comment.admin')) %}
+ {% set comment_permission_url = render_var(url('user.admin_permissions', {},{'fragment': 'module-comment'})) %}
+diff --git a/core/modules/help_topics/help_topics/node.editing.html.twig b/core/modules/help_topics/help_topics/node.editing.html.twig
+index 4c490bc..f2b7d95 100644
+--- a/core/modules/help_topics/help_topics/node.editing.html.twig
++++ b/core/modules/help_topics/help_topics/node.editing.html.twig
+@@ -18,9 +18,8 @@ related:
+     <ul>
+       <li>{% trans %}<em>Title</em>: key word(s) from the title{% endtrans %}</li>
+       <li>{% trans %}<em>Content type</em>{% endtrans %}</li>
+-      <li>{% trans %}<em>Published status</em>{% endtrans %}
+-      <li>{% trans %}<em>Language</em>{% endtrans %}
+-      </li>
++      <li>{% trans %}<em>Published status</em>{% endtrans %}</li>
++      <li>{% trans %}<em>Language</em>{% endtrans %}</li>
+     </ul>
+     {% trans %}If you enter or select filter values, click <em>Filter</em> to apply the filters.{% endtrans %}</li>
+   <li>{% trans %}Optionally, sort the list by clicking a column header. Click again to reverse the order.{% endtrans %}</li>
+diff --git a/core/modules/help_topics/help_topics/path.creating_alias.html.twig b/core/modules/help_topics/help_topics/path.creating_alias.html.twig
+index 1464c20..5272b49 100644
+--- a/core/modules/help_topics/help_topics/path.creating_alias.html.twig
++++ b/core/modules/help_topics/help_topics/path.creating_alias.html.twig
+@@ -6,13 +6,12 @@ related:
+   - node.creating_content
+   - node.editing
+ ---
+-{% set path_aliases = render_var(url('entity.path_alias.collection')) %}
+ {% set overview = render_var(url('help.help_topic', {'id':'path.overview'})) %}
+ {% set path_permission = render_var(url('user.admin_permissions', {}, {'fragment': 'module-path'})) %}
+ <h2>{% trans %}Goal{% endtrans %}</h2>
+ <p>{% trans %}Give a content item page a human- or SEO-friendly URL alias; you can follow similar steps to create an alias for a taxonomy term page. See <a href="{{ overview }}">Configuring aliases for URLs</a> for more about aliases.{% endtrans %}</p>
+ <h2>{% trans %}Who can create URL aliases?{% endtrans %}</h2>
+-<p>{% trans %}Users with the <em><a href="{{ permissions }}">Create and edit URL aliases</a></em> permission can create aliases. To follow the steps in this topic, you will also need permission to edit the content item.{% endtrans %}</p>
++<p>{% trans %}Users with the <em><a href="{{ path_permission }}">Create and edit URL aliases</a></em> permission can create aliases. To follow the steps in this topic, you will also need permission to edit the content item.{% endtrans %}</p>
+ <h2>{% trans %}Steps{% endtrans %}</h2>
+ <ol>
+   <li>{% trans %}Locate and open the content editing form for the content item, or create a new content item (see related topics on managing and creating content).{% endtrans %}</li>
+diff --git a/core/modules/help_topics/help_topics/path.editing_alias.html.twig b/core/modules/help_topics/help_topics/path.editing_alias.html.twig
+index 97b206a..7af8561 100644
+--- a/core/modules/help_topics/help_topics/path.editing_alias.html.twig
++++ b/core/modules/help_topics/help_topics/path.editing_alias.html.twig
+@@ -4,7 +4,6 @@ related:
+   - path.overview
+   - path.creating_alias
+ ---
+-{% set path_aliases = render_var(url('entity.path_alias.collection')) %}
+ {% set permission = render_var(url('user.admin_permissions', {}, {'fragment': 'module-path'})) %}
+ {% set overview = render_var(url('help.help_topic', {'id':'path.overview'})) %}
+ <h2>{% trans %}Goal{% endtrans %}</h2>

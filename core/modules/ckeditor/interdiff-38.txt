@@ -1,0 +1,13 @@
+diff --git a/core/modules/ckeditor/ckeditor.module b/core/modules/ckeditor/ckeditor.module
+index 9db04da..668e23e 100644
+--- a/core/modules/ckeditor/ckeditor.module
++++ b/core/modules/ckeditor/ckeditor.module
+@@ -39,7 +39,7 @@ function ckeditor_help($route_name, RouteMatchInterface $route_match) {
+       $output .= '<li>' . t('HTML tables can be created with table headers and caption/summary elements.') . '</li>';
+       $output .= '<li>' . t('Alt text is required by default on images added through CKEditor (note that this can be overridden).') . '</li>';
+       $output .= '<li>' . t('Semantic HTML5 figure/figcaption are available to add captions to images.') . '</li>';
+-      $output .= '<li>' . t('To support multilingual page content, a language button can be added to CKEditor toolbars.') . '</li>';
++      $output .= '<li>' . t('To support multilingual page content, CKEditor can be configured to include a language button in the toolbar.') . '</li>';
+       $output .= '</ul>';
+       $output .= '</dd>';
+       $output .= '</dl>';

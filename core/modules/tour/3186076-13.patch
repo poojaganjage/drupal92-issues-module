@@ -1,0 +1,40 @@
+diff --git a/core/modules/tour/tour.module b/core/modules/tour/tour.module
+index e6bbd2a..f5a87ad 100644
+--- a/core/modules/tour/tour.module
++++ b/core/modules/tour/tour.module
+@@ -50,9 +50,9 @@ function tour_toolbar() {
+     'tab' => [
+       '#type' => 'html_tag',
+       '#tag' => 'button',
+-      '#value' => t('Tour'),
++      '#value' => t('Take a tour of this page'),
+       '#attributes' => [
+-        'class' => ['toolbar-icon', 'toolbar-icon-help'],
++        'class' => ['toolbar-icon', 'toolbar-icon-help', 'button--primary'], 
+         'aria-pressed' => 'false',
+         'type' => 'button',
+       ],
+diff --git a/core/themes/claro/css/theme/toolbar.icons.theme.css b/core/themes/claro/css/theme/toolbar.icons.theme.css
+index 22bc14f..25bebe5 100644
+--- a/core/themes/claro/css/theme/toolbar.icons.theme.css
++++ b/core/themes/claro/css/theme/toolbar.icons.theme.css
+@@ -45,7 +45,6 @@
+ 
+ .toolbar button.toolbar-icon {
+   border: 0;
+-  background-color: transparent;
+   font-size: 1em;
+ }
+ 
+diff --git a/core/themes/claro/css/theme/toolbar.icons.theme.pcss.css b/core/themes/claro/css/theme/toolbar.icons.theme.pcss.css
+index 371d729..ffaf695 100644
+--- a/core/themes/claro/css/theme/toolbar.icons.theme.pcss.css
++++ b/core/themes/claro/css/theme/toolbar.icons.theme.pcss.css
+@@ -34,7 +34,6 @@
+ }
+ .toolbar button.toolbar-icon {
+   border: 0;
+-  background-color: transparent;
+   font-size: 1em;
+ }
+ .toolbar .toolbar-menu ul .toolbar-icon {

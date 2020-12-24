@@ -1,0 +1,462 @@
+diff --git a/core/modules/help_topics/help_topics/comment.configuring.html.twig b/core/modules/help_topics/help_topics/comment.configuring.html.twig
+new file mode 100644
+index 0000000..256db36
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/comment.configuring.html.twig
+@@ -0,0 +1,39 @@
++---
++label: 'Configuring content commenting'
++related:
++  - comment.overview
++  - comment.creating_type
++  - comment.disabling
++  - field_ui.add_field
++---
++{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
++{% set comment_permission_url = render_var(url('user.admin_permissions', {}, {'fragment': 'module-comment'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Configure a content entity type/subtype to allow commenting. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</p>
++<h2>{% trans %}Who can configure comments?{% endtrans %}</h2>
++<p>{% trans %}In order to follow these steps, the core Field UI module will need to be installed. You'll need the Comment module's <em><a href="{{ comment_permission_url }}">Administer comments and comment settings</a></em> permission, to change comment settings for a comment field. You'll also need to have the appropriate permission for adding fields to the entity type or subtype that the comments are attached to. For example, to attach comments to content items provided by the Node module, you would need the Node module's <em>Administer content types</em> permission.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}Follow the steps in the related <em>Adding a field to an entity sub-type</em> topic to add a field of type <em>Comment</em> to the desired entity type or sub-type.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Manage fields</em> from the dropdown button for the content type where you want to enable commenting.{% endtrans %}</li>
++  <li>{% trans %}When you get to the field settings page, enter the desired settings for the comment field:{% endtrans %}
++    <ul>
++      <li>{% trans %}<em>Threading</em>: whether or not the comments are collected by threads, with people able to reply to particular comments instead of to the content entity itself. (Note that not all themes support the display of comment threads with indentation.){% endtrans %}</li>
++      <li>{% trans %}<em>Comments per page</em>: the maximum number of comments displayed on one page (additional pages will be added if you exceed this limit).{% endtrans %}</li>
++      <li>{% trans %}<em>Anonymous commenting</em>: whether or not anonymous commenters are allowed or required to leave contact information with their comments (only applies if anonymous users have permission to post comments).{% endtrans %}</li>
++      <li>{% trans %}<em>Show reply form on the same page as comments</em>: whether the comment reply form is displayed on the same page as the comments. If this is not selected, clicking <em>Reply</em> will open a new page with the reply form.{% endtrans %}</li>
++      <li>{% trans %}<em>Preview comments</em>: whether previewing comments before submission is <em>Required</em>, <em>Optional</em>, or <em>Disabled</em>.{% endtrans %}</li>
++      <li>{% trans %}<em>Default value</em>: each content item will have its own comment settings, but here you can set defaults for the comment settings for this entity type or subtype. The comment settings values are:{% endtrans %}
++        <ul>
++          <li>{% trans %}<em>Open</em>: comments are allowed.{% endtrans %}</li>
++          <li>{% trans %}<em>Closed</em>: no new comments are allowed, but any past comments remain visible.{% endtrans %}</li>
++          <li>{% trans %}<em>Hidden</em>: no comments are allowed, and past comments are hidden.{% endtrans %}</li>
++        </ul>
++      </li>
++    </ul>
++  </li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/8/core/modules/comment/administering-a-content-types-comment-settings">{% trans %}Online documentation for content comment settings{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/comment.creating_type.html.twig b/core/modules/help_topics/help_topics/comment.creating_type.html.twig
+new file mode 100644
+index 0000000..74853a7
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/comment.creating_type.html.twig
+@@ -0,0 +1,26 @@
++---
++label: 'Creating a comment type'
++related:
++  - field_ui.add_field
++  - field_ui.manage_display
++  - field_ui.manage_form
++  - comment.overview
++  - comment.configuring
++---
++{% set overview = render_var(url('help.help_topic', {'id': 'comment.overview'})) %}
++{% set comment_types = render_var(url('entity.comment_type.collection')) %}
++{% set permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-comment'})) %}
++{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Create a new comment type. See <a href="{{ overview }}">Managing comments</a> for information about comments and comment types.{% endtrans %}</p>
++<h2>{% trans %}Who can create a content type?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ permissions }}">Administer comment types and settings</a></em> permission (typically administrators) can create comment types.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Structure</em> &gt; <a href="{{ comment_types }}"><em>Comment types</em></a>.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Add comment type</em>.{% endtrans %}</li>
++  <li>{% trans %}In the <em>Label</em> field, enter a name for the comment type, which is how it will be listed in the administrative interface.{% endtrans %}</li>
++  <li>{% trans %}In the <em>Target entity type</em> field, select the entity type to be commented on. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Save</em>. The comment type will be created.{% endtrans %}</li>
++  <li>{% trans %}Optionally, if you have the core Field UI module installed you can follow the steps in the related topics to add fields to the new comment type, set up the editing form, and configure the display.{% endtrans %}</li>
++</ol>
+diff --git a/core/modules/help_topics/help_topics/comment.disabling.html.twig b/core/modules/help_topics/help_topics/comment.disabling.html.twig
+new file mode 100644
+index 0000000..76453d7
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/comment.disabling.html.twig
+@@ -0,0 +1,25 @@
++---
++label: 'Disabling comments'
++related:
++  - comment.overview
++  - comment.configuring
++---
++{% set comment_permission_url = render_var(url('user.admin_permissions', {}, {'fragment': 'module-comment'})) %}
++{% set comment_config = render_var(url('help.help_topic', {'id': 'comment.configuring'})) %}
++{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Turn off commenting for a particular content entity. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields. Note that if you want to turn off commenting for all entities of an entity type or subtype, you will need to edit the field settings for the comment field; see the <a href="{{ comment_config }}">Configuring content commenting</a> topic for more about the comment field.{% endtrans %}</p>
++<h2>{% trans %}Who can disable comments?{% endtrans %}</h2>
++<p>{% trans %}You will need the <em><a href="{{ comment_permission_url }}">Administer comments and comment settings</a></em> permission in order to disable commenting. You will also need permission to edit the content entity that the comments are on.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}Find the entity you want to disable comments for, and edit it. For example, to turn off comments on a content item, you could find it by navigating in the <em>Manage</em> administrative menu to <em>Content</em>, filtering to find the content item, and clicking <em>Edit</em>.{% endtrans %}</li>
++  <li>{% trans %}Under <em>Comment settings</em>, select the desired comment setting:{% endtrans %}
++    <ul>
++      <li>{% trans %}<em>Open</em>: comments are allowed.{% endtrans %}</li>
++      <li>{% trans %}<em>Closed</em>: no new comments are allowed, but any past comments remain visible.{% endtrans %}</li>
++      <li>{% trans %}<em>Hidden</em>: no comments are allowed, and past comments are hidden.{% endtrans %}</li>
++    </ul>
++  </li>
++  <li>{% trans %}Save the entity.{% endtrans %}</li>
++</ol>
+diff --git a/core/modules/help_topics/help_topics/comment.moderating.html.twig b/core/modules/help_topics/help_topics/comment.moderating.html.twig
+new file mode 100644
+index 0000000..e98840f
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/comment.moderating.html.twig
+@@ -0,0 +1,25 @@
++---
++label: 'Moderating comments'
++related:
++  - comment.overview
++  - comment.configuring
++  - comment.disabling
++---
++{% set comment_unpublished_url = render_var(url('comment.admin_approval')) %}
++{% set comment_published_url = render_var(url('comment.admin')) %}
++{% set comment_permission_url = render_var(url('user.admin_permissions', {},{'fragment': 'module-comment'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Decide which comments are shown on the website.{% endtrans %}</p>
++<h2>{% trans %}Who can moderate comments?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ comment_permission_url }}">Administer comments and comment settings</a></em> permission (typically administrators) can moderate comments. You will also need the <em>Access the Content Overview page</em> permission from the Node module (if it is installed) to navigate to the comment management page.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Content</em> &gt; <em><a href="{{ comment_published_url }}">Comments</a></em>. A list of all comments is shown.{% endtrans %}</li>
++  <li>{% trans %}To unpublish comments, select one or more comments by checking the boxes on the left side (right side in right-to-left languages). Then select <em>Unpublish comment</em> from the <em>Action</em> select list and click <em>Apply to selected items</em>. If you select the <em>Delete comment</em> action, you can instead delete the unwanted  comments.{% endtrans %}</li>
++  <li>{% trans %}To change the content of a comment click <em>Edit</em> from the dropdown button for a particular comment.{% endtrans %}</li>
++  <li>{% trans %}To publish comments that are not yet visible on the website, navigate to the <em><a href="{{ comment_unpublished_url }}">Unapproved comments</a></em> tab. Select one or more comments by checking the boxes on the left side (right side in right-to-left languages). Then select <em>Publish comment</em> from the <em>Action</em> select list and click <em>Apply to selected items</em>.{% endtrans %}</li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/8/core/modules/comment/administering-and-approving-comments">{% trans %}Online documentation for moderating comments{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/comment.overview.html.twig b/core/modules/help_topics/help_topics/comment.overview.html.twig
+new file mode 100644
+index 0000000..29621de
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/comment.overview.html.twig
+@@ -0,0 +1,29 @@
++---
++label: 'Managing comments'
++top_level: true
++related:
++  - comment.moderating
++  - comment.configuring
++  - comment.creating_type
++  - comment.disabling
++  - field_ui.add_field
++  - field_ui.manage_display
++  - field_ui.manage_form
++---
++{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
++{% set users = render_var(url('help.help_topic', {'id': 'user.overview'})) %}
++<h2>{% trans %}What is a comment?{% endtrans %}</h2>
++<p>{% trans %}A comment is a piece of content, typically posted by a website visitor, which provides discussion or commentary on other content like forum topics, blog posts, and news articles. Comments are a type of content entity, and can have fields that store text, HTML markup, and other data. Comments are attached to other content entities via Comment fields. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</p>
++<h2>{% trans %}What is a comment type?{% endtrans %}</h2>
++<p>{% trans %}Comments are divided into <em>comment types</em>, which are the entity sub-types for the comment entity type; each comment type has its own fields and form and display settings. For example, you might set up different comment types for commenting on different content entities on your web site.{% endtrans %}</p>
++<h2>{% trans %}What is moderation?{% endtrans %}</h2>
++<p>{% trans %}<em>Moderation</em> is a workflow where comments posted by some users on your site are verified before being published, to prevent spam and other bad behavior. The core software provides basic moderation functionality: you can configure permissions so that new comments posted by some user roles start as unpublished until a user with a different role reviews and publishes them. Contributed modules provide additional moderation and spam-reduction functionality, such as requiring untrusted users pass a CAPTCHA test before submitting comments and letting community members flag comments as possible spam. See <a href="{{ users }}">Managing user accounts and site visitors</a> for more about users, permissions, and roles.{% endtrans %}</p>
++<h2>{% trans %}Overview of managing comments{% endtrans %}</h2>
++<p>{% trans %}The core Comment module provides the following functionality:{% endtrans %}</p>
++<ul>
++  <li>{% trans %}Posting comments{% endtrans %}</li>
++  <li>{% trans %}Creating comment types; the core Field UI module allows you to attach fields to comment types and attach comment reference fields to other entities so that people can comment on them.{% endtrans %}</li>
++  <li>{% trans %}Configuring commenting{% endtrans %}</li>
++  <li>{% trans %}Moderating comments as discussed above{% endtrans %}</li>
++</ul>
++<p>{% trans %}See the related topics listed below for specific tasks.{% endtrans %}</p>
+diff --git a/core/modules/help_topics/help_topics/node.creating_content.html.twig b/core/modules/help_topics/help_topics/node.creating_content.html.twig
+new file mode 100644
+index 0000000..450d5bb
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/node.creating_content.html.twig
+@@ -0,0 +1,30 @@
++---
++label: 'Creating a content item'
++related:
++  - node.overview
++  - node.creating_type
++  - path.creating_alias
++---
++{% set content = render_var(url('system.admin_content')) %}
++{% set permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-node'})) %}
++{% set overview = render_var(url('help.help_topic', {'id': 'node.overview'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Create and publish a content item. See <a href="{{ overview }}">Managing content</a> for more about content types and content items.{% endtrans %}</p>
++<h2>{% trans %}Who can create content?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ permissions }}">Access the Content overview page </a></em> permission can visit the <em>Content</em> page as described in this topic. Each content type has its own create permissions. For example, to create content of type Article, a user would need the <em><a href="{{ permissions }}">Article: Create new content</a></em> permission. In addition, users with the <em>Bypass content access control</em> or <em>Administer content</em> permission can create content items of all types. Some contributed modules change the permission structure for creating content.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em><a href="{{ content }}">Content</a></em>.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Add content</em>.{% endtrans %}</li>
++  <li>{% trans %}If there is more than one content type defined on your site that you have permission to create, click the name of the type of content you want to create.{% endtrans %}</li>
++  <li>{% trans %}On the content edit form, enter the <em>Title</em> of your content, which will show as the page title when the content item is displayed on a page, and also as the label for the content item in administration screens.{% endtrans %}</li>
++  <li>{% trans %}Fill in the other fields shown on the edit form for this specific content type.{% endtrans %}</li>
++  <li>{% trans %}Leave the <em>Published</em> field checked to publish the content immediately, or uncheck it to make it unpublished. Unpublished content is generally not shown to non-administrative site users.{% endtrans %}</li>
++  <li>{% trans %}Optionally, click <em>Preview</em> to preview the content.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Save</em>. You will see the content displayed on a page.{% endtrans %}</li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-chapter.html">{% trans %}User Guide: Basic page management{% endtrans %}</a></li>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-create.html">{% trans %}User Guide: Creating a content item{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/node.creating_type.html.twig b/core/modules/help_topics/help_topics/node.creating_type.html.twig
+new file mode 100644
+index 0000000..b76333d
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/node.creating_type.html.twig
+@@ -0,0 +1,30 @@
++---
++label: 'Creating a content type'
++related:
++  - node.overview
++  - core.content_structure
++  - field_ui.add_field
++  - field_ui.manage_display
++  - field_ui.manage_form
++---
++{% set permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-node'})) %}
++{% set content_types = render_var(url('entity.node_type.collection')) %}
++{% set overview = render_var(url('help.help_topic', {'id': 'node.overview'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Create a new content type. See <a href="{{ overview }}">Managing content</a> for more about content types.{% endtrans %}</p>
++<h2>{% trans %}Who can create a content type?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ permissions }}">Administer content types</a></em> permission (typically administrators) can create new content types.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Structure</em> &gt; <a href="{{ content_types }}"><em>Content types</em></a>.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Add content type.</em>{% endtrans %}</li>
++  <li>{% trans %}In the <em>Name</em> field, enter a name for the content type, which is how it will be listed in the administrative interface.{% endtrans %}</li>
++  <li>{% trans %}Optionally, enter a <em>Description</em> for the content type. You may also want to adjust some of the settings in the vertical tabs section of the edit page.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Save and manage fields</em>. Your content type will be created, and assuming you have the core Field UI module installed, you will be taken to the <em>Manage fields</em> page for the content type. (If you do not have the core Field UI module installed, the button will say <em>Save</em> instead.){% endtrans %}</li>
++  <li>{% trans %}If you have the core Field UI module installed, follow the steps in the related topics to add fields to the new content type, set up the editing form, and configure the display.{% endtrans %}</li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/structure-content-type.html">{% trans %}User Guide: Adding a content type{% endtrans %}</a></li>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-structure-chapter.html">{% trans %}User Guide: Setting up content structure{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/node.editing.html.twig b/core/modules/help_topics/help_topics/node.editing.html.twig
+new file mode 100644
+index 0000000..f2b7d95
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/node.editing.html.twig
+@@ -0,0 +1,33 @@
++---
++label: 'Editing a content item'
++related:
++  - node.overview
++  - node.creating_content
++---
++{% set content = render_var(url('system.admin_content')) %}
++{% set permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-node'})) %}
++{% set overview = render_var(url('help.help_topic', {'id': 'node.overview'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Find a content item and edit it, or update a group of content items in bulk. See <a href="{{ overview }}">Managing content</a> for more about content types and content items.{% endtrans %}</p>
++<h2>{% trans %}Who can find and edit content?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ permissions }}">Access the Content overview page </a></em> permission can use the <em>Content</em> page to find content. Each content type has its own edit permissions. For example, to edit content of type Article, a user would need the <em>Article: Edit own content</em> permission to edit an article they created, or the <em>Article: Edit any content</em> permission to edit an article someone else created. In addition, users with the <em>Bypass content access control</em> or <em>Administer content</em> permission can edit content items of all types. Some contributed modules change the permission structure for editing content.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em><a href="{{ content }}">Content</a></em>.{% endtrans %}</li>
++  <li>{% trans %}Optionally, use filters to reduce the list of content items shown:{% endtrans %}
++    <ul>
++      <li>{% trans %}<em>Title</em>: key word(s) from the title{% endtrans %}</li>
++      <li>{% trans %}<em>Content type</em>{% endtrans %}</li>
++      <li>{% trans %}<em>Published status</em>{% endtrans %}</li>
++      <li>{% trans %}<em>Language</em>{% endtrans %}</li>
++    </ul>
++    {% trans %}If you enter or select filter values, click <em>Filter</em> to apply the filters.{% endtrans %}</li>
++  <li>{% trans %}Optionally, sort the list by clicking a column header. Click again to reverse the order.{% endtrans %}</li>
++  <li>{% trans %}To edit the title or other field values for one content item, click <em>Edit</em> in the row of the content item. Update the values and click <em>Save</em>.{% endtrans %}</li>
++  <li>{% trans %}A few types of edits can be done in bulk to multiple content items. For example, to publish several unpublished content items, check the boxes in the left column (right column in right-to-left languages) to select the desired content items. For <em>Action</em>, select the <em>Publish content</em> action. Click <em>Apply to selected items</em> to make the change. The other actions under <em>Action</em> work in a similar manner.{% endtrans %}</li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-chapter.html">{% trans %}User Guide: Basic page management{% endtrans %}</a></li>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-edit.html">{% trans %}User Guide: Editing a content item{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/node.overview.html.twig b/core/modules/help_topics/help_topics/node.overview.html.twig
+new file mode 100644
+index 0000000..5cd325e
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/node.overview.html.twig
+@@ -0,0 +1,19 @@
++---
++label: 'Managing content'
++top_level: true
++related:
++  - core.content_structure
++  - field_ui.add_field
++  - field_ui.manage_display
++  - field_ui.manage_form
++  - node.creating_type
++  - node.creating_content
++  - node.editing
++---
++{% set content_structure = render_var(url('help.help_topic', {'id': 'core.content_structure'})) %}
++<h2>{% trans %}What is a content item?{% endtrans %}</h2>
++<p>{% trans %}A <em>content item</em> is a type of content entity for page-level content, which can have fields that store text, HTML markup, images, attached files, and other data. See <a href="{{ content_structure }}">Managing content structure</a> for more about content entities and fields.{% endtrans %}</p>
++<h2>{% trans %}What is a content type?{% endtrans %}</h2>
++<p>{% trans %}Content items are divided into <em>content types</em>, which are the entity sub-types for the content item entity type; each content type has its own fields and display settings. For example, you might set up content types for pages, articles, recipes, events, and blog entries on your web site.{% endtrans %}</p>
++<h2>{% trans %}Overview of managing content{% endtrans %}</h2>
++<p>{% trans %}The core Node module allows you to define content types, and add and edit content items. The core Field UI module allows you to attach fields to each content type and manage the edit form and display for each content type. See the related topics listed below for specific tasks. Many other core and contributed modules and installation profiles provide pre-defined content types, modify the permission structure for content items, and provide other functionality.{% endtrans %}</p>
+diff --git a/core/modules/help_topics/help_topics/path.creating_alias.html.twig b/core/modules/help_topics/help_topics/path.creating_alias.html.twig
+new file mode 100644
+index 0000000..5272b49
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/path.creating_alias.html.twig
+@@ -0,0 +1,25 @@
++---
++label: 'Creating a URL alias for a content item'
++related:
++  - path.overview
++  - path.editing_alias
++  - node.creating_content
++  - node.editing
++---
++{% set overview = render_var(url('help.help_topic', {'id':'path.overview'})) %}
++{% set path_permission = render_var(url('user.admin_permissions', {}, {'fragment': 'module-path'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Give a content item page a human- or SEO-friendly URL alias; you can follow similar steps to create an alias for a taxonomy term page. See <a href="{{ overview }}">Configuring aliases for URLs</a> for more about aliases.{% endtrans %}</p>
++<h2>{% trans %}Who can create URL aliases?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ path_permission }}">Create and edit URL aliases</a></em> permission can create aliases. To follow the steps in this topic, you will also need permission to edit the content item.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}Locate and open the content editing form for the content item, or create a new content item (see related topics on managing and creating content).{% endtrans %}</li>
++  <li>{% trans %}Under <em>URL alias</em> on the content item editing form, enter the <em>URL alias</em> (for example, "/about-us"). Make sure the alias starts with a "/" character.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Save</em>.{% endtrans %}</li>
++  <li>{% trans %}Verify that the page can be visited with the new alias, for example <em>http://example.com/about-us</em>.{% endtrans %}</li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-create.html">{% trans %}User guide: Creating a Content Item{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/path.editing_alias.html.twig b/core/modules/help_topics/help_topics/path.editing_alias.html.twig
+new file mode 100644
+index 0000000..7af8561
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/path.editing_alias.html.twig
+@@ -0,0 +1,19 @@
++---
++label: 'Editing a URL alias'
++related:
++  - path.overview
++  - path.creating_alias
++---
++{% set permission = render_var(url('user.admin_permissions', {}, {'fragment': 'module-path'})) %}
++{% set overview = render_var(url('help.help_topic', {'id':'path.overview'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Change an existing URL alias, to correct the path or the alias value. See <a href="{{ overview }}">Configuring aliases for URLs</a> for more about aliases.{% endtrans %}</p>
++<h2>{% trans %}Who can manage URL aliases?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ permission }}">Administer URL aliases</a></em> permission can edit aliases.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administration menu, navigate to <em>Configuration</em> &gt; <em>Search and Metadata</em> &gt; <a href="{{ path_aliases }}"><em>URL aliases</em></a>. A list of all the site's aliases will appear.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Edit</em> in the dropdown button for the alias that you would like to change.{% endtrans %}</li>
++  <li>{% trans %}Make the required changes and click <em>Save</em>. You will be returned to the URL alias list page.{% endtrans %}</li>
++  <li>{% trans %}Note that you can also add new aliases from this page, for any path on your site.{% endtrans %}</li>
++</ol>
+diff --git a/core/modules/help_topics/help_topics/path.overview.html.twig b/core/modules/help_topics/help_topics/path.overview.html.twig
+new file mode 100644
+index 0000000..b50d9ab
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/path.overview.html.twig
+@@ -0,0 +1,24 @@
++---
++label: 'Configuring aliases for URLs'
++top_level: true
++related:
++  - path.creating_alias
++  - path.editing_alias
++---
++<h2>{% trans %}What is a URL?{% endtrans %}</h2>
++<p>{% trans %}URL is the abbreviation for "Uniform Resource Locator", which is the page's address on the web. It is the "name" by which a browser identifies a page to display. In the example "Visit us at <em>example.com</em>.", <em>example.com</em> is the URL for the home page of your website. Users use URLs to locate content on the web.{% endtrans %}</p>
++<h2>{% trans %}What is a path?{% endtrans %}</h2>
++<p>{% trans %}A path is the unique, last part of the URL for a specific function or piece of content. For example, for a page whose full URL is <em>http://example.com/node/7</em>, the path is <em>node/7</em>. Here are some examples of paths you might find in your site:{% endtrans %}</p>
++<ul>
++  <li>{% trans %}node/7: Path to a particular content item.{% endtrans %}</li>
++  <li>{% trans %}taxonomy/term/6: Path to a taxonomy term page.{% endtrans %}</li>
++  <li>{% trans %}user/3: Path to user profile page.{% endtrans %}</li>
++</ul>
++<h2>{% trans %}What is an alias?{% endtrans %}</h2>
++<p>{% trans %}The core software allows you to provide more understandable URLs for pages on your site, which are called <em>aliases</em>. For example, if you have an "About Us" page with the path <em>node/7</em>, you can set up an alias so that your visitors will see it as <em>http://www.example.com/about</em>.{% endtrans %}</p>
++<h2>{% trans %}Overview of configuring paths, aliases, and URLs{% endtrans %}</h2>
++<p>{% trans %}The core Path module provides the URL aliasing functionality. The contributed <a href="https://www.drupal.org/project/pathauto">Pathauto</a> module allows you to configure automatically-generated URL aliases for content items and other pages. See the related topics listed below for specific tasks.{% endtrans %}</p>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/content-paths.html">{% trans %}User Guide topic on Paths{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/taxonomy.configuring.html.twig b/core/modules/help_topics/help_topics/taxonomy.configuring.html.twig
+new file mode 100644
+index 0000000..3b5a2cb
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/taxonomy.configuring.html.twig
+@@ -0,0 +1,30 @@
++---
++label: 'Configuring taxonomy'
++related:
++  - taxonomy.overview
++  - field_ui.reference_field
++  - field_ui.manage_display
++  - field_ui.manage_form
++---
++{% set taxonomy_permissions = render_var(url('user.admin_permissions', {}, {'fragment': 'module-taxonomy'})) %}
++{% set taxonomy_admin = render_var(url('entity.taxonomy_vocabulary.collection')) %}
++{% set overview = render_var(url('help.help_topic', {'id':'taxonomy.overview'})) %}
++{% set content_structure = render_var(url('help.help_topic', {'id':'core.content_structure'})) %}
++<h2>{% trans %}Goal{% endtrans %}</h2>
++<p>{% trans %}Create a taxonomy vocabulary and add a reference field for that vocabulary to a content entity. See <a href="{{ overview }}">Managing taxonomy</a> for information about taxonomy and <a href="{{ content_structure }}">Managing content structure</a> for more on content entities.{% endtrans %}</p>
++<h2>{% trans %}Who can configure a taxonomy vocabulary?{% endtrans %}</h2>
++<p>{% trans %}Users with the <em><a href="{{ taxonomy_permissions }}">Administer vocabularies and terms</a></em> permission can configure a vocabulary. To add a field using the Field UI module, you will also need the <em>Administer fields</em> permission for the entity you are adding the field to.{% endtrans %}</p>
++<h2>{% trans %}Steps{% endtrans %}</h2>
++<ol>
++  <li>{% trans %}In the <em>Manage</em> administrative menu, navigate to <em>Structure</em> &gt; <a href="{{ taxonomy_admin }}"><em>Taxonomy</em></a>.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Add vocabulary</em>.{% endtrans %}</li>
++  <li>{% trans %}In the <em>Name</em> field, enter a name for the vocabulary (for example "Ingredients"), which is how it will be shown in the administrative interface. Optionally, add a description.{% endtrans %}</li>
++  <li>{% trans %}Click <em>Save</em>. Your vocabulary will be created and you will see the page that lists all the terms in this vocabulary.{% endtrans %}</li>
++  <li>{% trans %}Optionally, click <em>Add term</em> to add a term to the new vocabulary. In the <em>Name</em> field, enter the term name (for example "Butter"). Click <em>Save</em>. You will receive a confirmation about the term you created. You may optionally continue to add more terms.{% endtrans %}</li>
++  <li>{% trans %}If you have the Field UI module installed, follow the instructions on the related <em>Adding a reference field to an entity sub-type</em> topic to add a taxonomy reference field to the entity type of your choice. The settings page will allow you to choose the <em>Vocabulary</em> that you created as the vocabulary to reference.{% endtrans %}</li>
++  <li>{% trans %}You may also want to configure the display and form display of the new field (see related topics).{% endtrans %}</li>
++</ol>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a href="https://www.drupal.org/docs/user_guide/en/structure-taxonomy-setup.html">{% trans %}User Guide: Setting up a taxonomy{% endtrans %}</a></li>
++</ul>
+diff --git a/core/modules/help_topics/help_topics/taxonomy.overview.html.twig b/core/modules/help_topics/help_topics/taxonomy.overview.html.twig
+new file mode 100644
+index 0000000..35a56ec
+--- /dev/null
++++ b/core/modules/help_topics/help_topics/taxonomy.overview.html.twig
+@@ -0,0 +1,24 @@
++---
++label: 'Managing taxonomy'
++top_level: true
++---
++{% set content_structure = render_var(url('help.help_topic', {'id':'core.content_structure'})) %}
++<h2>{% trans %}What is Taxonomy?{% endtrans %}</h2>
++<p>{% trans %}<em>Taxonomy</em> is used to classify website content. One common example of taxonomy is the tags used to classify or categorize posts in a blog website; a cooking website could use an ingredients taxonomy to classify recipes. Individual taxonomy items are known as <em>terms</em> (the blog tags or recipe ingredients in these examples); and a set of terms is known as a <em>vocabulary</em> (the set of all blog post tags, or the set of all recipe ingredients in these examples). Technically, taxonomy terms are an entity type and the entity subtypes are the vocabularies; see <a href="{{ content_structure }}">Managing content structure</a> for more on content entities. Like other entities, taxonomy terms can have fields attached; for instance, you could set up an image field to contain an icon for each term.{% endtrans %}</p>
++<p>{% trans %}An individual vocabulary can organize its terms in a hierarchy, or it could be flat. For example, blog tags normally have a flat structure, while a recipe ingredients vocabulary could be hierarchical (for example, tomatoes could be a sub-term of vegetables, and under tomatoes, you could have green and red tomatoes).{% endtrans %}</p>
++<p>{% trans %}Taxonomy terms are normally attached as reference fields to other content entities, which is how you can use them to classify content. When you set up a taxonomy reference field, you can let users enter terms in two ways:{% endtrans %}</p>
++<dl>
++  <dt>{% trans %}Free tagging{% endtrans %}</dt>
++  <dd>{% trans %}New terms can be created right on the content editing form.{% endtrans %}</dd>
++  <dt>{% trans %}Fixed list of terms{% endtrans %}</dt>
++  <dd>{% trans %}The list of terms is curated and managed outside the content editing form, and users can only select from the existing list when editing content.{% endtrans %}</dd>
++</dl>
++<p>{% trans %}Taxonomy reference fields can be added to any entity, such as user accounts, custom blocks, or regular content items. If you use them to classify regular content items, your site will automatically be set up with taxonomy listing pages for each term; each of these pages lists all of the content items that are classified with that term.{% endtrans %}</p>
++<h2>{% trans %}Overview of managing taxonomy{% endtrans %}</h2>
++<p>{% trans %}The core Taxonomy module allows you to create and edit taxonomy vocabularies and taxonomy terms. The core Field UI module provides a user interface for adding fields to entities, including the taxonomy reference field, and configuring field editing and display. See the related topics listed below for specific tasks.{% endtrans %}</p>
++<h2>{% trans %}Additional resources{% endtrans %}</h2>
++<ul>
++  <li><a
++      href="https://www.drupal.org/docs/user_guide/en/structure-taxonomy.html">{% trans %}User guide on Taxonomy{% endtrans %}</a>
++  </li>
++</ul>

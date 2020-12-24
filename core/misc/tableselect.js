@@ -38,20 +38,25 @@
       });
     };
 
-    $table.find('th.select-all').prepend($(Drupal.theme('checkbox')).attr('title', strings.selectAll)).on('click', function (event) {
-      if ($(event.target).is('input[type="checkbox"]')) {
-        checkboxes.each(function () {
-          var $checkbox = $(this);
-          var stateChanged = $checkbox.prop('checked') !== event.target.checked;
+    $table.find('th.select-all').each(function () {
+      var $this = $(this);
+      var $selectAllCheckbox = $('<input type="checkbox" class="form-checkbox" />').attr('title', strings.selectAll).attr('id', Math.random().toString(16).slice(2, 10));
+      var $selectAllLabel = $('<label>').attr('for', $selectAllCheckbox.attr('id'));
+      $this.prepend($selectAllCheckbox).append($selectAllLabel).on('click', function (event) {
+        if ($(event.target).is('input[type="checkbox"]')) {
+          checkboxes.each(function () {
+            var $checkbox = $(this);
+            var stateChanged = $checkbox.prop('checked') !== event.target.checked;
 
-          if (stateChanged) {
-            $checkbox.prop('checked', event.target.checked).trigger('change');
-          }
+            if (stateChanged) {
+              $checkbox.prop('checked', event.target.checked).trigger('change');
+            }
 
-          $checkbox.closest('tr').toggleClass('selected', this.checked);
-        });
-        updateSelectAll(event.target.checked);
-      }
+            $checkbox.closest('tr').toggleClass('selected', this.checked);
+          });
+          updateSelectAll(event.target.checked);
+        }
+      });
     });
     checkboxes = $table.find('td input[type="checkbox"]:enabled').on('click', function (e) {
       $(this).closest('tr').toggleClass('selected', this.checked);

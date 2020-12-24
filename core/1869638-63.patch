@@ -1,0 +1,227 @@
+diff --git a/core/modules/toolbar/config/schema/toolbar.schema.yml b/core/modules/toolbar/config/schema/toolbar.schema.yml
+new file mode 100644
+index 0000000..84830ae
+--- /dev/null
++++ b/core/modules/toolbar/config/schema/toolbar.schema.yml
+@@ -0,0 +1,13 @@
++# Schema for the configuration files of the Toolbar module.
++
++toolbar.settings:
++  type: config_object
++  label: 'Toolbar settings'
++  mapping:
++    admin_tray:
++      type: mapping
++      label: 'Admin tray settings'
++      mapping:
++        menu_name:
++          type: string
++          label: 'Menu to use in the toolbar admin tray'
+diff --git a/core/modules/toolbar/src/Controller/ToolbarController.php b/core/modules/toolbar/src/Controller/ToolbarController.php
+index c94e35b..c299b8a 100644
+--- a/core/modules/toolbar/src/Controller/ToolbarController.php
++++ b/core/modules/toolbar/src/Controller/ToolbarController.php
+@@ -5,16 +5,37 @@
+ use Drupal\Core\Access\AccessResult;
+ use Drupal\Core\Ajax\AjaxResponse;
+ use Drupal\Core\Cache\CacheableMetadata;
++use Drupal\Core\Config\ConfigFactoryInterface;
+ use Drupal\Core\Controller\ControllerBase;
+ use Drupal\Core\Menu\MenuTreeParameters;
+ use Drupal\Core\Security\TrustedCallbackInterface;
+ use Drupal\toolbar\Ajax\SetSubtreesCommand;
++use Symfony\Component\DependencyInjection\ContainerInterface;
+ 
+ /**
+  * Defines a controller for the toolbar module.
+  */
+ class ToolbarController extends ControllerBase implements TrustedCallbackInterface {
+ 
++  /**
++   * Constructs the ToolbarController object.
++   *
++   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
++   *   The config factory.
++   */
++  public function __construct(ConfigFactoryInterface $config_factory) {
++    $this->configFactory = $config_factory;
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public static function create(ContainerInterface $container) {
++    return new static(
++      $container->get('config.factory')
++    );
++  }
++
+   /**
+    * Returns an AJAX response to render the toolbar subtrees.
+    *
+@@ -65,15 +86,15 @@ public function checkSubTreeAccess($hash) {
+    *
+    * @see \Drupal\Core\Render\RendererInterface::render()
+    */
+-  public static function preRenderAdministrationTray(array $element) {
++  public function preRenderAdministrationTray(array $element) {
+     $menu_tree = \Drupal::service('toolbar.menu_tree');
+     // Load the administrative menu. The first level is the "Administration"
+     // link. In order to load the children of that link, start and end on the
+     // second level.
+     $parameters = new MenuTreeParameters();
+     $parameters->setMinDepth(2)->setMaxDepth(2)->onlyEnabledLinks();
+-    // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
+-    $tree = $menu_tree->load('admin', $parameters);
++    $admin_tray_menu = $this->configFactory->get('toolbar.settings')->get('admin_tray.menu_name') ?: 'admin';
++    $tree = $menu_tree->load($admin_tray_menu, $parameters);
+     $manipulators = [
+       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+@@ -89,15 +110,15 @@ public static function preRenderAdministrationTray(array $element) {
+    *
+    * @internal
+    */
+-  public static function preRenderGetRenderedSubtrees(array $data) {
++  public function preRenderGetRenderedSubtrees(array $data) {
+     $menu_tree = \Drupal::service('toolbar.menu_tree');
+     // Load the administration menu. The first level is the "Administration"
+     // link. In order to load the children of that link and the subsequent two
+     // levels, start at the second level and end at the fourth.
+     $parameters = new MenuTreeParameters();
+     $parameters->setMinDepth(2)->setMaxDepth(4)->onlyEnabledLinks();
+-    // @todo Make the menu configurable in https://www.drupal.org/node/1869638.
+-    $tree = $menu_tree->load('admin', $parameters);
++    $admin_tray_menu = $this->configFactory->get('toolbar.settings')->get('admin_tray.menu_name') ?: 'admin';
++    $tree = $menu_tree->load($admin_tray_menu, $parameters);
+     $manipulators = [
+       ['callable' => 'menu.default_tree_manipulators:checkAccess'],
+       ['callable' => 'menu.default_tree_manipulators:generateIndexAndSort'],
+@@ -136,7 +157,7 @@ public static function preRenderGetRenderedSubtrees(array $data) {
+   /**
+    * {@inheritdoc}
+    */
+-  public static function trustedCallbacks() {
++  public function trustedCallbacks() {
+     return ['preRenderAdministrationTray', 'preRenderGetRenderedSubtrees'];
+   }
+ 
+diff --git a/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/config/install/system.menu.custom.yml b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/config/install/system.menu.custom.yml
+new file mode 100644
+index 0000000..d0ff9cd
+--- /dev/null
++++ b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/config/install/system.menu.custom.yml
+@@ -0,0 +1,6 @@
++langcode: en
++status: true
++dependencies: {  }
++id: custom
++label: Custom
++description: ''
+diff --git a/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/config/install/toolbar.settings.yml b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/config/install/toolbar.settings.yml
+new file mode 100644
+index 0000000..e9d5127
+--- /dev/null
++++ b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/config/install/toolbar.settings.yml
+@@ -0,0 +1,2 @@
++admin_tray:
++  menu_name: custom
+diff --git a/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/toolbar_custom_admin_tray_menu.info.yml b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/toolbar_custom_admin_tray_menu.info.yml
+new file mode 100644
+index 0000000..71b3f92
+--- /dev/null
++++ b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/toolbar_custom_admin_tray_menu.info.yml
+@@ -0,0 +1,7 @@
++name: 'Custom toolbar admin tray menu'
++type: module
++description: 'Support module for testing toolbar with a custom admin tray menu.'
++package: Testing
++version: VERSION
++dependencies:
++  - toolbar
+diff --git a/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/toolbar_custom_admin_tray_menu.links.menu.yml b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/toolbar_custom_admin_tray_menu.links.menu.yml
+new file mode 100644
+index 0000000..f852e69
+--- /dev/null
++++ b/core/modules/toolbar/tests/modules/toolbar_custom_admin_tray_menu/toolbar_custom_admin_tray_menu.links.menu.yml
+@@ -0,0 +1,8 @@
++custom.base:
++  title: Custom menu base link
++  menu_name: custom
++  route_name: '<nolink>'
++custom.link:
++  title: Custom menu link
++  parent: custom.base
++  route_name: '<front>'
+diff --git a/core/modules/toolbar/tests/src/Functional/ToolbarCustomAdminTrayMenuTest.php b/core/modules/toolbar/tests/src/Functional/ToolbarCustomAdminTrayMenuTest.php
+new file mode 100644
+index 0000000..bd371a2
+--- /dev/null
++++ b/core/modules/toolbar/tests/src/Functional/ToolbarCustomAdminTrayMenuTest.php
+@@ -0,0 +1,66 @@
++<?php
++
++namespace Drupal\Tests\toolbar\Functional;
++
++use Drupal\Tests\BrowserTestBase;
++
++/**
++ * Tests overriding the toolbar's admin tray menu.
++ *
++ * @group toolbar
++ */
++class ToolbarCustomAdminTrayMenuTest extends BrowserTestBase {
++
++  /**
++   * A user with permission to access the toolbar.
++   *
++   * @var \Drupal\user\UserInterface
++   */
++  protected $adminUser;
++
++  /**
++   * {@inheritdoc}
++   */
++  protected static $modules = [
++    'toolbar',
++    'toolbar_custom_admin_tray_menu',
++    'test_page_test',
++  ];
++
++  /**
++   * {@inheritdoc}
++   */
++  protected $defaultTheme = 'stark';
++
++  /**
++   * {@inheritdoc}
++   */
++  protected function setUp(): void {
++    parent::setUp();
++
++    // Create an administrative user and log it in.
++    $this->adminUser = $this->drupalCreateUser([
++      'access toolbar',
++      'access administration pages',
++    ]);
++    $this->drupalLogin($this->adminUser);
++  }
++
++  /**
++   * Tests the custom admin tray menu.
++   */
++  public function testToolbarCustomAdminTrayMenu() {
++    $this->drupalGet('test-page');
++    $this->assertSession()->statusCodeEquals(200);
++
++    // Assert that the toolbar is present in the HTML.
++    $this->assertRaw('id="toolbar-administration"');
++
++    // Assert that the "Content" link not present.
++    $this->assertNoRaw('href="/admin/content"');
++
++    // Assert that the custom link is present.
++    $this->assertRaw('Custom menu link');
++  }
++
++}

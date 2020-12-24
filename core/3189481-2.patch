@@ -1,0 +1,1403 @@
+diff --git a/core/modules/action/src/Plugin/migrate/source/Action.php b/core/modules/action/src/Plugin/migrate/source/Action.php
+index f3ff266..eb5b9e7 100644
+--- a/core/modules/action/src/Plugin/migrate/source/Action.php
++++ b/core/modules/action/src/Plugin/migrate/source/Action.php
+@@ -12,6 +12,8 @@
+  *   id = "action",
+  *   source_module = "system"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Action extends DrupalSqlBase {
+ 
+diff --git a/core/modules/aggregator/src/Plugin/migrate/source/AggregatorFeed.php b/core/modules/aggregator/src/Plugin/migrate/source/AggregatorFeed.php
+index 7d01536..b7f55fe 100644
+--- a/core/modules/aggregator/src/Plugin/migrate/source/AggregatorFeed.php
++++ b/core/modules/aggregator/src/Plugin/migrate/source/AggregatorFeed.php
+@@ -11,6 +11,8 @@
+  *   id = "aggregator_feed",
+  *   source_module = "aggregator"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class AggregatorFeed extends DrupalSqlBase {
+ 
+diff --git a/core/modules/aggregator/src/Plugin/migrate/source/AggregatorItem.php b/core/modules/aggregator/src/Plugin/migrate/source/AggregatorItem.php
+index 8cde1f8..36ab907 100644
+--- a/core/modules/aggregator/src/Plugin/migrate/source/AggregatorItem.php
++++ b/core/modules/aggregator/src/Plugin/migrate/source/AggregatorItem.php
+@@ -11,6 +11,8 @@
+  *   id = "aggregator_item",
+  *   source_module = "aggregator"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class AggregatorItem extends DrupalSqlBase {
+ 
+diff --git a/core/modules/ban/src/Plugin/migrate/source/d7/BlockedIps.php b/core/modules/ban/src/Plugin/migrate/source/d7/BlockedIps.php
+index 7d3eeeb..b8c7576 100644
+--- a/core/modules/ban/src/Plugin/migrate/source/d7/BlockedIps.php
++++ b/core/modules/ban/src/Plugin/migrate/source/d7/BlockedIps.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_blocked_ips",
+  *   source_module = "system"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class BlockedIps extends DrupalSqlBase {
+ 
+diff --git a/core/modules/block/src/Plugin/migrate/source/Block.php b/core/modules/block/src/Plugin/migrate/source/Block.php
+index da06ace..f42f9eb 100644
+--- a/core/modules/block/src/Plugin/migrate/source/Block.php
++++ b/core/modules/block/src/Plugin/migrate/source/Block.php
+@@ -12,6 +12,8 @@
+  *   id = "block",
+  *   source_module = "block"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Block extends DrupalSqlBase {
+ 
+diff --git a/core/modules/block_content/src/Plugin/migrate/source/d6/Box.php b/core/modules/block_content/src/Plugin/migrate/source/d6/Box.php
+index 0a1da19..e64af04 100644
+--- a/core/modules/block_content/src/Plugin/migrate/source/d6/Box.php
++++ b/core/modules/block_content/src/Plugin/migrate/source/d6/Box.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_box",
+  *   source_module = "block"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Box extends DrupalSqlBase {
+ 
+diff --git a/core/modules/block_content/src/Plugin/migrate/source/d6/BoxTranslation.php b/core/modules/block_content/src/Plugin/migrate/source/d6/BoxTranslation.php
+index 23cf118..fd63dfa 100644
+--- a/core/modules/block_content/src/Plugin/migrate/source/d6/BoxTranslation.php
++++ b/core/modules/block_content/src/Plugin/migrate/source/d6/BoxTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_box_translation",
+  *   source_module = "i18nblocks"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class BoxTranslation extends D7BlockCustomTranslation {
+ 
+diff --git a/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustom.php b/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustom.php
+index 7c166e9..a23db30 100644
+--- a/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustom.php
++++ b/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustom.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_block_custom",
+  *   source_module = "block"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class BlockCustom extends DrupalSqlBase {
+ 
+diff --git a/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php b/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php
+index 6893551..e56c947 100644
+--- a/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php
++++ b/core/modules/block_content/src/Plugin/migrate/source/d7/BlockCustomTranslation.php
+@@ -13,6 +13,8 @@
+  *   id = "d7_block_custom_translation",
+  *   source_module = "i18n_block"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class BlockCustomTranslation extends DrupalSqlBase {
+ 
+diff --git a/core/modules/book/src/Plugin/migrate/source/Book.php b/core/modules/book/src/Plugin/migrate/source/Book.php
+index 08977fb..9de72d7 100644
+--- a/core/modules/book/src/Plugin/migrate/source/Book.php
++++ b/core/modules/book/src/Plugin/migrate/source/Book.php
+@@ -11,6 +11,8 @@
+  *   id = "book",
+  *   source_module = "book",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Book extends DrupalSqlBase {
+ 
+diff --git a/core/modules/color/src/Plugin/migrate/source/d7/Color.php b/core/modules/color/src/Plugin/migrate/source/d7/Color.php
+index d0382c2..2922e2b 100644
+--- a/core/modules/color/src/Plugin/migrate/source/d7/Color.php
++++ b/core/modules/color/src/Plugin/migrate/source/d7/Color.php
+@@ -17,6 +17,8 @@
+  *   id = "d7_color",
+  *   source_module = "color"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Color extends VariableMultiRow {
+ 
+diff --git a/core/modules/comment/src/Plugin/migrate/source/d6/Comment.php b/core/modules/comment/src/Plugin/migrate/source/d6/Comment.php
+index 29ed6b7..40635e2 100644
+--- a/core/modules/comment/src/Plugin/migrate/source/d6/Comment.php
++++ b/core/modules/comment/src/Plugin/migrate/source/d6/Comment.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_comment",
+  *   source_module = "comment"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Comment extends DrupalSqlBase {
+ 
+diff --git a/core/modules/comment/src/Plugin/migrate/source/d7/Comment.php b/core/modules/comment/src/Plugin/migrate/source/d7/Comment.php
+index 73c2d8f..a59f0c7 100644
+--- a/core/modules/comment/src/Plugin/migrate/source/d7/Comment.php
++++ b/core/modules/comment/src/Plugin/migrate/source/d7/Comment.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_comment",
+  *   source_module = "comment"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Comment extends FieldableEntity {
+ 
+diff --git a/core/modules/comment/src/Plugin/migrate/source/d7/CommentEntityTranslation.php b/core/modules/comment/src/Plugin/migrate/source/d7/CommentEntityTranslation.php
+index a749f71..4e1d5bb 100644
+--- a/core/modules/comment/src/Plugin/migrate/source/d7/CommentEntityTranslation.php
++++ b/core/modules/comment/src/Plugin/migrate/source/d7/CommentEntityTranslation.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_comment_entity_translation",
+  *   source_module = "entity_translation"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class CommentEntityTranslation extends FieldableEntity {
+ 
+diff --git a/core/modules/config_translation/src/Plugin/migrate/source/d6/ProfileFieldTranslation.php b/core/modules/config_translation/src/Plugin/migrate/source/d6/ProfileFieldTranslation.php
+index e308685..a5bcb59 100644
+--- a/core/modules/config_translation/src/Plugin/migrate/source/d6/ProfileFieldTranslation.php
++++ b/core/modules/config_translation/src/Plugin/migrate/source/d6/ProfileFieldTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_profile_field_translation",
+  *   source_module = "i18nprofile"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ProfileFieldTranslation extends ProfileField {
+ 
+diff --git a/core/modules/contact/src/Plugin/migrate/source/ContactCategory.php b/core/modules/contact/src/Plugin/migrate/source/ContactCategory.php
+index c361588..1498540 100644
+--- a/core/modules/contact/src/Plugin/migrate/source/ContactCategory.php
++++ b/core/modules/contact/src/Plugin/migrate/source/ContactCategory.php
+@@ -12,6 +12,8 @@
+  *   id = "contact_category",
+  *   source_module = "contact"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ContactCategory extends DrupalSqlBase {
+ 
+diff --git a/core/modules/contact/src/Plugin/migrate/source/ContactSettings.php b/core/modules/contact/src/Plugin/migrate/source/ContactSettings.php
+index 8297be6..a6ac30f 100644
+--- a/core/modules/contact/src/Plugin/migrate/source/ContactSettings.php
++++ b/core/modules/contact/src/Plugin/migrate/source/ContactSettings.php
+@@ -9,6 +9,8 @@
+  *   id = "contact_settings",
+  *   source_module = "contact"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ContactSettings extends Variable {
+ 
+diff --git a/core/modules/content_translation/src/Plugin/migrate/source/d7/EntityTranslationSettings.php b/core/modules/content_translation/src/Plugin/migrate/source/d7/EntityTranslationSettings.php
+index f35a205..c52ea13 100644
+--- a/core/modules/content_translation/src/Plugin/migrate/source/d7/EntityTranslationSettings.php
++++ b/core/modules/content_translation/src/Plugin/migrate/source/d7/EntityTranslationSettings.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_entity_translation_settings",
+  *   source_module = "entity_translation"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class EntityTranslationSettings extends DrupalSqlBase {
+ 
+diff --git a/core/modules/contextual/css/contextual.toolbar.css b/core/modules/contextual/css/contextual.toolbar.css
+index 5b84c24..aca2c83 100644
+--- a/core/modules/contextual/css/contextual.toolbar.css
++++ b/core/modules/contextual/css/contextual.toolbar.css
+@@ -12,6 +12,7 @@
+ }
+ .toolbar .toolbar-bar .contextual-toolbar-tab .toolbar-item {
+   margin: 0;
++  background-color: #0f0f0f;
+ }
+ .toolbar .toolbar-bar .contextual-toolbar-tab .toolbar-item.is-active {
+   background-image: -webkit-linear-gradient(rgb(78, 159, 234) 0%, rgb(69, 132, 221) 100%);
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/Field.php b/core/modules/field/src/Plugin/migrate/source/d6/Field.php
+index cab0204..1deb47f 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/Field.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/Field.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_field",
+  *   source_module = "content"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Field extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstance.php b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstance.php
+index 23fb882..c07c241 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstance.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstance.php
+@@ -14,6 +14,8 @@
+  *   id = "d6_field_instance",
+  *   source_module = "content"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstance extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstanceOptionTranslation.php b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstanceOptionTranslation.php
+index 15ec9b9..01d078e 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstanceOptionTranslation.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstanceOptionTranslation.php
+@@ -9,6 +9,8 @@
+  *   id = "d6_field_instance_option_translation",
+  *   source_module = "i18ncck"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstanceOptionTranslation extends FieldOptionTranslation {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerFormDisplay.php b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerFormDisplay.php
+index 1db201e..1c34ad4 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerFormDisplay.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerFormDisplay.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_field_instance_per_form_display",
+  *   source_module = "content"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstancePerFormDisplay extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerViewMode.php b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerViewMode.php
+index 2fd1e1b..34e197e 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerViewMode.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/FieldInstancePerViewMode.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_field_instance_per_view_mode",
+  *   source_module = "content"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstancePerViewMode extends ViewModeBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/FieldLabelDescriptionTranslation.php b/core/modules/field/src/Plugin/migrate/source/d6/FieldLabelDescriptionTranslation.php
+index 7da1ac0..847f3be 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/FieldLabelDescriptionTranslation.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/FieldLabelDescriptionTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_field_instance_label_description_translation",
+  *   source_module = "i18ncck"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldLabelDescriptionTranslation extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d6/FieldOptionTranslation.php b/core/modules/field/src/Plugin/migrate/source/d6/FieldOptionTranslation.php
+index c5d1c28..cc53abb 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d6/FieldOptionTranslation.php
++++ b/core/modules/field/src/Plugin/migrate/source/d6/FieldOptionTranslation.php
+@@ -9,6 +9,8 @@
+  *   id = "d6_field_option_translation",
+  *   source_module = "i18ncck"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldOptionTranslation extends Field {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/Field.php b/core/modules/field/src/Plugin/migrate/source/d7/Field.php
+index eefb7a2..6835c54 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/Field.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/Field.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_field",
+  *   source_module = "field_sql_storage"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Field extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/FieldInstance.php b/core/modules/field/src/Plugin/migrate/source/d7/FieldInstance.php
+index e15fe7b..0eda8c7 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/FieldInstance.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/FieldInstance.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_field_instance",
+  *   source_module = "field"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstance extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerFormDisplay.php b/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerFormDisplay.php
+index 7165f6d..527b2de 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerFormDisplay.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerFormDisplay.php
+@@ -9,6 +9,8 @@
+  *   id = "d7_field_instance_per_form_display",
+  *   source_module = "field"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstancePerFormDisplay extends FieldInstance {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerViewMode.php b/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerViewMode.php
+index 7d5ee81..3e391c9 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerViewMode.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/FieldInstancePerViewMode.php
+@@ -9,6 +9,8 @@
+  *   id = "d7_field_instance_per_view_mode",
+  *   source_module = "field"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldInstancePerViewMode extends FieldInstance {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/FieldLabelDescriptionTranslation.php b/core/modules/field/src/Plugin/migrate/source/d7/FieldLabelDescriptionTranslation.php
+index 3ed17b9..967af69 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/FieldLabelDescriptionTranslation.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/FieldLabelDescriptionTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_field_instance_label_description_translation",
+  *   source_module = "i18n_field"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldLabelDescriptionTranslation extends DrupalSqlBase {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/FieldOptionTranslation.php b/core/modules/field/src/Plugin/migrate/source/d7/FieldOptionTranslation.php
+index f1a9030..6aa5f9c 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/FieldOptionTranslation.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/FieldOptionTranslation.php
+@@ -9,6 +9,8 @@
+  *   id = "d7_field_option_translation",
+  *   source_module = "i18n_field"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FieldOptionTranslation extends Field {
+ 
+diff --git a/core/modules/field/src/Plugin/migrate/source/d7/ViewMode.php b/core/modules/field/src/Plugin/migrate/source/d7/ViewMode.php
+index 039960a..70f7f98 100644
+--- a/core/modules/field/src/Plugin/migrate/source/d7/ViewMode.php
++++ b/core/modules/field/src/Plugin/migrate/source/d7/ViewMode.php
+@@ -9,6 +9,8 @@
+  *   id = "d7_view_mode",
+  *   source_module = "field"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ViewMode extends FieldInstance {
+ 
+diff --git a/core/modules/file/src/Plugin/migrate/source/d6/File.php b/core/modules/file/src/Plugin/migrate/source/d6/File.php
+index 14a0a6d..e4e8f8d 100644
+--- a/core/modules/file/src/Plugin/migrate/source/d6/File.php
++++ b/core/modules/file/src/Plugin/migrate/source/d6/File.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_file",
+  *   source_module = "system"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class File extends DrupalSqlBase {
+ 
+diff --git a/core/modules/file/src/Plugin/migrate/source/d6/Upload.php b/core/modules/file/src/Plugin/migrate/source/d6/Upload.php
+index 4d03e5f..289d75b 100644
+--- a/core/modules/file/src/Plugin/migrate/source/d6/Upload.php
++++ b/core/modules/file/src/Plugin/migrate/source/d6/Upload.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_upload",
+  *   source_module = "upload"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Upload extends DrupalSqlBase {
+ 
+diff --git a/core/modules/file/src/Plugin/migrate/source/d6/UploadInstance.php b/core/modules/file/src/Plugin/migrate/source/d6/UploadInstance.php
+index f4182a9..69e64d8 100644
+--- a/core/modules/file/src/Plugin/migrate/source/d6/UploadInstance.php
++++ b/core/modules/file/src/Plugin/migrate/source/d6/UploadInstance.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_upload_instance",
+  *   source_module = "upload"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UploadInstance extends DrupalSqlBase {
+ 
+diff --git a/core/modules/file/src/Plugin/migrate/source/d7/File.php b/core/modules/file/src/Plugin/migrate/source/d7/File.php
+index 4e8f334..aba872b 100644
+--- a/core/modules/file/src/Plugin/migrate/source/d7/File.php
++++ b/core/modules/file/src/Plugin/migrate/source/d7/File.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_file",
+  *   source_module = "file"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class File extends DrupalSqlBase {
+ 
+diff --git a/core/modules/filter/src/Plugin/migrate/source/d6/FilterFormat.php b/core/modules/filter/src/Plugin/migrate/source/d6/FilterFormat.php
+index de9ab4c..0c01ade 100644
+--- a/core/modules/filter/src/Plugin/migrate/source/d6/FilterFormat.php
++++ b/core/modules/filter/src/Plugin/migrate/source/d6/FilterFormat.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_filter_format",
+  *   source_module = "filter"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FilterFormat extends DrupalSqlBase {
+ 
+diff --git a/core/modules/filter/src/Plugin/migrate/source/d7/FilterFormat.php b/core/modules/filter/src/Plugin/migrate/source/d7/FilterFormat.php
+index 13438f2..42301e9 100644
+--- a/core/modules/filter/src/Plugin/migrate/source/d7/FilterFormat.php
++++ b/core/modules/filter/src/Plugin/migrate/source/d7/FilterFormat.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_filter_format",
+  *   source_module = "filter"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class FilterFormat extends DrupalSqlBase {
+ 
+diff --git a/core/modules/image/src/Plugin/migrate/source/d6/ImageCachePreset.php b/core/modules/image/src/Plugin/migrate/source/d6/ImageCachePreset.php
+index 662648d..2daa285 100644
+--- a/core/modules/image/src/Plugin/migrate/source/d6/ImageCachePreset.php
++++ b/core/modules/image/src/Plugin/migrate/source/d6/ImageCachePreset.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_imagecache_presets",
+  *   source_module = "imagecache"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ImageCachePreset extends DrupalSqlBase {
+ 
+diff --git a/core/modules/image/src/Plugin/migrate/source/d7/ImageStyles.php b/core/modules/image/src/Plugin/migrate/source/d7/ImageStyles.php
+index 070cc9b..7d7a21e 100644
+--- a/core/modules/image/src/Plugin/migrate/source/d7/ImageStyles.php
++++ b/core/modules/image/src/Plugin/migrate/source/d7/ImageStyles.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_image_styles",
+  *   source_module = "image"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ImageStyles extends DrupalSqlBase {
+ 
+diff --git a/core/modules/language/src/Plugin/migrate/source/Language.php b/core/modules/language/src/Plugin/migrate/source/Language.php
+index 8e62b23..a6f985d 100644
+--- a/core/modules/language/src/Plugin/migrate/source/Language.php
++++ b/core/modules/language/src/Plugin/migrate/source/Language.php
+@@ -10,6 +10,8 @@
+  *   id = "language",
+  *   source_module = "locale"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Language extends DrupalSqlBase {
+ 
+diff --git a/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettings.php b/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettings.php
+index 369238c..4c17568 100644
+--- a/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettings.php
++++ b/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettings.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_language_content_settings",
+  *   source_module = "locale"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class LanguageContentSettings extends DrupalSqlBase {
+ 
+diff --git a/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettingsTaxonomyVocabulary.php b/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettingsTaxonomyVocabulary.php
+index 7787865..da7c165 100644
+--- a/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettingsTaxonomyVocabulary.php
++++ b/core/modules/language/src/Plugin/migrate/source/d6/LanguageContentSettingsTaxonomyVocabulary.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_language_content_settings_taxonomy_vocabulary",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class LanguageContentSettingsTaxonomyVocabulary extends DrupalSqlBase {
+ 
+diff --git a/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettings.php b/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettings.php
+index 8811ae1..8b57cd1 100644
+--- a/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettings.php
++++ b/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettings.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_language_content_settings",
+  *   source_module = "locale"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class LanguageContentSettings extends DrupalSqlBase {
+ 
+diff --git a/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettingsTaxonomyVocabulary.php b/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettingsTaxonomyVocabulary.php
+index eb29950..ba8a9f9 100644
+--- a/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettingsTaxonomyVocabulary.php
++++ b/core/modules/language/src/Plugin/migrate/source/d7/LanguageContentSettingsTaxonomyVocabulary.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_language_content_settings_taxonomy_vocabulary",
+  *   source_module = "i18n_taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class LanguageContentSettingsTaxonomyVocabulary extends Vocabulary {
+ 
+diff --git a/core/modules/menu_link_content/src/Plugin/migrate/source/MenuLink.php b/core/modules/menu_link_content/src/Plugin/migrate/source/MenuLink.php
+index 5f269c0..323a920 100644
+--- a/core/modules/menu_link_content/src/Plugin/migrate/source/MenuLink.php
++++ b/core/modules/menu_link_content/src/Plugin/migrate/source/MenuLink.php
+@@ -13,6 +13,8 @@
+  *   id = "menu_link",
+  *   source_module = "menu"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class MenuLink extends DrupalSqlBase {
+ 
+diff --git a/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php b/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php
+index 088c2a3..1195c03 100644
+--- a/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php
++++ b/core/modules/menu_link_content/src/Plugin/migrate/source/d6/MenuLinkTranslation.php
+@@ -13,6 +13,8 @@
+  *   id = "d6_menu_link_translation",
+  *   source_module = "i18nmenu"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class MenuLinkTranslation extends MenuLink {
+ 
+diff --git a/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkLocalized.php b/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkLocalized.php
+index b683186..233967e 100644
+--- a/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkLocalized.php
++++ b/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkLocalized.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_menu_link_localized",
+  *   source_module = "i18n_menu"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class MenuLinkLocalized extends MenuLink {
+ 
+diff --git a/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php b/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php
+index c7832ba..186460f 100644
+--- a/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php
++++ b/core/modules/menu_link_content/src/Plugin/migrate/source/d7/MenuLinkTranslation.php
+@@ -13,6 +13,8 @@
+  *   id = "d7_menu_link_translation",
+  *   source_module = "i18n_menu"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class MenuLinkTranslation extends MenuLink {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntity.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntity.php
+index a2f38d1..0036811 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntity.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntity.php
+@@ -53,6 +53,8 @@
+  *   source_module = "migrate_drupal",
+  *   deriver = "\Drupal\migrate_drupal\Plugin\migrate\source\ContentEntityDeriver",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ContentEntity extends SourcePluginBase implements ContainerFactoryPluginInterface {
+   use EntityFieldDefinitionTrait;
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntityDeriver.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntityDeriver.php
+index 2740441..e3ff767 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntityDeriver.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/ContentEntityDeriver.php
+@@ -10,6 +10,8 @@
+ 
+ /**
+  * Deriver for content entity source plugins.
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ContentEntityDeriver extends DeriverBase implements ContainerDeriverInterface {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/EmptySource.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/EmptySource.php
+index 8a95570..4ff4172 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/EmptySource.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/EmptySource.php
+@@ -17,6 +17,8 @@
+  *   id = "md_empty",
+  *   source_module = "system",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class EmptySource extends BaseEmptySource implements ContainerFactoryPluginInterface, DependentPluginInterface {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/Variable.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/Variable.php
+index 320fc23..dfdc4d1 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/Variable.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/Variable.php
+@@ -69,6 +69,8 @@
+  *   id = "variable",
+  *   source_module = "system",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Variable extends DrupalSqlBase {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/VariableMultiRow.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/VariableMultiRow.php
+index 47d575c..42a19f0 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/VariableMultiRow.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/VariableMultiRow.php
+@@ -14,6 +14,8 @@
+  *   id = "variable_multirow",
+  *   source_module = "system",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class VariableMultiRow extends DrupalSqlBase {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/d6/VariableTranslation.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/d6/VariableTranslation.php
+index 633e7fe..9eee514 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/d6/VariableTranslation.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/d6/VariableTranslation.php
+@@ -15,6 +15,8 @@
+  *   id = "d6_variable_translation",
+  *   source_module = "i18n",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class VariableTranslation extends DrupalSqlBase {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/FieldableEntity.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/FieldableEntity.php
+index fe0fe48..b2ab15b 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/FieldableEntity.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/FieldableEntity.php
+@@ -7,6 +7,8 @@
+ /**
+  * Base class for D7 source plugins which need to collect field values from
+  * the Field API.
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ abstract class FieldableEntity extends DrupalSqlBase {
+ 
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/VariableTranslation.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/VariableTranslation.php
+index dd68dbe..15b7edc 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/VariableTranslation.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/d7/VariableTranslation.php
+@@ -14,6 +14,8 @@
+  *   id = "d7_variable_translation",
+  *   source_module = "i18n_variable",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class VariableTranslation extends DrupalSqlBase {
+   /**
+diff --git a/core/modules/migrate_drupal/src/Plugin/migrate/source/d8/Config.php b/core/modules/migrate_drupal/src/Plugin/migrate/source/d8/Config.php
+index c396b76..8f5804b 100644
+--- a/core/modules/migrate_drupal/src/Plugin/migrate/source/d8/Config.php
++++ b/core/modules/migrate_drupal/src/Plugin/migrate/source/d8/Config.php
+@@ -12,6 +12,8 @@
+  *   id = "d8_config",
+  *   source_module = "system",
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Config extends DrupalSqlBase {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d6/NodeComplete.php b/core/modules/node/src/Plugin/migrate/source/d6/NodeComplete.php
+index 96d6d29..c62e99b 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d6/NodeComplete.php
++++ b/core/modules/node/src/Plugin/migrate/source/d6/NodeComplete.php
+@@ -9,6 +9,8 @@
+  *   id = "d6_node_complete",
+  *   source_module = "node"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeComplete extends NodeRevision {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d6/NodeRevision.php b/core/modules/node/src/Plugin/migrate/source/d6/NodeRevision.php
+index 6292498..6f54d61 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d6/NodeRevision.php
++++ b/core/modules/node/src/Plugin/migrate/source/d6/NodeRevision.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_node_revision",
+  *   source_module = "node"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeRevision extends Node {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d6/NodeType.php b/core/modules/node/src/Plugin/migrate/source/d6/NodeType.php
+index c5caa12..9646424 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d6/NodeType.php
++++ b/core/modules/node/src/Plugin/migrate/source/d6/NodeType.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_node_type",
+  *   source_module = "node"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeType extends DrupalSqlBase {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d6/ViewMode.php b/core/modules/node/src/Plugin/migrate/source/d6/ViewMode.php
+index 2a938af..4387578 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d6/ViewMode.php
++++ b/core/modules/node/src/Plugin/migrate/source/d6/ViewMode.php
+@@ -9,6 +9,8 @@
+  *   id = "d6_view_mode",
+  *   source_module = "content"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ViewMode extends ViewModeBase {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d6/ViewModeBase.php b/core/modules/node/src/Plugin/migrate/source/d6/ViewModeBase.php
+index 88d84d9..43a9915 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d6/ViewModeBase.php
++++ b/core/modules/node/src/Plugin/migrate/source/d6/ViewModeBase.php
+@@ -6,6 +6,8 @@
+ 
+ /**
+  * A base class for migrations that require view mode info.
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ abstract class ViewModeBase extends DrupalSqlBase {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php b/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php
+index 6aba4ed..165e02b 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php
++++ b/core/modules/node/src/Plugin/migrate/source/d7/NodeComplete.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_node_complete",
+  *   source_module = "node"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeComplete extends NodeRevision {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d7/NodeRevision.php b/core/modules/node/src/Plugin/migrate/source/d7/NodeRevision.php
+index 67071a7..c90ff41 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d7/NodeRevision.php
++++ b/core/modules/node/src/Plugin/migrate/source/d7/NodeRevision.php
+@@ -9,6 +9,8 @@
+  *   id = "d7_node_revision",
+  *   source_module = "node"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeRevision extends Node {
+ 
+diff --git a/core/modules/node/src/Plugin/migrate/source/d7/NodeType.php b/core/modules/node/src/Plugin/migrate/source/d7/NodeType.php
+index e64b989..1c7a5f3 100644
+--- a/core/modules/node/src/Plugin/migrate/source/d7/NodeType.php
++++ b/core/modules/node/src/Plugin/migrate/source/d7/NodeType.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_node_type",
+  *   source_module = "node"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeType extends DrupalSqlBase {
+ 
+diff --git a/core/modules/path/src/Plugin/migrate/source/UrlAliasBase.php b/core/modules/path/src/Plugin/migrate/source/UrlAliasBase.php
+index 79e6400..a72ecc0 100644
+--- a/core/modules/path/src/Plugin/migrate/source/UrlAliasBase.php
++++ b/core/modules/path/src/Plugin/migrate/source/UrlAliasBase.php
+@@ -6,6 +6,8 @@
+ 
+ /**
+  * Base class for the url_alias source plugins.
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ abstract class UrlAliasBase extends DrupalSqlBase {
+ 
+diff --git a/core/modules/path/src/Plugin/migrate/source/d6/UrlAlias.php b/core/modules/path/src/Plugin/migrate/source/d6/UrlAlias.php
+index c01d364..f490a23 100644
+--- a/core/modules/path/src/Plugin/migrate/source/d6/UrlAlias.php
++++ b/core/modules/path/src/Plugin/migrate/source/d6/UrlAlias.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_url_alias",
+  *   source_module = "path"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UrlAlias extends UrlAliasBase {
+ 
+diff --git a/core/modules/path/src/Plugin/migrate/source/d7/UrlAlias.php b/core/modules/path/src/Plugin/migrate/source/d7/UrlAlias.php
+index 58405fd..6598b15 100644
+--- a/core/modules/path/src/Plugin/migrate/source/d7/UrlAlias.php
++++ b/core/modules/path/src/Plugin/migrate/source/d7/UrlAlias.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_url_alias",
+  *   source_module = "path"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UrlAlias extends UrlAliasBase {
+ 
+diff --git a/core/modules/rdf/src/Plugin/migrate/source/d7/RdfMapping.php b/core/modules/rdf/src/Plugin/migrate/source/d7/RdfMapping.php
+index f8e613a..02532de 100644
+--- a/core/modules/rdf/src/Plugin/migrate/source/d7/RdfMapping.php
++++ b/core/modules/rdf/src/Plugin/migrate/source/d7/RdfMapping.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_rdf_mapping",
+  *   source_module = "rdf"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class RdfMapping extends DrupalSqlBase {
+ 
+diff --git a/core/modules/responsive_image/src/Plugin/migrate/source/d7/ResponsiveImageStyles.php b/core/modules/responsive_image/src/Plugin/migrate/source/d7/ResponsiveImageStyles.php
+index a5da895..0a5fafc 100644
+--- a/core/modules/responsive_image/src/Plugin/migrate/source/d7/ResponsiveImageStyles.php
++++ b/core/modules/responsive_image/src/Plugin/migrate/source/d7/ResponsiveImageStyles.php
+@@ -19,6 +19,8 @@
+  *   id = "d7_responsive_image_styles",
+  *   source_module = "picture"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ResponsiveImageStyles extends SqlBase {
+ 
+diff --git a/core/modules/search/src/Plugin/migrate/source/d6/SearchPage.php b/core/modules/search/src/Plugin/migrate/source/d6/SearchPage.php
+index 085de33..4bf6e3b 100644
+--- a/core/modules/search/src/Plugin/migrate/source/d6/SearchPage.php
++++ b/core/modules/search/src/Plugin/migrate/source/d6/SearchPage.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_search_page",
+  *   source_module = "search"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class SearchPage extends Variable {
+ 
+diff --git a/core/modules/search/src/Plugin/migrate/source/d7/SearchPage.php b/core/modules/search/src/Plugin/migrate/source/d7/SearchPage.php
+index 6ae2b22..a8d810d 100644
+--- a/core/modules/search/src/Plugin/migrate/source/d7/SearchPage.php
++++ b/core/modules/search/src/Plugin/migrate/source/d7/SearchPage.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_search_page",
+  *   source_module = "search"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class SearchPage extends Variable {
+ 
+diff --git a/core/modules/shortcut/src/Plugin/migrate/source/d7/Shortcut.php b/core/modules/shortcut/src/Plugin/migrate/source/d7/Shortcut.php
+index adf37f9..e678713 100644
+--- a/core/modules/shortcut/src/Plugin/migrate/source/d7/Shortcut.php
++++ b/core/modules/shortcut/src/Plugin/migrate/source/d7/Shortcut.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_shortcut",
+  *   source_module = "shortcut"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Shortcut extends DrupalSqlBase {
+ 
+diff --git a/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSet.php b/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSet.php
+index 7a3ed8a..a71617e 100644
+--- a/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSet.php
++++ b/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSet.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_shortcut_set",
+  *   source_module = "shortcut"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ShortcutSet extends DrupalSqlBase {
+ 
+diff --git a/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSetUsers.php b/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSetUsers.php
+index c4d54e9..0bfeb07 100644
+--- a/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSetUsers.php
++++ b/core/modules/shortcut/src/Plugin/migrate/source/d7/ShortcutSetUsers.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_shortcut_set_users",
+  *   source_module = "shortcut"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ShortcutSetUsers extends DrupalSqlBase {
+ 
+diff --git a/core/modules/statistics/src/Plugin/migrate/source/NodeCounter.php b/core/modules/statistics/src/Plugin/migrate/source/NodeCounter.php
+index 0877d3f..c58dea5 100644
+--- a/core/modules/statistics/src/Plugin/migrate/source/NodeCounter.php
++++ b/core/modules/statistics/src/Plugin/migrate/source/NodeCounter.php
+@@ -11,6 +11,8 @@
+  *   id = "node_counter",
+  *   source_module = "statistics"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class NodeCounter extends DrupalSqlBase {
+ 
+diff --git a/core/modules/system/src/Plugin/migrate/source/Extension.php b/core/modules/system/src/Plugin/migrate/source/Extension.php
+index 3799391..d6214dc 100644
+--- a/core/modules/system/src/Plugin/migrate/source/Extension.php
++++ b/core/modules/system/src/Plugin/migrate/source/Extension.php
+@@ -12,6 +12,8 @@
+  *   id = "extension",
+  *   source_module = "system"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Extension extends DrupalSqlBase {
+ 
+diff --git a/core/modules/system/src/Plugin/migrate/source/Menu.php b/core/modules/system/src/Plugin/migrate/source/Menu.php
+index 14296f1..bb9649c 100644
+--- a/core/modules/system/src/Plugin/migrate/source/Menu.php
++++ b/core/modules/system/src/Plugin/migrate/source/Menu.php
+@@ -11,6 +11,8 @@
+  *   id = "menu",
+  *   source_module = "menu"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Menu extends DrupalSqlBase {
+ 
+diff --git a/core/modules/system/src/Plugin/migrate/source/d7/MenuTranslation.php b/core/modules/system/src/Plugin/migrate/source/d7/MenuTranslation.php
+index 534e47e..dc62bb8 100644
+--- a/core/modules/system/src/Plugin/migrate/source/d7/MenuTranslation.php
++++ b/core/modules/system/src/Plugin/migrate/source/d7/MenuTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_menu_translation",
+  *   source_module = "i18n_menu"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class MenuTranslation extends Menu {
+ 
+diff --git a/core/modules/system/src/Plugin/migrate/source/d7/ThemeSettings.php b/core/modules/system/src/Plugin/migrate/source/d7/ThemeSettings.php
+index 6ae17be..6e5c89d 100644
+--- a/core/modules/system/src/Plugin/migrate/source/d7/ThemeSettings.php
++++ b/core/modules/system/src/Plugin/migrate/source/d7/ThemeSettings.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_theme_settings",
+  *   source_module = "system"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ThemeSettings extends VariableMultiRow {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/Term.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/Term.php
+index d43ed16..3d44060 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/Term.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/Term.php
+@@ -14,6 +14,8 @@
+  *   id = "d6_taxonomy_term",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Term extends DrupalSqlBase {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php
+index ec0260b..d54760a 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermLocalizedTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_term_localized_translation",
+  *   source_module = "i18ntaxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TermLocalizedTranslation extends Term {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNode.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNode.php
+index 4171cce..8621674 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNode.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNode.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_term_node",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TermNode extends DrupalSqlBase {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNodeRevision.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNodeRevision.php
+index 96d30d4..ddb2f70 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNodeRevision.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/TermNodeRevision.php
+@@ -9,6 +9,8 @@
+  *   id = "d6_term_node_revision",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TermNodeRevision extends TermNode {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/Vocabulary.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/Vocabulary.php
+index 767daf4..09bd2cd 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/Vocabulary.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/Vocabulary.php
+@@ -13,6 +13,8 @@
+  *   id = "d6_taxonomy_vocabulary",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Vocabulary extends DrupalSqlBase {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyPerType.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyPerType.php
+index a21a85e..b739d5a 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyPerType.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyPerType.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_taxonomy_vocabulary_per_type",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class VocabularyPerType extends Vocabulary {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyTranslation.php
+index 52ba08e..aea08e4 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d6/VocabularyTranslation.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_taxonomy_vocabulary_translation",
+  *   source_module = "i18ntaxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class VocabularyTranslation extends DrupalSqlBase {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/Term.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/Term.php
+index 4e347fc..a4d4caa 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/Term.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/Term.php
+@@ -14,6 +14,8 @@
+  *   id = "d7_taxonomy_term",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Term extends FieldableEntity {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermEntityTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermEntityTranslation.php
+index 0ba70c8..a17de6f 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermEntityTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermEntityTranslation.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_taxonomy_term_entity_translation",
+  *   source_module = "entity_translation"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TermEntityTranslation extends FieldableEntity {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php
+index e94685f..3593d86 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermLocalizedTranslation.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_term_localized_translation",
+  *   source_module = "i18n_taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TermLocalizedTranslation extends Term {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php
+index 52250f4..ef0f29b 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/TermTranslation.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_taxonomy_term_translation",
+  *   source_module = "i18n_taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TermTranslation extends Term {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/Vocabulary.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/Vocabulary.php
+index 82048a3..9f6b1ad 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/Vocabulary.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/Vocabulary.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_taxonomy_vocabulary",
+  *   source_module = "taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Vocabulary extends DrupalSqlBase {
+ 
+diff --git a/core/modules/taxonomy/src/Plugin/migrate/source/d7/VocabularyTranslation.php b/core/modules/taxonomy/src/Plugin/migrate/source/d7/VocabularyTranslation.php
+index 0940f4d..4911565 100644
+--- a/core/modules/taxonomy/src/Plugin/migrate/source/d7/VocabularyTranslation.php
++++ b/core/modules/taxonomy/src/Plugin/migrate/source/d7/VocabularyTranslation.php
+@@ -9,6 +9,8 @@
+  *   id = "d7_taxonomy_vocabulary_translation",
+  *   source_module = "i18n_taxonomy"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class VocabularyTranslation extends Vocabulary {
+ 
+diff --git a/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerNode.php b/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerNode.php
+index 2805b7d..75ef5fb 100644
+--- a/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerNode.php
++++ b/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerNode.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_tracker_node",
+  *   source_module = "tracker"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TrackerNode extends DrupalSqlBase {
+ 
+diff --git a/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerUser.php b/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerUser.php
+index 4991dbe..a4ea79b 100644
+--- a/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerUser.php
++++ b/core/modules/tracker/src/Plugin/migrate/source/d7/TrackerUser.php
+@@ -11,6 +11,8 @@
+  *   id = "d7_tracker_user",
+  *   source_module = "tracker"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class TrackerUser extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/ProfileField.php b/core/modules/user/src/Plugin/migrate/source/ProfileField.php
+index 7b4b7cb..71acc00 100644
+--- a/core/modules/user/src/Plugin/migrate/source/ProfileField.php
++++ b/core/modules/user/src/Plugin/migrate/source/ProfileField.php
+@@ -13,6 +13,8 @@
+  *   id = "profile_field",
+  *   source_module = "profile"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ProfileField extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/UserPictureInstance.php b/core/modules/user/src/Plugin/migrate/source/UserPictureInstance.php
+index b7013ba..778c5ab 100644
+--- a/core/modules/user/src/Plugin/migrate/source/UserPictureInstance.php
++++ b/core/modules/user/src/Plugin/migrate/source/UserPictureInstance.php
+@@ -14,6 +14,8 @@
+  *   id = "user_picture_instance",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UserPictureInstance extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldOptionTranslation.php b/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldOptionTranslation.php
+index b4486ce..ce240bd 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldOptionTranslation.php
++++ b/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldOptionTranslation.php
+@@ -11,6 +11,8 @@
+  *   id = "d6_profile_field_option_translation",
+  *   source_module = "i18nprofile"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ProfileFieldOptionTranslation extends ProfileField {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldValues.php b/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldValues.php
+index ac49290..742a0df 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldValues.php
++++ b/core/modules/user/src/Plugin/migrate/source/d6/ProfileFieldValues.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_profile_field_values",
+  *   source_module = "profile"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class ProfileFieldValues extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d6/Role.php b/core/modules/user/src/Plugin/migrate/source/d6/Role.php
+index a809b07..3c85892 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d6/Role.php
++++ b/core/modules/user/src/Plugin/migrate/source/d6/Role.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_user_role",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Role extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d6/User.php b/core/modules/user/src/Plugin/migrate/source/d6/User.php
+index ea9457c..4e33a4b 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d6/User.php
++++ b/core/modules/user/src/Plugin/migrate/source/d6/User.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_user",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class User extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d6/UserPicture.php b/core/modules/user/src/Plugin/migrate/source/d6/UserPicture.php
+index 288cf6c..03ac85b 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d6/UserPicture.php
++++ b/core/modules/user/src/Plugin/migrate/source/d6/UserPicture.php
+@@ -13,6 +13,8 @@
+  *   id = "d6_user_picture",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UserPicture extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d6/UserPictureFile.php b/core/modules/user/src/Plugin/migrate/source/d6/UserPictureFile.php
+index 4414198..c09e635 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d6/UserPictureFile.php
++++ b/core/modules/user/src/Plugin/migrate/source/d6/UserPictureFile.php
+@@ -12,6 +12,8 @@
+  *   id = "d6_user_picture_file",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UserPictureFile extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d7/Role.php b/core/modules/user/src/Plugin/migrate/source/d7/Role.php
+index 7950991..f8cdc1f 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d7/Role.php
++++ b/core/modules/user/src/Plugin/migrate/source/d7/Role.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_user_role",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class Role extends DrupalSqlBase {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d7/User.php b/core/modules/user/src/Plugin/migrate/source/d7/User.php
+index 3400bf5..f094a14 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d7/User.php
++++ b/core/modules/user/src/Plugin/migrate/source/d7/User.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_user",
+  *   source_module = "user"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class User extends FieldableEntity {
+ 
+diff --git a/core/modules/user/src/Plugin/migrate/source/d7/UserEntityTranslation.php b/core/modules/user/src/Plugin/migrate/source/d7/UserEntityTranslation.php
+index 7d4f8df..28464e5 100644
+--- a/core/modules/user/src/Plugin/migrate/source/d7/UserEntityTranslation.php
++++ b/core/modules/user/src/Plugin/migrate/source/d7/UserEntityTranslation.php
+@@ -12,6 +12,8 @@
+  *   id = "d7_user_entity_translation",
+  *   source_module = "entity_translation"
+  * )
++ *
++ * @see \Drupal\migrate\Plugin\migrate\source\SqlBase
+  */
+ class UserEntityTranslation extends FieldableEntity {
+ 

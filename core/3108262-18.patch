@@ -1,0 +1,281 @@
+diff --git a/composer/Plugin/VendorHardening/README.txt b/composer/Plugin/VendorHardening/README.txt
+index d81ac88131..6699414940 100644
+--- a/composer/Plugin/VendorHardening/README.txt
++++ b/composer/Plugin/VendorHardening/README.txt
+@@ -31,9 +31,13 @@ happen automatically.
+ The plugin can also be configured to clean up additional packages using the
+ project's composer.json extra field.
+ 
++This plugin can also clean up packages that were installed outside of the
++vendor directory, using composer/installers. This allows users to configure the
++plugin to clean up, for instance, Drupal extensions and Drupal core.
++
+ 2) The plugin also adds .htaccess and web.config files to the root of the
+-project's vendor directory. These files will do due diligence to keep the web
+-server from serving files from within the vendor directory.
++project's vendor directory. These files will perform due diligence to keep the
++web server from serving files from within the vendor directory.
+ 
+ How do I set it up?
+ -------------------
+@@ -60,3 +64,19 @@ the root package's composer.json extra field, like this:
+ 
+ The above code will tell the plugin to remove the test/ and documentation/
+ directories from the 'vendor/package' package when it is installed or updated.
++
++For packages installed outside of the vendor directory, such as those installed
++by composer/installers, the paths to remove should be relative to the package
++base. As an example, a Drupal module package named drupal/module_name might be
++installed by composer/installers to web/modules/contrib/module_name/. Cleanup
++paths specified for this package might look like this:
++
++    "extra": {
++      "drupal-core-vendor-hardening": {
++        "drupal/module_name": ["tests", "src/Tests"]
++      }
++    }
++
++This would then cause the plugin to try and remove
++web/modules/contrib/module_name/tests and
++web/modules/contrib/module_name/src/Tests.
+diff --git a/composer/Plugin/VendorHardening/VendorHardeningPlugin.php b/composer/Plugin/VendorHardening/VendorHardeningPlugin.php
+index 2cd7bdec52..0ad1f434e0 100644
+--- a/composer/Plugin/VendorHardening/VendorHardeningPlugin.php
++++ b/composer/Plugin/VendorHardening/VendorHardeningPlugin.php
+@@ -8,6 +8,7 @@
+ use Composer\Installer\PackageEvents;
+ use Composer\IO\IOInterface;
+ use Composer\Package\BasePackage;
++use Composer\Package\PackageInterface;
+ use Composer\Plugin\PluginInterface;
+ use Composer\Script\Event;
+ use Composer\Script\ScriptEvents;
+@@ -109,7 +110,7 @@ public function onPostAutoloadDump(Event $event) {
+    *   The Composer event.
+    */
+   public function onPostCmd(Event $event) {
+-    $this->cleanAllPackages($this->composer->getConfig()->get('vendor-dir'));
++    $this->cleanAllPackages();
+   }
+ 
+   /**
+@@ -140,10 +141,7 @@ public function onPrePackageUpdate(PackageEvent $event) {
+    * @param \Composer\Installer\PackageEvent $event
+    */
+   public function onPostPackageInstall(PackageEvent $event) {
+-    /** @var \Composer\Package\CompletePackage $package */
+-    $package = $event->getOperation()->getPackage();
+-    $package_name = $package->getName();
+-    $this->cleanPackage($this->composer->getConfig()->get('vendor-dir'), $package_name);
++    $this->cleanPackage($event->getOperation()->getPackage());
+   }
+ 
+   /**
+@@ -152,10 +150,7 @@ public function onPostPackageInstall(PackageEvent $event) {
+    * @param \Composer\Installer\PackageEvent $event
+    */
+   public function onPostPackageUpdate(PackageEvent $event) {
+-    /** @var \Composer\Package\CompletePackage $package */
+-    $package = $event->getOperation()->getTargetPackage();
+-    $package_name = $package->getName();
+-    $this->cleanPackage($this->composer->getConfig()->get('vendor-dir'), $package_name);
++    $this->cleanPackage($event->getOperation()->getTargetPackage());
+   }
+ 
+   /**
+@@ -254,15 +249,26 @@ protected function getInstalledPackages() {
+     return $this->composer->getRepositoryManager()->getLocalRepository()->getPackages();
+   }
+ 
++  /**
++   * Gets the installed path for a package.
++   *
++   * @param \Composer\Package\PackageInterface $package
++   *   The package.
++   *
++   * @return string
++   *   Path to the install path for the package, relative to the project. This
++   *   accounts for changes made by composer/installers, if any.
++   */
++  protected function getInstallPathForPackage(PackageInterface $package) {
++    return $this->composer->getInstallationManager()->getInstallPath($package);
++  }
++
+   /**
+    * Clean all configured packages.
+    *
+    * This applies in the context of a post-command event.
+-   *
+-   * @param string $vendor_dir
+-   *   Path to vendor directory
+    */
+-  public function cleanAllPackages($vendor_dir) {
++  public function cleanAllPackages() {
+     // Get a list of all the packages available after the update or install
+     // command.
+     $installed_packages = [];
+@@ -271,20 +277,22 @@ public function cleanAllPackages($vendor_dir) {
+       $installed_packages[strtolower($package->getName())] = $package;
+     }
+ 
++    $all_cleanup_paths = $this->config->getAllCleanupPaths();
++
+     // Get all the packages that we should clean up but haven't already.
+-    $cleanup_packages = array_diff_key($this->config->getAllCleanupPaths(), $this->packagesAlreadyCleaned);
++    $cleanup_paths = array_diff_key($all_cleanup_paths, $this->packagesAlreadyCleaned);
+ 
+     // Get all the packages that are installed that we should clean up.
+-    $packages_to_be_cleaned = array_intersect_key($cleanup_packages, $installed_packages);
++    $packages_to_be_cleaned = array_intersect_key($cleanup_paths, $installed_packages);
+ 
+     if (!$packages_to_be_cleaned) {
+-      $this->io->writeError('<info>Vendor directory already clean.</info>');
++      $this->io->writeError('<info>Packages already clean.</info>');
+       return;
+     }
+-    $this->io->writeError('<info>Cleaning vendor directory.</info>');
++    $this->io->writeError('<info>Cleaning installed packages.</info>');
+ 
+-    foreach ($packages_to_be_cleaned as $package_name => $paths_for_package) {
+-      $this->cleanPathsForPackage($vendor_dir, $package_name, $paths_for_package);
++    foreach ($packages_to_be_cleaned as $package_name => $paths) {
++      $this->cleanPathsForPackage($installed_packages[$package_name], $all_cleanup_paths[$package_name]);
+     }
+   }
+ 
+@@ -293,14 +301,12 @@ public function cleanAllPackages($vendor_dir) {
+    *
+    * This applies in the context of a package post-install or post-update event.
+    *
+-   * @param string $vendor_dir
+-   *   Path to vendor directory
+-   * @param string $package_name
+-   *   Name of the package to clean
++   * @param \Composer\Package\PackageInterface $package
++   *   The package to clean.
+    */
+-  public function cleanPackage($vendor_dir, $package_name) {
++  public function cleanPackage(PackageInterface $package) {
+     // Normalize package names to lower case.
+-    $package_name = strtolower($package_name);
++    $package_name = strtolower($package->getName());
+     if (isset($this->packagesAlreadyCleaned[$package_name])) {
+       $this->io->writeError(sprintf('%s<info>%s</info> already cleaned.', str_repeat(' ', 4), $package_name), TRUE, IOInterface::VERY_VERBOSE);
+       return;
+@@ -309,26 +315,25 @@ public function cleanPackage($vendor_dir, $package_name) {
+     $paths_for_package = $this->config->getPathsForPackage($package_name);
+     if ($paths_for_package) {
+       $this->io->writeError(sprintf('%sCleaning: <info>%s</info>', str_repeat(' ', 4), $package_name));
+-      $this->cleanPathsForPackage($vendor_dir, $package_name, $paths_for_package);
++      $this->cleanPathsForPackage($package, $paths_for_package);
+     }
+   }
+ 
+   /**
+    * Clean the installed directories for a named package.
+    *
+-   * @param string $vendor_dir
+-   *   Path to vendor directory.
+-   * @param string $package_name
+-   *   Name of package to sanitize.
++   * @param \Composer\Package\PackageInterface $package
++   *   The package to clean.
+    * @param string $paths_for_package
+    *   List of directories in $package_name to remove.
+    */
+-  protected function cleanPathsForPackage($vendor_dir, $package_name, $paths_for_package) {
++  protected function cleanPathsForPackage(PackageInterface $package, $paths_for_package) {
+     // Whatever happens here, this package counts as cleaned so that we don't
+     // process it more than once.
++    $package_name = strtolower($package->getName());
+     $this->packagesAlreadyCleaned[$package_name] = TRUE;
+ 
+-    $package_dir = $vendor_dir . '/' . $package_name;
++    $package_dir = $this->getInstallPathForPackage($package);
+     if (!is_dir($package_dir)) {
+       return;
+     }
+diff --git a/core/tests/Drupal/Tests/Composer/Plugin/VendorHardening/VendorHardeningPluginTest.php b/core/tests/Drupal/Tests/Composer/Plugin/VendorHardening/VendorHardeningPluginTest.php
+index 089b906718..7b845daf10 100644
+--- a/core/tests/Drupal/Tests/Composer/Plugin/VendorHardening/VendorHardeningPluginTest.php
++++ b/core/tests/Drupal/Tests/Composer/Plugin/VendorHardening/VendorHardeningPluginTest.php
+@@ -43,7 +43,13 @@ public function testCleanPackage() {
+       ->method('getPathsForPackage')
+       ->willReturn(['tests']);
+ 
+-    $plugin = new VendorHardeningPlugin();
++    $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
++      ->setMethods(['getInstallPathForPackage'])
++      ->getMock();
++    $plugin->expects($this->once())
++      ->method('getInstallPathForPackage')
++      ->willReturn(vfsStream::url('vendor/drupal/package'));
++
+     $ref_config = new \ReflectionProperty($plugin, 'config');
+     $ref_config->setAccessible(TRUE);
+     $ref_config->setValue($plugin, $config);
+@@ -55,7 +61,10 @@ public function testCleanPackage() {
+ 
+     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
+ 
+-    $plugin->cleanPackage(vfsStream::url('vendor'), 'drupal/package');
++    $package = $this->prophesize(PackageInterface::class);
++    $package->getName()->willReturn('drupal/package');
++
++    $plugin->cleanPackage($package->reveal());
+ 
+     $this->assertFileNotExists(vfsStream::url('vendor/drupal/package/tests'));
+   }
+@@ -64,7 +73,12 @@ public function testCleanPackage() {
+    * @covers ::cleanPathsForPackage
+    */
+   public function testCleanPathsForPackage() {
+-    $plugin = new VendorHardeningPlugin();
++    $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
++      ->setMethods(['getInstallPathForPackage'])
++      ->getMock();
++    $plugin->expects($this->once())
++      ->method('getInstallPathForPackage')
++      ->willReturn(vfsStream::url('vendor/drupal/package'));
+ 
+     $io = $this->prophesize(IOInterface::class);
+     $ref_io = new \ReflectionProperty($plugin, 'io');
+@@ -73,9 +87,12 @@ public function testCleanPathsForPackage() {
+ 
+     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
+ 
++    $package = $this->prophesize(PackageInterface::class);
++    $package->getName()->willReturn('drupal/package');
++
+     $ref_clean = new \ReflectionMethod($plugin, 'cleanPathsForPackage');
+     $ref_clean->setAccessible(TRUE);
+-    $ref_clean->invokeArgs($plugin, [vfsStream::url('vendor'), 'drupal/package', ['tests']]);
++    $ref_clean->invokeArgs($plugin, [$package->reveal(), ['tests']]);
+ 
+     $this->assertFileNotExists(vfsStream::url('vendor/drupal/package/tests'));
+   }
+@@ -100,11 +117,14 @@ public function testCleanAllPackages() {
+       ->willReturn('drupal/package');
+ 
+     $plugin = $this->getMockBuilder(VendorHardeningPlugin::class)
+-      ->setMethods(['getInstalledPackages'])
++      ->setMethods(['getInstalledPackages', 'getInstallPathForPackage'])
+       ->getMock();
+     $plugin->expects($this->once())
+       ->method('getInstalledPackages')
+       ->willReturn([$package]);
++    $plugin->expects($this->once())
++      ->method('getInstallPathForPackage')
++      ->willReturn(vfsStream::url('vendor/drupal/package'));
+ 
+     $io = $this->prophesize(IOInterface::class);
+     $ref_io = new \ReflectionProperty($plugin, 'io');
+@@ -117,7 +137,7 @@ public function testCleanAllPackages() {
+ 
+     $this->assertFileExists(vfsStream::url('vendor/drupal/package/tests/SomeTest.php'));
+ 
+-    $plugin->cleanAllPackages(vfsStream::url('vendor'));
++    $plugin->cleanAllPackages();
+ 
+     $this->assertFileNotExists(vfsStream::url('vendor/drupal/package/tests'));
+   }

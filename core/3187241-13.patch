@@ -1,0 +1,15 @@
+diff --git a/core/MAINTAINERS.txt b/core/MAINTAINERS.txt
+index 614c9e2..51b156d 100644
+--- a/core/MAINTAINERS.txt
++++ b/core/MAINTAINERS.txt
+@@ -543,4 +543,9 @@ participate in mentoring.
+ - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
+ - Matthew Radcliffe 'mradcliffe' https://www.drupal.org/u/mradcliffe
+ 
+-Provisional membership: None at this time.
++Provisional mentoring coordinators
++----------------------------------
++
++- Chris Darke 'ChrisDarke' https://www.drupal.org/u/chrisdarke
++- Brian Gilbert 'realityloop' https://www.drupal.org/u/realityloop
++- AmyJune Hineline 'volkswagenchick' https://www.drupal.org/u/volkswagenchick

@@ -38,6 +38,10 @@ Release managers
 - Nathaniel Catchpole 'catch' https://www.drupal.org/u/catch
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 
+Core JavaScript packages
+ - (provisional) Théodore Biadala 'nod_' https://www.drupal.org/u/nod_
+ - (provisional) Sally Young 'justafish' https://www.drupal.org/u/justafish
+
 Committer team facilitators
 - Pamela Barone 'pameeela' https://www.drupal.org/u/pameeela
 
@@ -313,6 +317,12 @@ Node Access
 - Moshe Weitzman 'moshe weitzman' https://www.drupal.org/u/moshe-weitzman
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 
+Olivero
+- Mike Herchel 'mherchel' https://www.drupal.org/u/mherchel
+- Putra Bonaccorsi 'proeung' https://www.drupal.org/u/proeung
+- Jen Witkowski 'jwitkowski79' https://www.drupal.org/u/jwitkowski79
+- Konstantin Shupenko 'kostyashupenko' https://www.drupal.org/u/kostyashupenko
+
 Options
 - ?
 
@@ -538,14 +548,8 @@ participate in mentoring.
 - Lucas Hedding 'heddn' https://www.drupal.org/u/heddn
 - Tara King 'sparklingrobots' https://www.drupal.org/u/sparklingrobots
 - Rachel Lawson 'rachel_norfolk' https://www.drupal.org/u/rachel_norfolk
-- Valery Lourie 'valthebald' https://www.drupal.org/u/valthebald
 - Elli Ludwigson 'ekl1773' https://www.drupal.org/u/ekl1773
 - Jess Myrbo 'xjm' https://www.drupal.org/u/xjm
 - Matthew Radcliffe 'mradcliffe' https://www.drupal.org/u/mradcliffe
 
-Provisional mentoring coordinators
-----------------------------------
-
-- Chris Darke 'ChrisDarke' https://www.drupal.org/u/chrisdarke
-- Brian Gilbert 'realityloop' https://www.drupal.org/u/realityloop
-- AmyJune Hineline 'volkswagenchick' https://www.drupal.org/u/volkswagenchick
+Provisional membership: None at this time.

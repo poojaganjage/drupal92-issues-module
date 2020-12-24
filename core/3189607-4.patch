@@ -1,0 +1,156 @@
+diff --git a/core/modules/ckeditor/tests/src/Functional/CKEditorAdminTest.php b/core/modules/ckeditor/tests/src/Functional/CKEditorAdminTest.php
+index 4f35718..b0b70e5 100644
+--- a/core/modules/ckeditor/tests/src/Functional/CKEditorAdminTest.php
++++ b/core/modules/ckeditor/tests/src/Functional/CKEditorAdminTest.php
+@@ -202,8 +202,7 @@ public function testExistingFormat() {
+     $this->resetAll();
+     $this->container->get('plugin.manager.ckeditor.plugin')->clearCachedDefinitions();
+     $this->drupalGet('admin/config/content/formats/manage/filtered_html');
+-    $ultra_llama_mode_checkbox = $this->xpath('//input[@type="checkbox" and @name="editor[settings][plugins][llama_contextual_and_button][ultra_llama_mode]" and not(@checked)]');
+-    $this->assertCount(1, $ultra_llama_mode_checkbox, 'The "Ultra llama mode" checkbox exists and is not checked.');
++    $this->assertSession()->checkboxNotChecked('editor[settings][plugins][llama_contextual_and_button][ultra_llama_mode]');
+     $editor = Editor::load('filtered_html');
+     $this->assertInstanceOf(Editor::class, $editor);
+     $this->assertEqual($expected_settings, $editor->getSettings(), 'The Editor config entity has the correct settings.');
+@@ -215,8 +214,7 @@ public function testExistingFormat() {
+     ];
+     $this->drupalPostForm(NULL, $edit, t('Save configuration'));
+     $this->drupalGet('admin/config/content/formats/manage/filtered_html');
+-    $ultra_llama_mode_checkbox = $this->xpath('//input[@type="checkbox" and @name="editor[settings][plugins][llama_contextual_and_button][ultra_llama_mode]" and @checked="checked"]');
+-    $this->assertCount(1, $ultra_llama_mode_checkbox, 'The "Ultra llama mode" checkbox exists and is checked.');
++    $this->assertSession()->checkboxChecked('editor[settings][plugins][llama_contextual_and_button][ultra_llama_mode]');
+     $expected_settings['plugins']['llama_contextual_and_button']['ultra_llama_mode'] = TRUE;
+     $editor = Editor::load('filtered_html');
+     $this->assertInstanceOf(Editor::class, $editor);
+diff --git a/core/modules/editor/tests/src/Functional/EditorAdminTest.php b/core/modules/editor/tests/src/Functional/EditorAdminTest.php
+index 25eacaf..cb9c6aa 100644
+--- a/core/modules/editor/tests/src/Functional/EditorAdminTest.php
++++ b/core/modules/editor/tests/src/Functional/EditorAdminTest.php
+@@ -93,8 +93,7 @@ public function testAddEditorToExistingFormat() {
+       'editor[editor]' => '',
+     ];
+     $this->drupalPostForm(NULL, $edit, 'Configure');
+-    $unicorn_setting = $this->xpath('//input[@name="editor[settings][ponies_too]" and @type="checkbox" and @checked]');
+-    $this->assertCount(0, $unicorn_setting, "Unicorn Editor's settings form is no longer present.");
++    $this->assertSession()->fieldNotExists('editor[settings][ponies_too]');
+   }
+ 
+   /**
+@@ -210,8 +209,7 @@ protected function selectUnicornEditor() {
+       'editor[editor]' => 'unicorn',
+     ];
+     $this->drupalPostForm(NULL, $edit, 'Configure');
+-    $unicorn_setting = $this->xpath('//input[@name="editor[settings][ponies_too]" and @type="checkbox" and @checked]');
+-    $this->assertCount(1, $unicorn_setting, "Unicorn Editor's settings form is present.");
++    $this->assertSession()->checkboxChecked('editor[settings][ponies_too]');
+ 
+     return $edit;
+   }
+diff --git a/core/modules/system/tests/src/Functional/Module/DependencyTest.php b/core/modules/system/tests/src/Functional/Module/DependencyTest.php
+index 9439445..32b548b 100644
+--- a/core/modules/system/tests/src/Functional/Module/DependencyTest.php
++++ b/core/modules/system/tests/src/Functional/Module/DependencyTest.php
+@@ -64,8 +64,7 @@ public function testMissingModules() {
+     // as missing a dependency.
+     $this->drupalGet('admin/modules');
+     $this->assertRaw(t('@module (<span class="admin-missing">missing</span>)', ['@module' => Unicode::ucfirst('_missing_dependency')]));
+-    $checkbox = $this->xpath('//input[@type="checkbox" and @disabled="disabled" and @name="modules[system_dependencies_test][enable]"]');
+-    $this->assertCount(1, $checkbox, 'Checkbox for the module is disabled.');
++    $this->assertSession()->checkboxNotChecked('modules[system_dependencies_test][enable]');
+   }
+ 
+   /**
+@@ -79,8 +78,7 @@ public function testIncompatibleModuleVersionDependency() {
+       '@module' => 'System incompatible module version test (>2.0)',
+       '@version' => '1.0',
+     ]));
+-    $checkbox = $this->xpath('//input[@type="checkbox" and @disabled="disabled" and @name="modules[system_incompatible_module_version_dependencies_test][enable]"]');
+-    $this->assertCount(1, $checkbox, 'Checkbox for the module is disabled.');
++    $this->assertSession()->fieldDisabled('modules[system_incompatible_module_version_dependencies_test][enable]');
+   }
+ 
+   /**
+@@ -93,8 +91,7 @@ public function testIncompatibleCoreVersionDependency() {
+     $this->assertRaw(t('@module (<span class="admin-missing">incompatible with</span> this version of Drupal core)', [
+       '@module' => 'System core incompatible semver test',
+     ]));
+-    $checkbox = $this->xpath('//input[@type="checkbox" and @disabled="disabled" and @name="modules[system_incompatible_core_version_dependencies_test][enable]"]');
+-    $this->assertCount(1, $checkbox, 'Checkbox for the module is disabled.');
++    $this->assertSession()->fieldDisabled('modules[system_incompatible_core_version_dependencies_test][enable]');
+   }
+ 
+   /**
+@@ -103,8 +100,7 @@ public function testIncompatibleCoreVersionDependency() {
+   public function testIncompatiblePhpVersionDependency() {
+     $this->drupalGet('admin/modules');
+     $this->assertRaw('This module requires PHP version 6502.* and is incompatible with PHP version ' . phpversion() . '.');
+-    $checkbox = $this->xpath('//input[@type="checkbox" and @disabled="disabled" and @name="modules[system_incompatible_php_version_test][enable]"]');
+-    $this->assertCount(1, $checkbox, 'Checkbox for the module is disabled.');
++    $this->assertSession()->fieldDisabled('modules[system_incompatible_php_version_test][enable]');
+   }
+ 
+   /**
+@@ -201,8 +197,7 @@ public function testUninstallDependents() {
+ 
+     // Check that the comment module cannot be uninstalled.
+     $this->drupalGet('admin/modules/uninstall');
+-    $checkbox = $this->xpath('//input[@type="checkbox" and @name="uninstall[comment]" and @disabled="disabled"]');
+-    $this->assertCount(1, $checkbox, 'Checkbox for uninstalling the comment module is disabled.');
++    $this->assertSession()->fieldDisabled('uninstall[comment]');
+ 
+     // Delete any forum terms.
+     $vid = $this->config('forum.settings')->get('vocabulary');
+diff --git a/core/modules/system/tests/src/Functional/Module/InstallUninstallTest.php b/core/modules/system/tests/src/Functional/Module/InstallUninstallTest.php
+index 035c133..61b7151 100644
+--- a/core/modules/system/tests/src/Functional/Module/InstallUninstallTest.php
++++ b/core/modules/system/tests/src/Functional/Module/InstallUninstallTest.php
+@@ -174,12 +174,8 @@ public function testInstallUninstall() {
+           // See if we can currently uninstall this module (if its dependencies
+           // have been uninstalled), and do so if we can.
+           $this->drupalGet('admin/modules/uninstall');
+-          $field_name = "uninstall[$to_uninstall]";
+-          $has_checkbox = $this->xpath('//input[@type="checkbox" and @name="' . $field_name . '"]');
+-          $disabled = $this->xpath('//input[@type="checkbox" and @name="' . $field_name . '" and @disabled="disabled"]');
+-
+-          if (!empty($has_checkbox) && empty($disabled)) {
+-            // This one is eligible for being uninstalled.
++          $checkbox = $this->assertSession()->fieldDisabled("uninstall[$to_uninstall]");
++          if (!$checkbox->isSelected()) {
+             $package = $all_modules[$to_uninstall]->info['package'];
+             $this->assertSuccessfulUninstall($to_uninstall, $package);
+             $added_modules = array_diff($added_modules, [$to_uninstall]);
+diff --git a/core/modules/system/tests/src/Functional/Module/VersionTest.php b/core/modules/system/tests/src/Functional/Module/VersionTest.php
+index 2935edf..21262c5 100644
+--- a/core/modules/system/tests/src/Functional/Module/VersionTest.php
++++ b/core/modules/system/tests/src/Functional/Module/VersionTest.php
+@@ -53,8 +53,12 @@ public function testModuleVersions() {
+     $n = count($dependencies);
+     for ($i = 0; $i < $n; $i++) {
+       $this->drupalGet('admin/modules');
+-      $checkbox = $this->xpath('//input[@id="edit-modules-module-test-enable"]');
+-      $this->assertEqual(!empty($checkbox[0]->getAttribute('disabled')), $i % 2, $dependencies[$i]);
++      if ($i % 2 == 0) {
++        $this->assertSession()->fieldEnabled('edit-modules-module-test-enable');
++      }
++      else {
++        $this->assertSession()->fieldDisabled('edit-modules-module-test-enable');
++      }
+     }
+   }
+diff --git a/core/modules/views/tests/src/Functional/Plugin/ExposedFormCheckboxesTest.php b/core/modules/views/tests/src/Functional/Plugin/ExposedFormCheckboxesTest.php
+index 425e54f..9ee8cdb 100644
+--- a/core/modules/views/tests/src/Functional/Plugin/ExposedFormCheckboxesTest.php
++++ b/core/modules/views/tests/src/Functional/Plugin/ExposedFormCheckboxesTest.php
+@@ -97,10 +97,8 @@ public function testExposedFormRenderCheckboxes() {
+     $view->save();
+     $this->drupalGet('test_exposed_form_checkboxes');
+ 
+-    $actual = $this->xpath('//form//input[@type="checkbox" and @name="type[article]"]');
+-    $this->assertCount(1, $actual, 'Article option renders as a checkbox.');
+-    $actual = $this->xpath('//form//input[@type="checkbox" and @name="type[page]"]');
+-    $this->assertCount(1, $actual, 'Page option renders as a checkbox');
++    $this->assertSame('checkbox', $this->assertSession()->fieldExists('type[article]')->getAttribute('type'));
++    $this->assertSame('checkbox', $this->assertSession()->fieldExists('type[page]')->getAttribute('type'));
+ 
+     // Ensure that all results are displayed.
+     $rows = $this->xpath("//div[contains(@class, 'views-row')]");
