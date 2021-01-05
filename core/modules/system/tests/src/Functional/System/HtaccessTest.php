@@ -56,6 +56,7 @@ class HtaccessTest extends BrowserTestBase {
       'profile',
       'po',
       'sh',
+      'scss',
       'sql',
       'theme',
       'twig',
