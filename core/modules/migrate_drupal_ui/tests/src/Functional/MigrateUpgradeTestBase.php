@@ -103,6 +103,26 @@ abstract class MigrateUpgradeTestBase extends BrowserTestBase {
    * {@inheritdoc}
    */
   protected function tearDown() {
+    $html_output_directory = getenv('BROWSERTEST_OUTPUT_DIRECTORY');
+    $html_output_directory = rtrim($html_output_directory, '/');
+    $html_output_directory = drupalGet($html_output_directory);
+    $filename = $html_output_directory . '/' . 'migrate_drupal_ui_upgrade_log';
+
+    $db = \Drupal::service('database');
+    $results = $db->select('watchdog', 'w')
+      ->fields('w')
+      ->condition('type', 'migrate_drupal_ui')
+      ->execute()
+      ->fetchAll();
+    @unlink($filename);
+    $f = fopen($filename, 'a');
+    if ($results) {
+      fputcsv($f, array_keys((array) $results[0]));
+      foreach ($results as $result) {
+        fputcsv($f, (array) $result);
+      }
+    }
+    fclose($f);
     Database::removeConnection('migrate_drupal_ui');
     parent::tearDown();
   }

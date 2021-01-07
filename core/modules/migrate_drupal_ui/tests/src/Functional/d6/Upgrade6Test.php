@@ -141,6 +141,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Block',
       'Block translation',
       'Book',
+      'CCK translation',
       'Comment',
       'Contact',
       'Content',
@@ -153,6 +154,8 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Forum',
       'ImageCache',
       'ImageField',
+      'Internationalization',
+      'Locale',
       'Menu',
       'Menu translation',
       'Node',
@@ -162,9 +165,11 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
       'Profile translation',
       'Search',
       'Statistics',
+      'String translation',
       'Synchronize translations',
       'System',
       'Taxonomy',
+      'Taxonomy translation',
       'Text',
       'Upload',
       'User',
@@ -186,13 +191,7 @@ class Upgrade6Test extends MigrateUpgradeExecuteTestBase {
    * {@inheritdoc}
    */
   protected function getMissingPaths() {
-    return [
-      'CCK translation',
-      'Internationalization',
-      'Locale',
-      'String translation',
-      'Taxonomy translation',
-    ];
+    return [];
   }
 
   /**

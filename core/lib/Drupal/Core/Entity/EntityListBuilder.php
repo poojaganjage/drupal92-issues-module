@@ -155,7 +155,10 @@ class EntityListBuilder extends EntityHandlerBase implements EntityListBuilderIn
    * @see \Drupal\Core\Entity\EntityListBuilder::render()
    */
   public function buildHeader() {
-    $row['operations'] = $this->t('Operations');
+    $row['operations'] = [
+      'data' => $this->t('Operations'),
+      'class' => 'select-all',
+    ];
     return $row;
   }
 

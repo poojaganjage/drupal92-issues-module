@@ -1,0 +1,37 @@
+diff --git a/core/.stylelintrc.json b/core/.stylelintrc.json
+index 615f0f83..65a5468a 100644
+--- a/core/.stylelintrc.json
++++ b/core/.stylelintrc.json
+@@ -460,7 +460,7 @@
+     "selector-pseudo-element-colon-notation": null,
+     "shorthand-property-no-redundant-values": null,
+     "string-quotes": "double",
+-    "unit-allowed-list": ["deg", "em", "ex", "fr", "ms", "rem", "%", "s", "px", "vw", "vh"],
++    "unit-allowed-list": ["ch", "deg", "em", "ex", "fr", "ms", "rem", "%", "s", "px", "vw", "vh"],
+     "value-keyword-case": ["lower", {
+       "ignoreProperties": [
+         "--font-family",
+diff --git a/core/themes/olivero/css/components/form.css b/core/themes/olivero/css/components/form.css
+index 90cb9125..df5cc812 100644
+--- a/core/themes/olivero/css/components/form.css
++++ b/core/themes/olivero/css/components/form.css
+@@ -131,6 +131,7 @@ tr .form-item,
+ .form-item__description {
+   margin-top: 9px;
+   margin-bottom: 9px;
++  max-width: 60ch;
+   font-size: 14px;
+   line-height: 18px;
+ }
+diff --git a/core/themes/olivero/css/components/form.pcss.css b/core/themes/olivero/css/components/form.pcss.css
+index edb2f6f8..f9ad65c3 100644
+--- a/core/themes/olivero/css/components/form.pcss.css
++++ b/core/themes/olivero/css/components/form.pcss.css
+@@ -99,6 +99,7 @@ tr .form-item,
+  */
+ .form-item__description {
+   margin-block: var(--sp0-5);
++  max-width: 60ch;
+   font-size: var(--font-size-s);
+   line-height: var(--line-height-s);
+ }

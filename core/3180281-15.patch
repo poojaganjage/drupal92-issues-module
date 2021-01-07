@@ -1,0 +1,13 @@
+diff --git a/core/.stylelintrc.json b/core/.stylelintrc.json
+index 615f0f83..65a5468a 100644
+--- a/core/.stylelintrc.json
++++ b/core/.stylelintrc.json
+@@ -460,7 +460,7 @@
+     "selector-pseudo-element-colon-notation": null,
+     "shorthand-property-no-redundant-values": null,
+     "string-quotes": "double",
+-    "unit-allowed-list": ["deg", "em", "ex", "fr", "ms", "rem", "%", "s", "px", "vw", "vh"],
++    "unit-allowed-list": ["ch", "deg", "em", "ex", "fr", "ms", "rem", "%", "s", "px", "vw", "vh"],
+     "value-keyword-case": ["lower", {
+       "ignoreProperties": [
+         "--font-family",

@@ -84,7 +84,10 @@ class ConfigEntityListTest extends BrowserTestBase {
     $expected_items = [
       'label' => 'Label',
       'id' => 'Machine name',
-      'operations' => 'Operations',
+      'operations' => [
+        'data' => 'Operations',
+        'class' => 'select-all',
+      ],
     ];
     $actual_items = $controller->buildHeader();
     $this->assertEquals($expected_items, $actual_items, 'Return value from buildHeader matches expected.');

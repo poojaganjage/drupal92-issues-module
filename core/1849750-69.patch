@@ -1,0 +1,32 @@
+diff --git a/core/lib/Drupal/Core/Entity/EntityListBuilder.php b/core/lib/Drupal/Core/Entity/EntityListBuilder.php
+index bc68e06e..ab8742be 100644
+--- a/core/lib/Drupal/Core/Entity/EntityListBuilder.php
++++ b/core/lib/Drupal/Core/Entity/EntityListBuilder.php
+@@ -155,7 +155,10 @@ protected function getDefaultOperations(EntityInterface $entity) {
+    * @see \Drupal\Core\Entity\EntityListBuilder::render()
+    */
+   public function buildHeader() {
+-    $row['operations'] = $this->t('Operations');
++    $row['operations'] = [
++      'data' => $this->t('Operations'),
++      'class' => 'select-all',
++    ];
+     return $row;
+   }
+ 
+diff --git a/core/modules/config/tests/src/Functional/ConfigEntityListTest.php b/core/modules/config/tests/src/Functional/ConfigEntityListTest.php
+index 95358c8e..a68ea93f 100644
+--- a/core/modules/config/tests/src/Functional/ConfigEntityListTest.php
++++ b/core/modules/config/tests/src/Functional/ConfigEntityListTest.php
+@@ -84,7 +84,10 @@ public function testList() {
+     $expected_items = [
+       'label' => 'Label',
+       'id' => 'Machine name',
+-      'operations' => 'Operations',
++      'operations' => [
++        'data' => 'Operations',
++        'class' => 'select-all',
++      ],
+     ];
+     $actual_items = $controller->buildHeader();
+     $this->assertEquals($expected_items, $actual_items, 'Return value from buildHeader matches expected.');

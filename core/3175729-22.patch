@@ -1,0 +1,345 @@
+diff --git a/core/modules/config_translation/migrations/state/config_translation.migrate_drupal.yml b/core/modules/config_translation/migrations/state/config_translation.migrate_drupal.yml
+index 52552137..63c9cf54 100644
+--- a/core/modules/config_translation/migrations/state/config_translation.migrate_drupal.yml
++++ b/core/modules/config_translation/migrations/state/config_translation.migrate_drupal.yml
+@@ -1,28 +1,15 @@
+ finished:
+   6:
+-    i18nprofile: config_translation
+-  7:
+-    i18n_variable: config_translation
+-    i18n_taxonomy: config_translation
+-    i18n_menu: config_translation
+-not_finished:
+-  6:
+-    # language content comment settings.
+     locale: language
+-    # @TODO: Move to finished when remaining Drupal 6 i18n issues are resolved.
+-    # See https://www.drupal.org/project/drupal/issues/2208401
+     i18n: config_translation
+-    # field labels and descriptions, synchronized fields.
+     i18ncck: config_translation
+-    # Block, menu, taxonomy, User profiles.
+     i18nstrings: config_translation
++    i18nprofile: config_translation
+     i18ntaxonomy: config_translation
+   7:
+-    # language content comment settings.
+-    locale: language
+-    # @TODO: Move to finished when remaining Drupal 7 i18n issues are resolved.
+-    # See https://www.drupal.org/project/drupal/issues/2208401
+-    i18n: config_translation
+-    # field labels and descriptions, field options.
+     i18n_field: config_translation
++    i18n_menu: config_translation
+     i18n_string: config_translation
++    i18n_taxonomy: config_translation
++    i18n_variable: config_translation
++    locale: language
+diff --git a/core/modules/content_translation/migrations/state/content_translation.migrate_drupal.yml b/core/modules/content_translation/migrations/state/content_translation.migrate_drupal.yml
+index 0f8e2044..f7312598 100644
+--- a/core/modules/content_translation/migrations/state/content_translation.migrate_drupal.yml
++++ b/core/modules/content_translation/migrations/state/content_translation.migrate_drupal.yml
+@@ -1,5 +1,6 @@
+ finished:
+   6:
++    i18n: content_translation
+     i18nblocks:
+       - block
+       - block_content
+@@ -7,6 +8,7 @@ finished:
+     i18nmenu:
+       - content_translation
+       - menu_link_content
++    i18ntaxonomy: content_translation
+     locale: content_translation
+     menu: content_translation
+   # Node revision translations.
+@@ -15,6 +17,7 @@ finished:
+     taxonomy: content_translation
+   7:
+     entity_translation: content_translation
++    i18n: content_translation
+     i18n_block:
+       - block
+       - block_content
+@@ -23,21 +26,7 @@ finished:
+     menu: content_translation
+     # menu links.
+     i18n_menu: content_translation
++    i18n_taxonomy: content_translation
+     statistics: statistics
+     # Node revision translations.
+     node: content_translation
+-not_finished:
+-  # Also D6 and D7 node revision translations.
+-  6:
+-    # @TODO: Move to finished when remaining Drupal 6 i18n issues are resolved.
+-    # See https://www.drupal.org/project/drupal/issues/2208401
+-    i18n: content_translation
+-    # Taxonomy term references.
+-    i18ntaxonomy: content_translation
+-  7:
+-    # @TODO: Move to finished when remaining Drupal 7 i18n issues are resolved.
+-    # See https://www.drupal.org/project/drupal/issues/2208401
+-    i18n: content_translation
+-    # @TODO: Remove when taxonomy term field translations are migrated.
+-    # See https://www.drupal.org/project/drupal/issues/3073050
+-    i18n_taxonomy: content_translation
+diff --git a/core/modules/migrate_drupal_ui/tests/src/Functional/MigrateUpgradeTestBase.php b/core/modules/migrate_drupal_ui/tests/src/Functional/MigrateUpgradeTestBase.php
+index 3d2f053c..1a5a05fa 100644
+--- a/core/modules/migrate_drupal_ui/tests/src/Functional/MigrateUpgradeTestBase.php
++++ b/core/modules/migrate_drupal_ui/tests/src/Functional/MigrateUpgradeTestBase.php
+@@ -103,6 +103,26 @@ protected function createMigrationConnection() {
+    * {@inheritdoc}
+    */
+   protected function tearDown() {
++    $html_output_directory = getenv('BROWSERTEST_OUTPUT_DIRECTORY');
++    $html_output_directory = rtrim($html_output_directory, '/');
++    $html_output_directory = drupalGet($html_output_directory);
++    $filename = $html_output_directory . '/' . 'migrate_drupal_ui_upgrade_log';
++
++    $db = \Drupal::service('database');
++    $results = $db->select('watchdog', 'w')
++      ->fields('w')
++      ->condition('type', 'migrate_drupal_ui')
++      ->execute()
++      ->fetchAll();
++    @unlink($filename);
++    $f = fopen($filename, 'a');
++    if ($results) {
++      fputcsv($f, array_keys((array) $results[0]));
++      foreach ($results as $result) {
++        fputcsv($f, (array) $result);
++      }
++    }
++    fclose($f);
+     Database::removeConnection('migrate_drupal_ui');
+     parent::tearDown();
+   }
+diff --git a/core/modules/migrate_drupal_ui/tests/src/Functional/d6/MultilingualReviewPageTest.php b/core/modules/migrate_drupal_ui/tests/src/Functional/d6/MultilingualReviewPageTest.php
+index fca5b7ab..a3f04b57 100644
+--- a/core/modules/migrate_drupal_ui/tests/src/Functional/d6/MultilingualReviewPageTest.php
++++ b/core/modules/migrate_drupal_ui/tests/src/Functional/d6/MultilingualReviewPageTest.php
+@@ -61,6 +61,7 @@ protected function getAvailablePaths() {
+       'Blog',
+       'Blog API',
+       'Book',
++      'CCK translation',
+       'Calendar Signup',
+       'Color',
+       'Comment',
+@@ -96,7 +97,9 @@ protected function getAvailablePaths() {
+       'ImageCache',
+       'ImageCache UI',
+       'ImageField',
++      'Internationalization',
+       'Link',
++      'Locale',
+       'Menu',
+       'Menu translation',
+       'Node',
+@@ -115,9 +118,11 @@ protected function getAvailablePaths() {
+       'Profile translation',
+       'Search',
+       'Statistics',
++      'String translation',
+       'Synchronize translations',
+       'Syslog',
+       'System',
++      'Taxonomy translation',
+       'Taxonomy',
+       'Text',
+       'Throttle',
+@@ -142,14 +147,9 @@ protected function getMissingPaths() {
+     return [
+       // Block is set not_finished in migrate_state_not_finished_test.
+       'Block',
+-      'CCK translation',
+       'Devel',
+       'Devel generate',
+       'Devel node access',
+-      'Internationalization',
+-      'Locale',
+-      'String translation',
+-      'Taxonomy translation',
+       'Views',
+       'Views translation',
+       'migrate_status_active_test',
+diff --git a/core/modules/migrate_drupal_ui/tests/src/Functional/d6/Upgrade6Test.php b/core/modules/migrate_drupal_ui/tests/src/Functional/d6/Upgrade6Test.php
+index 39354071..8e38cdb0 100644
+--- a/core/modules/migrate_drupal_ui/tests/src/Functional/d6/Upgrade6Test.php
++++ b/core/modules/migrate_drupal_ui/tests/src/Functional/d6/Upgrade6Test.php
+@@ -141,6 +141,7 @@ protected function getAvailablePaths() {
+       'Block',
+       'Block translation',
+       'Book',
++      'CCK translation',
+       'Comment',
+       'Contact',
+       'Content',
+@@ -153,6 +154,8 @@ protected function getAvailablePaths() {
+       'Forum',
+       'ImageCache',
+       'ImageField',
++      'Internationalization',
++      'Locale',
+       'Menu',
+       'Menu translation',
+       'Node',
+@@ -162,9 +165,11 @@ protected function getAvailablePaths() {
+       'Profile translation',
+       'Search',
+       'Statistics',
++      'String translation',
+       'Synchronize translations',
+       'System',
+       'Taxonomy',
++      'Taxonomy translation',
+       'Text',
+       'Upload',
+       'User',
+@@ -186,13 +191,7 @@ protected function getAvailablePaths() {
+    * {@inheritdoc}
+    */
+   protected function getMissingPaths() {
+-    return [
+-      'CCK translation',
+-      'Internationalization',
+-      'Locale',
+-      'String translation',
+-      'Taxonomy translation',
+-    ];
++    return [];
+   }
+ 
+   /**
+diff --git a/core/modules/migrate_drupal_ui/tests/src/Functional/d7/MultilingualReviewPageTest.php b/core/modules/migrate_drupal_ui/tests/src/Functional/d7/MultilingualReviewPageTest.php
+index ad88c344..75de68d3 100644
+--- a/core/modules/migrate_drupal_ui/tests/src/Functional/d7/MultilingualReviewPageTest.php
++++ b/core/modules/migrate_drupal_ui/tests/src/Functional/d7/MultilingualReviewPageTest.php
+@@ -92,6 +92,7 @@ protected function getAvailablePaths() {
+       'Forum',
+       'Help',
+       'Image',
++      'Internationalization',
+       'Link',
+       'List',
+       'Locale',
+@@ -117,6 +118,7 @@ protected function getAvailablePaths() {
+       'Synchronize translations',
+       'Syslog',
+       'System',
++      'Taxonomy translation',
+       'Taxonomy',
+       'Term Depth access',
+       'Test search node tags',
+@@ -152,14 +154,12 @@ protected function getMissingPaths() {
+       // Flexslider_picture is a sub module of Picture module. Only the
+       // styles from picture are migrated.
+       'FlexSlider Picture',
+-      'Internationalization',
+       'Multilingual content',
+       'Multilingual forum',
+       'Multilingual select',
+       'Path translation',
+       'Picture',
+       'String translation',
+-      'Taxonomy translation',
+       'Translation redirect',
+       'Translation sets',
+       'User mail translation',
+diff --git a/core/modules/migrate_drupal_ui/tests/src/Functional/d7/NoMultilingualReviewPageTest.php b/core/modules/migrate_drupal_ui/tests/src/Functional/d7/NoMultilingualReviewPageTest.php
+index d9a116d9..bc14ee00 100644
+--- a/core/modules/migrate_drupal_ui/tests/src/Functional/d7/NoMultilingualReviewPageTest.php
++++ b/core/modules/migrate_drupal_ui/tests/src/Functional/d7/NoMultilingualReviewPageTest.php
+@@ -77,14 +77,17 @@ protected function getAvailablePaths() {
+       'Entity Translation',
+       'Entity feature module',
+       'Entity tokens',
++      'Field translation',
+       'Field',
+       'Field SQL storage',
+       'File',
+       'Filter',
+       'Forum',
+       'Image',
++      'Internationalization',
+       'Link',
+       'List',
++      'Locale',
+       'Menu',
+       'Menu translation',
+       'Node',
+@@ -102,9 +105,11 @@ protected function getAvailablePaths() {
+       'Search embedded form',
+       'Shortcut',
+       'Statistics',
++      'String translation',
+       'Stylizer',
+       'Synchronize translations',
+       'System',
++      'Taxonomy translation',
+       'Taxonomy',
+       'Term Depth access',
+       'Test search node tags',
+@@ -147,17 +152,12 @@ protected function getMissingPaths() {
+       'Contact translation',
+       'Entity Translation Menu',
+       'Entity Translation Upgrade',
+-      'Field translation',
+       'FlexSlider Picture',
+-      'Internationalization',
+-      'Locale',
+       'Multilingual content',
+       'Multilingual forum',
+       'Multilingual select',
+       'Path translation',
+       'Picture',
+-      'String translation',
+-      'Taxonomy translation',
+       'Translation redirect',
+       'Translation sets',
+       'User mail translation',
+diff --git a/core/modules/migrate_drupal_ui/tests/src/Functional/d7/Upgrade7Test.php b/core/modules/migrate_drupal_ui/tests/src/Functional/d7/Upgrade7Test.php
+index 665ed5b0..7158efd8 100644
+--- a/core/modules/migrate_drupal_ui/tests/src/Functional/d7/Upgrade7Test.php
++++ b/core/modules/migrate_drupal_ui/tests/src/Functional/d7/Upgrade7Test.php
+@@ -151,11 +151,14 @@ protected function getAvailablePaths() {
+       'Entity Reference',
+       'Entity Translation',
+       'Field SQL storage',
++      'Field translation',
+       'Field',
+       'File',
+       'Filter',
+       'Forum',
+       'Image',
++      'Internationalization',
++      'Locale',
+       'Link',
+       'List',
+       'Menu',
+@@ -169,8 +172,10 @@ protected function getAvailablePaths() {
+       'Search',
+       'Shortcut',
+       'Statistics',
++      'String translation',
+       'Synchronize translations',
+       'System',
++      'Taxonomy translation',
+       'Taxonomy',
+       'Text',
+       'Title',
+@@ -196,11 +201,6 @@ protected function getAvailablePaths() {
+    */
+   protected function getMissingPaths() {
+     return [
+-      'Field translation',
+-      'Internationalization',
+-      'Locale',
+-      'String translation',
+-      'Taxonomy translation',
+       'Translation sets',
+       'Variable realm',
+       'Variable store',
