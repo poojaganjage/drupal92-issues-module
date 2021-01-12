@@ -773,9 +773,6 @@ td.group-title {
 .dropbutton-widget {
   position: relative;
 }
-.js .views-edit-view .dropbutton-wrapper .dropbutton .dropbutton-action > * {
-  font-size: 10px;
-}
 .js .dropbutton-wrapper .dropbutton .dropbutton-action > .ajax-progress-throbber {
   position: absolute;
   z-index: 2;
@@ -830,7 +827,6 @@ td.group-title {
   border: medium;
   background: none;
   font-family: inherit;
-  font-size: 12px;
 }
 [dir="rtl"] .views-ui-display-tab-actions .dropbutton-wrapper li a,
 [dir="rtl"] .views-ui-display-tab-actions .dropbutton-wrapper input {
