@@ -1,0 +1,56 @@
+diff --git a/core/modules/migrate/src/Plugin/migrate/destination/Config.php b/core/modules/migrate/src/Plugin/migrate/destination/Config.php
+index 3c037466..fe2ce583 100644
+--- a/core/modules/migrate/src/Plugin/migrate/destination/Config.php
++++ b/core/modules/migrate/src/Plugin/migrate/destination/Config.php
+@@ -159,9 +159,6 @@ public function fields() {
+    */
+   public function getIds() {
+     $ids['config_name']['type'] = 'string';
+-    if ($this->isTranslationDestination()) {
+-      $ids['langcode']['type'] = 'string';
+-    }
+     return $ids;
+   }
+ 
+diff --git a/core/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php b/core/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php
+index ffdd7784..5bf5bc0d 100644
+--- a/core/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php
++++ b/core/modules/migrate/src/Plugin/migrate/destination/EntityConfigBase.php
+@@ -177,9 +177,6 @@ protected function isTranslationDestination() {
+   public function getIds() {
+     $id_key = $this->getKey('id');
+     $ids[$id_key]['type'] = 'string';
+-    if ($this->isTranslationDestination()) {
+-      $ids['langcode']['type'] = 'string';
+-    }
+     return $ids;
+   }
+ 
+diff --git a/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldInstance.php b/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldInstance.php
+index 090ec3a9..08fae1e6 100644
+--- a/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldInstance.php
++++ b/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldInstance.php
+@@ -54,9 +54,6 @@ public function getIds() {
+     $ids['entity_type']['type'] = 'string';
+     $ids['bundle']['type'] = 'string';
+     $ids['field_name']['type'] = 'string';
+-    if ($this->isTranslationDestination()) {
+-      $ids['langcode']['type'] = 'string';
+-    }
+     return $ids;
+   }
+ 
+diff --git a/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldStorageConfig.php b/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldStorageConfig.php
+index 0b9714a7..10336cf8 100644
+--- a/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldStorageConfig.php
++++ b/core/modules/migrate/src/Plugin/migrate/destination/EntityFieldStorageConfig.php
+@@ -59,9 +59,6 @@ public function getIds() {
+     $ids['entity_type']['type'] = 'string';
+     $ids['field_name']['type'] = 'string';
+     // @todo: Remove conditional. https://www.drupal.org/node/3004574
+-    if ($this->isTranslationDestination()) {
+-      $ids['langcode']['type'] = 'string';
+-    }
+     return $ids;
+   }
+ 

@@ -1,0 +1,138 @@
+diff --git a/core/lib/Drupal/Core/Entity/Query/EntityQuery/Condition.php b/core/lib/Drupal/Core/Entity/Query/EntityQuery/Condition.php
+new file mode 100644
+index 00000000..8e2676f5
+--- /dev/null
++++ b/core/lib/Drupal/Core/Entity/Query/EntityQuery/Condition.php
+@@ -0,0 +1,32 @@
++<?php
++
++namespace Drupal\Core\Entity\Query\EntityQuery;
++
++use Drupal\Core\Entity\Query\ConditionBase;
++
++/**
++ * Defines the condition class for the null entity query.
++ */
++class Condition extends ConditionBase {
++
++  /**
++   * {@inheritdoc}
++   */
++  public function compile($query) {
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function exists($field, $langcode = NULL) {
++    return $this->condition($field, NULL, 'IS NOT NULL', $langcode);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function notExists($field, $langcode = NULL) {
++    return $this->condition($field, NULL, 'IS NULL', $langcode);
++  }
++
++}
+diff --git a/core/lib/Drupal/Core/Entity/Query/EntityQuery/Query.php b/core/lib/Drupal/Core/Entity/Query/EntityQuery/Query.php
+new file mode 100644
+index 00000000..fc014f63
+--- /dev/null
++++ b/core/lib/Drupal/Core/Entity/Query/EntityQuery/Query.php
+@@ -0,0 +1,46 @@
++<?php
++
++namespace Drupal\Core\Entity\Query\EntityQuery;
++
++use Drupal\Core\Entity\Query\QueryAggregateInterface;
++use Drupal\Core\Entity\Query\QueryBase;
++use Drupal\Core\Entity\Query\QueryInterface;
++use Drupal\Core\Entity\Query\Sql\ConditionAggregate;
++
++/**
++ * Defines the entity query for configuration entities.
++ */
++class Query extends QueryBase implements QueryInterface, QueryAggregateInterface {
++
++  /**
++   * {@inheritdoc}
++   */
++  public function execute() {
++    if ($this->count) {
++      return 0;
++    }
++    return [];
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function existsAggregate($field, $function, $langcode = NULL) {
++    return $this->conditionAggregate->exists($field, $function, $langcode);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function notExistsAggregate($field, $function, $langcode = NULL) {
++    return $this->conditionAggregate->notExists($field, $function, $langcode);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function conditionAggregateGroupFactory($conjunction = 'AND') {
++    return new ConditionAggregate($conjunction, $this);
++  }
++
++}
+diff --git a/core/lib/Drupal/Core/Entity/Query/EntityQuery/QueryFactory.php b/core/lib/Drupal/Core/Entity/Query/EntityQuery/QueryFactory.php
+new file mode 100644
+index 00000000..363baa81
+--- /dev/null
++++ b/core/lib/Drupal/Core/Entity/Query/EntityQuery/QueryFactory.php
+@@ -0,0 +1,42 @@
++<?php
++
++namespace Drupal\Core\Entity\Query\EntityQuery;
++
++use Drupal\Core\Entity\EntityTypeInterface;
++use Drupal\Core\Entity\Query\QueryBase;
++use Drupal\Core\Entity\Query\QueryFactoryInterface;
++
++/**
++ * Provides a factory for creating entity query objects for the null backend.
++ */
++class QueryFactory implements QueryFactoryInterface {
++
++  /**
++   * The namespace of this class, the parent class etc.
++   *
++   * @var array
++   */
++  protected $namespaces;
++
++  /**
++   * Constructs a QueryFactory object.
++   */
++  public function __construct() {
++    $this->namespaces = QueryBase::getNamespaces($this);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function get(EntityTypeInterface $entity_type, $conjunction) {
++    return new Query($entity_type, $conjunction, $this->namespaces);
++  }
++
++  /**
++   * {@inheritdoc}
++   */
++  public function getAggregate(EntityTypeInterface $entity_type, $conjunction) {
++    return new Query($entity_type, $conjunction, $this->namespaces);
++  }
++
++}
