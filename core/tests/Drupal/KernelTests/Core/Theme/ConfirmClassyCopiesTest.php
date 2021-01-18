@@ -692,7 +692,7 @@ class ConfirmClassyCopiesTest extends KernelTestBase {
         'icons.css' => '56f623bd343b9bc7e7ac3e3e95d7f3ce',
         'image-widget.css' => '2da54829199f64a2c390930c3b0913a3',
         'indented.css' => '48e214a106d9fede1e05aa10b4796361',
-        'inline-form.css' => 'cc5cbfd34511d9021a53ec693c110740',
+        'inline-form.css' => '504bc16a837ee6cf16431db80acc43be',
         'item-list.css' => '1d519afe6007f4b01e00f22b0ba8bf33',
         'link.css' => '22f42d430fe458080a7739c70a2d2ea5',
         'links.css' => '21fe64349f5702cd5b89104a1d3b9cd3',

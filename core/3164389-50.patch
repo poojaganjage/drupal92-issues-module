@@ -1,0 +1,848 @@
+diff --git a/core/lib/Drupal/Core/Block/BlockManager.php b/core/lib/Drupal/Core/Block/BlockManager.php
+index 026d810f..c879c92f 100644
+--- a/core/lib/Drupal/Core/Block/BlockManager.php
++++ b/core/lib/Drupal/Core/Block/BlockManager.php
+@@ -2,6 +2,7 @@
+ 
+ namespace Drupal\Core\Block;
+ 
++use Drupal\Component\Plugin\Factory\DefaultFactory;
+ use Drupal\Component\Plugin\FallbackPluginManagerInterface;
+ use Drupal\Core\Cache\CacheBackendInterface;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+@@ -65,6 +66,17 @@ protected function getType() {
+   public function processDefinition(&$definition, $plugin_id) {
+     parent::processDefinition($definition, $plugin_id);
+     $this->processDefinitionCategory($definition);
++
++    // @todo Remove this check in https://www.drupal.org/node/3167432.
++    $class = DefaultFactory::getPluginClass($plugin_id, $definition);
++    $plugin_class = new \ReflectionClass($class);
++    if (!$plugin_class->getParentClass()->isAbstract()) {
++      @trigger_error('Extending ' . $class . ' from a concrete class is deprecated in drupal:9.2.0 and will be disallowed before drupal:10.0.0. Extend the class from an abstract base class instead. See https://www.drupal.org/node/xxxxxxxx.', E_USER_DEPRECATED);
++    }
++    $build_method = new \ReflectionMethod($class, 'build');
++    if (!$build_method->hasReturnType() || $build_method->getReturnType()->getName() !== 'array') {
++      @trigger_error('Declaring ::build() without an array return typehint in ' . $class . ' is deprecated in drupal:9.2.0. Typehinting will be required before drupal:10.0.0. See https://www.drupal.org/node/3164649.', E_USER_DEPRECATED);
++    }
+   }
+ 
+   /**
+diff --git a/core/lib/Drupal/Core/Block/BlockPluginInterface.php b/core/lib/Drupal/Core/Block/BlockPluginInterface.php
+index e4b33051..e9c8028b 100644
+--- a/core/lib/Drupal/Core/Block/BlockPluginInterface.php
++++ b/core/lib/Drupal/Core/Block/BlockPluginInterface.php
+@@ -72,6 +72,8 @@ public function access(AccountInterface $account, $return_as_object = FALSE);
+    * @return array
+    *   A renderable array representing the content of the block.
+    *
++   * @todo Add array as the return type in https://www.drupal.org/node/3167432.
++   *
+    * @see \Drupal\block\BlockViewBuilder
+    */
+   public function build();
+diff --git a/core/lib/Drupal/Core/Block/Plugin/Block/Broken.php b/core/lib/Drupal/Core/Block/Plugin/Block/Broken.php
+index 0d09afb8..81d0803c 100644
+--- a/core/lib/Drupal/Core/Block/Plugin/Block/Broken.php
++++ b/core/lib/Drupal/Core/Block/Plugin/Block/Broken.php
+@@ -64,7 +64,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $build = [];
+     if ($this->currentUser->hasPermission('administer blocks')) {
+       $build += $this->brokenMessage();
+diff --git a/core/lib/Drupal/Core/Block/Plugin/Block/PageTitleBlock.php b/core/lib/Drupal/Core/Block/Plugin/Block/PageTitleBlock.php
+index af1fb6ee..461a9e2c 100644
+--- a/core/lib/Drupal/Core/Block/Plugin/Block/PageTitleBlock.php
++++ b/core/lib/Drupal/Core/Block/Plugin/Block/PageTitleBlock.php
+@@ -43,7 +43,7 @@ public function defaultConfiguration() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#type' => 'page_title',
+       '#title' => $this->title,
+diff --git a/core/lib/Drupal/Core/Menu/Plugin/Block/LocalActionsBlock.php b/core/lib/Drupal/Core/Menu/Plugin/Block/LocalActionsBlock.php
+index 70ef668b..3e067dbf 100644
+--- a/core/lib/Drupal/Core/Menu/Plugin/Block/LocalActionsBlock.php
++++ b/core/lib/Drupal/Core/Menu/Plugin/Block/LocalActionsBlock.php
+@@ -75,7 +75,7 @@ public function defaultConfiguration() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $route_name = $this->routeMatch->getRouteName();
+     $local_actions = $this->localActionManager->getActionsForRoute($route_name);
+ 
+diff --git a/core/lib/Drupal/Core/Menu/Plugin/Block/LocalTasksBlock.php b/core/lib/Drupal/Core/Menu/Plugin/Block/LocalTasksBlock.php
+index 6a518ef3..85052cef 100644
+--- a/core/lib/Drupal/Core/Menu/Plugin/Block/LocalTasksBlock.php
++++ b/core/lib/Drupal/Core/Menu/Plugin/Block/LocalTasksBlock.php
+@@ -82,7 +82,7 @@ public function defaultConfiguration() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $config = $this->configuration;
+     $cacheability = new CacheableMetadata();
+     $cacheability->addCacheableDependency($this->localTaskManager);
+diff --git a/core/modules/aggregator/src/Plugin/Block/AggregatorFeedBlock.php b/core/modules/aggregator/src/Plugin/Block/AggregatorFeedBlock.php
+index 8c5ed018..3bea4f39 100644
+--- a/core/modules/aggregator/src/Plugin/Block/AggregatorFeedBlock.php
++++ b/core/modules/aggregator/src/Plugin/Block/AggregatorFeedBlock.php
+@@ -125,7 +125,8 @@ public function blockSubmit($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
++    $build = [];
+     // Load the selected feed.
+     if ($feed = $this->feedStorage->load($this->configuration['feed'])) {
+       $result = $this->itemStorage->getQuery()
+@@ -155,9 +156,9 @@ public function build() {
+           '#url' => $feed->toUrl(),
+           '#attributes' => ['title' => $this->t("View this feed's recent news.")],
+         ];
+-        return $build;
+       }
+     }
++    return $build;
+   }
+ 
+   /**
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestAccessBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestAccessBlock.php
+index e558bcb9..18fcfc60 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestAccessBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestAccessBlock.php
+@@ -64,7 +64,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => 'Hello test world'];
+   }
+ 
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestBlockInstantiation.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestBlockInstantiation.php
+index 0d146390..b3006542 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestBlockInstantiation.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestBlockInstantiation.php
+@@ -55,7 +55,7 @@ public function blockSubmit($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#children' => $this->configuration['display_message'],
+     ];
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestCacheBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestCacheBlock.php
+index 5fec14cc..a6a5087e 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestCacheBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestCacheBlock.php
+@@ -17,7 +17,7 @@ class TestCacheBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $content = \Drupal::state()->get('block_test.content');
+ 
+     $build = [];
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareBlock.php
+index edc66168..a0c687dc 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareBlock.php
+@@ -24,7 +24,7 @@ class TestContextAwareBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     /** @var $user \Drupal\user\UserInterface */
+     $user = $this->getContextValue('user');
+     return [
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareNoValidContextOptionsBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareNoValidContextOptionsBlock.php
+index 234bf9a3..b54bb460 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareNoValidContextOptionsBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareNoValidContextOptionsBlock.php
+@@ -20,7 +20,7 @@ class TestContextAwareNoValidContextOptionsBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#markup' => 'Rendered block with no valid context options',
+     ];
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareUnsatisfiedBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareUnsatisfiedBlock.php
+index d0789e37..e36eb6b4 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareUnsatisfiedBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestContextAwareUnsatisfiedBlock.php
+@@ -20,7 +20,7 @@ class TestContextAwareUnsatisfiedBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#markup' => 'test',
+     ];
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestFormBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestFormBlock.php
+index e499fa88..ea2beaae 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestFormBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestFormBlock.php
+@@ -17,7 +17,7 @@ class TestFormBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return \Drupal::formBuilder()->getForm('Drupal\block_test\Form\TestForm');
+   }
+ 
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestHtmlBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestHtmlBlock.php
+index 35f08c4b..15504835 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestHtmlBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestHtmlBlock.php
+@@ -17,7 +17,7 @@ class TestHtmlBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#attributes' => \Drupal::state()->get('block_test.attributes'),
+       '#children' => \Drupal::state()->get('block_test.content'),
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestMultipleFormsBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestMultipleFormsBlock.php
+index 64b70b22..1538155c 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestMultipleFormsBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestMultipleFormsBlock.php
+@@ -20,7 +20,7 @@ class TestMultipleFormsBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [];
+   }
+ 
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestSettingsValidationBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestSettingsValidationBlock.php
+index d1f16d7f..c3cbebfc 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestSettingsValidationBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestSettingsValidationBlock.php
+@@ -34,7 +34,7 @@ public function blockValidate($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => 'foo'];
+   }
+ 
+diff --git a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestXSSTitleBlock.php b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestXSSTitleBlock.php
+index 3b679149..51c61d61 100644
+--- a/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestXSSTitleBlock.php
++++ b/core/modules/block/tests/modules/block_test/src/Plugin/Block/TestXSSTitleBlock.php
+@@ -2,6 +2,8 @@
+ 
+ namespace Drupal\block_test\Plugin\Block;
+ 
++use Drupal\Core\Block\BlockBase;
++
+ /**
+  * Provides a block to test XSS in title.
+  *
+@@ -10,5 +12,13 @@
+  *   admin_label = "<script>alert('XSS subject');</script>"
+  * )
+  */
+-class TestXSSTitleBlock extends TestCacheBlock {
++class TestXSSTitleBlock extends BlockBase {
++
++  /**
++   * {@inheritdoc}
++   */
++  public function build(): array {
++    return [];
++  }
++
+ }
+diff --git a/core/modules/block_content/src/Plugin/Block/BlockContentBlock.php b/core/modules/block_content/src/Plugin/Block/BlockContentBlock.php
+index 6ca88d19..4b95a328 100644
+--- a/core/modules/block_content/src/Plugin/Block/BlockContentBlock.php
++++ b/core/modules/block_content/src/Plugin/Block/BlockContentBlock.php
+@@ -182,7 +182,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     if ($block = $this->getEntity()) {
+       return $this->entityTypeManager->getViewBuilder($block->getEntityTypeId())->view($block, $this->configuration['view_mode']);
+     }
+diff --git a/core/modules/book/src/Plugin/Block/BookNavigationBlock.php b/core/modules/book/src/Plugin/Block/BookNavigationBlock.php
+index d48568fe..c61e9b35 100644
+--- a/core/modules/book/src/Plugin/Block/BookNavigationBlock.php
++++ b/core/modules/book/src/Plugin/Block/BookNavigationBlock.php
+@@ -120,7 +120,7 @@ public function blockSubmit($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $current_bid = 0;
+ 
+     if ($node = $this->requestStack->getCurrentRequest()->get('node')) {
+diff --git a/core/modules/forum/src/Plugin/Block/ForumBlockBase.php b/core/modules/forum/src/Plugin/Block/ForumBlockBase.php
+index 8095ceff..8e2bd28c 100644
+--- a/core/modules/forum/src/Plugin/Block/ForumBlockBase.php
++++ b/core/modules/forum/src/Plugin/Block/ForumBlockBase.php
+@@ -17,7 +17,7 @@ abstract class ForumBlockBase extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $result = $this->buildForumQuery()->execute();
+     $elements = [];
+     if ($node_title_list = node_title_list($result)) {
+diff --git a/core/modules/help/src/Plugin/Block/HelpBlock.php b/core/modules/help/src/Plugin/Block/HelpBlock.php
+index 04f8bcba..942ce20d 100644
+--- a/core/modules/help/src/Plugin/Block/HelpBlock.php
++++ b/core/modules/help/src/Plugin/Block/HelpBlock.php
+@@ -85,7 +85,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     // Do not show on a 403 or 404 page.
+     if ($this->request->attributes->has('exception')) {
+       return [];
+diff --git a/core/modules/language/src/Plugin/Block/LanguageBlock.php b/core/modules/language/src/Plugin/Block/LanguageBlock.php
+index be8571b9..2e1af599 100644
+--- a/core/modules/language/src/Plugin/Block/LanguageBlock.php
++++ b/core/modules/language/src/Plugin/Block/LanguageBlock.php
+@@ -81,7 +81,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $build = [];
+     $route_name = $this->pathMatcher->isFrontPage() ? '<front>' : '<current>';
+     $type = $this->getDerivativeId();
+diff --git a/core/modules/layout_builder/src/Plugin/Block/ExtraFieldBlock.php b/core/modules/layout_builder/src/Plugin/Block/ExtraFieldBlock.php
+index 56875deb..104f6510 100644
+--- a/core/modules/layout_builder/src/Plugin/Block/ExtraFieldBlock.php
++++ b/core/modules/layout_builder/src/Plugin/Block/ExtraFieldBlock.php
+@@ -118,7 +118,7 @@ protected function getEntity() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $entity = $this->getEntity();
+     // Add a placeholder to replace after the entity view is built.
+     // @see layout_builder_entity_view_alter().
+diff --git a/core/modules/layout_builder/src/Plugin/Block/FieldBlock.php b/core/modules/layout_builder/src/Plugin/Block/FieldBlock.php
+index 80d9b973..ef61aa60 100644
+--- a/core/modules/layout_builder/src/Plugin/Block/FieldBlock.php
++++ b/core/modules/layout_builder/src/Plugin/Block/FieldBlock.php
+@@ -154,7 +154,7 @@ protected function getEntity() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $display_settings = $this->getConfiguration()['formatter'];
+     $display_settings['third_party_settings']['layout_builder']['view_mode'] = $this->getContextValue('view_mode');
+     $entity = $this->getEntity();
+diff --git a/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php b/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php
+index 9f347174..2807a749 100644
+--- a/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php
++++ b/core/modules/layout_builder/src/Plugin/Block/InlineBlock.php
+@@ -213,7 +213,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $block = $this->getEntity();
+     return $this->entityTypeManager->getViewBuilder($block->getEntityTypeId())->view($block, $this->configuration['view_mode']);
+   }
+diff --git a/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestFormApiFormBlock.php b/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestFormApiFormBlock.php
+index 791ccbba..9c419ea0 100644
+--- a/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestFormApiFormBlock.php
++++ b/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestFormApiFormBlock.php
+@@ -61,7 +61,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return $this->formBuilder->getForm($this);
+   }
+ 
+diff --git a/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestInlineTemplateFormBlock.php b/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestInlineTemplateFormBlock.php
+index c93f55d3..3c99831a 100644
+--- a/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestInlineTemplateFormBlock.php
++++ b/core/modules/layout_builder/tests/modules/layout_builder_form_block_test/src/Plugin/Block/TestInlineTemplateFormBlock.php
+@@ -20,7 +20,7 @@ class TestInlineTemplateFormBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $build['form'] = [
+       '#type' => 'inline_template',
+       '#template' => '<form method="POST"><label>{{ "Keywords"|t }}<input name="keyword" type="text" required /></label><input name="submit" type="submit" value="{{ "Submit"|t }}" /></form>',
+diff --git a/core/modules/layout_builder/tests/modules/layout_builder_test/src/Plugin/Block/TestAjaxBlock.php b/core/modules/layout_builder/tests/modules/layout_builder_test/src/Plugin/Block/TestAjaxBlock.php
+index 1f1eeb0d..d189c7fc 100644
+--- a/core/modules/layout_builder/tests/modules/layout_builder_test/src/Plugin/Block/TestAjaxBlock.php
++++ b/core/modules/layout_builder/tests/modules/layout_builder_test/src/Plugin/Block/TestAjaxBlock.php
+@@ -49,7 +49,7 @@ public function ajaxCallback($form, $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $build['content'] = [
+       '#markup' => $this->t('Every word is like an unnecessary stain on silence and nothingness.'),
+     ];
+diff --git a/core/modules/node/src/Plugin/Block/SyndicateBlock.php b/core/modules/node/src/Plugin/Block/SyndicateBlock.php
+index bcc98d04..5512a7a4 100644
+--- a/core/modules/node/src/Plugin/Block/SyndicateBlock.php
++++ b/core/modules/node/src/Plugin/Block/SyndicateBlock.php
+@@ -36,7 +36,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#theme' => 'feed_icon',
+       '#url' => 'rss.xml',
+diff --git a/core/modules/search/src/Plugin/Block/SearchBlock.php b/core/modules/search/src/Plugin/Block/SearchBlock.php
+index d1a1f249..e7799116 100644
+--- a/core/modules/search/src/Plugin/Block/SearchBlock.php
++++ b/core/modules/search/src/Plugin/Block/SearchBlock.php
+@@ -77,7 +77,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $page = $this->configuration['page_id'] ?? NULL;
+     return $this->formBuilder->getForm(SearchBlockForm::class, $page);
+   }
+diff --git a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsClassBlock.php b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsClassBlock.php
+index 699a09a5..54b3482e 100644
+--- a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsClassBlock.php
++++ b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsClassBlock.php
+@@ -20,7 +20,7 @@ class SettingsTrayFormAnnotationIsClassBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => '<span>class</span>'];
+   }
+ 
+diff --git a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsFalseBlock.php b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsFalseBlock.php
+index 47bb6113..c20edc20 100644
+--- a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsFalseBlock.php
++++ b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationIsFalseBlock.php
+@@ -20,7 +20,7 @@ class SettingsTrayFormAnnotationIsFalseBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => '<span>FALSE</span>'];
+   }
+ 
+diff --git a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationNoneBlock.php b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationNoneBlock.php
+index 5b6eb923..8a463ee0 100644
+--- a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationNoneBlock.php
++++ b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/SettingsTrayFormAnnotationNoneBlock.php
+@@ -17,7 +17,7 @@ class SettingsTrayFormAnnotationNoneBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => '<span>none</span>'];
+   }
+ 
+diff --git a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/ValidationErrorBlock.php b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/ValidationErrorBlock.php
+index f54b1a3f..ab0cb3f7 100644
+--- a/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/ValidationErrorBlock.php
++++ b/core/modules/settings_tray/tests/modules/settings_tray_test/src/Plugin/Block/ValidationErrorBlock.php
+@@ -18,7 +18,7 @@ class ValidationErrorBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => '<span>If I had more time this would be very witty :(.</span>'];
+   }
+ 
+diff --git a/core/modules/shortcut/src/Plugin/Block/ShortcutsBlock.php b/core/modules/shortcut/src/Plugin/Block/ShortcutsBlock.php
+index ab2d57e4..3779b52a 100644
+--- a/core/modules/shortcut/src/Plugin/Block/ShortcutsBlock.php
++++ b/core/modules/shortcut/src/Plugin/Block/ShortcutsBlock.php
+@@ -20,7 +20,7 @@ class ShortcutsBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       shortcut_renderable_links(shortcut_current_displayed_set()),
+     ];
+diff --git a/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php b/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php
+index efdb72a6..c20accd5 100644
+--- a/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php
++++ b/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php
+@@ -149,7 +149,7 @@ public function blockSubmit($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $content = [];
+ 
+     if ($this->configuration['top_day_num'] > 0) {
+diff --git a/core/modules/system/src/Plugin/Block/SystemBrandingBlock.php b/core/modules/system/src/Plugin/Block/SystemBrandingBlock.php
+index fdb869a4..a1de734b 100644
+--- a/core/modules/system/src/Plugin/Block/SystemBrandingBlock.php
++++ b/core/modules/system/src/Plugin/Block/SystemBrandingBlock.php
+@@ -152,7 +152,7 @@ public function blockSubmit($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $build = [];
+     $site_config = $this->configFactory->get('system.site');
+ 
+diff --git a/core/modules/system/src/Plugin/Block/SystemBreadcrumbBlock.php b/core/modules/system/src/Plugin/Block/SystemBreadcrumbBlock.php
+index a0873863..cf85d0ea 100644
+--- a/core/modules/system/src/Plugin/Block/SystemBreadcrumbBlock.php
++++ b/core/modules/system/src/Plugin/Block/SystemBreadcrumbBlock.php
+@@ -68,7 +68,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return $this->breadcrumbManager->build($this->routeMatch)->toRenderable();
+   }
+ 
+diff --git a/core/modules/system/src/Plugin/Block/SystemMainBlock.php b/core/modules/system/src/Plugin/Block/SystemMainBlock.php
+index 92f44308..869b21b3 100644
+--- a/core/modules/system/src/Plugin/Block/SystemMainBlock.php
++++ b/core/modules/system/src/Plugin/Block/SystemMainBlock.php
+@@ -4,6 +4,7 @@
+ 
+ use Drupal\Core\Block\BlockBase;
+ use Drupal\Core\Block\MainContentBlockPluginInterface;
++use Drupal\Core\Logger\LoggerChannelTrait;
+ 
+ /**
+  * Provides a 'Main page content' block.
+@@ -18,6 +19,8 @@
+  */
+ class SystemMainBlock extends BlockBase implements MainContentBlockPluginInterface {
+ 
++  use LoggerChannelTrait;
++
+   /**
+    * The render array representing the main page content.
+    *
+@@ -35,7 +38,11 @@ public function setMainContent(array $main_content) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
++    if (!is_array($this->mainContent)) {
++      $this->getLogger('system')->error('The system_main_block was placed but ::setMainContent() was not called.');
++      return [];
++    }
+     return $this->mainContent;
+   }
+ 
+diff --git a/core/modules/system/src/Plugin/Block/SystemMenuBlock.php b/core/modules/system/src/Plugin/Block/SystemMenuBlock.php
+index ed240603..fbcdd4a1 100644
+--- a/core/modules/system/src/Plugin/Block/SystemMenuBlock.php
++++ b/core/modules/system/src/Plugin/Block/SystemMenuBlock.php
+@@ -143,7 +143,7 @@ public function blockSubmit($form, FormStateInterface $form_state) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $menu_name = $this->getDerivativeId();
+     if ($this->configuration['expand_all_items']) {
+       $parameters = new MenuTreeParameters();
+diff --git a/core/modules/system/src/Plugin/Block/SystemMessagesBlock.php b/core/modules/system/src/Plugin/Block/SystemMessagesBlock.php
+index f737b8fd..d001a42a 100644
+--- a/core/modules/system/src/Plugin/Block/SystemMessagesBlock.php
++++ b/core/modules/system/src/Plugin/Block/SystemMessagesBlock.php
+@@ -30,7 +30,7 @@ public function defaultConfiguration() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return [
+       '#type' => 'status_messages',
+       '#include_fallback' => TRUE,
+diff --git a/core/modules/system/src/Plugin/Block/SystemPoweredByBlock.php b/core/modules/system/src/Plugin/Block/SystemPoweredByBlock.php
+index c1e0ba8b..9a831e2b 100644
+--- a/core/modules/system/src/Plugin/Block/SystemPoweredByBlock.php
++++ b/core/modules/system/src/Plugin/Block/SystemPoweredByBlock.php
+@@ -24,7 +24,7 @@ public function defaultConfiguration() {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return ['#markup' => '<span>' . $this->t('Powered by <a href=":poweredby">Drupal</a>', [':poweredby' => 'https://www.drupal.org']) . '</span>'];
+   }
+ 
+diff --git a/core/modules/system/tests/modules/ajax_forms_test/src/Plugin/Block/AjaxFormBlock.php b/core/modules/system/tests/modules/ajax_forms_test/src/Plugin/Block/AjaxFormBlock.php
+index 65e1372d..f72fa348 100644
+--- a/core/modules/system/tests/modules/ajax_forms_test/src/Plugin/Block/AjaxFormBlock.php
++++ b/core/modules/system/tests/modules/ajax_forms_test/src/Plugin/Block/AjaxFormBlock.php
+@@ -71,7 +71,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return $this->formBuilder->getForm($this);
+   }
+ 
+diff --git a/core/modules/system/tests/modules/form_test/src/Plugin/Block/RedirectFormBlock.php b/core/modules/system/tests/modules/form_test/src/Plugin/Block/RedirectFormBlock.php
+index cf5fff36..40039f2e 100644
+--- a/core/modules/system/tests/modules/form_test/src/Plugin/Block/RedirectFormBlock.php
++++ b/core/modules/system/tests/modules/form_test/src/Plugin/Block/RedirectFormBlock.php
+@@ -60,7 +60,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     return $this->formBuilder->getForm('Drupal\form_test\Form\RedirectBlockForm');
+   }
+ 
+diff --git a/core/modules/system/tests/modules/render_attached_test/src/Plugin/Block/AttachedRenderingBlock.php b/core/modules/system/tests/modules/render_attached_test/src/Plugin/Block/AttachedRenderingBlock.php
+index 721d10ca..4951327e 100644
+--- a/core/modules/system/tests/modules/render_attached_test/src/Plugin/Block/AttachedRenderingBlock.php
++++ b/core/modules/system/tests/modules/render_attached_test/src/Plugin/Block/AttachedRenderingBlock.php
+@@ -22,7 +22,7 @@ class AttachedRenderingBlock extends BlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     // Grab test attachment fixtures from
+     // Drupal\render_attached_test\Controller\RenderAttachedTestController.
+     $controller = new RenderAttachedTestController();
+diff --git a/core/modules/user/src/Plugin/Block/UserLoginBlock.php b/core/modules/user/src/Plugin/Block/UserLoginBlock.php
+index f55a70d6..fab6bc7e 100644
+--- a/core/modules/user/src/Plugin/Block/UserLoginBlock.php
++++ b/core/modules/user/src/Plugin/Block/UserLoginBlock.php
+@@ -82,7 +82,7 @@ protected function blockAccess(AccountInterface $account) {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $form = \Drupal::formBuilder()->getForm('Drupal\user\Form\UserLoginForm');
+     unset($form['name']['#attributes']['autofocus']);
+     // When unsetting field descriptions, also unset aria-describedby attributes
+diff --git a/core/modules/views/src/Plugin/Block/ViewsBlock.php b/core/modules/views/src/Plugin/Block/ViewsBlock.php
+index 34738cdd..d094c7d3 100644
+--- a/core/modules/views/src/Plugin/Block/ViewsBlock.php
++++ b/core/modules/views/src/Plugin/Block/ViewsBlock.php
+@@ -21,7 +21,7 @@ class ViewsBlock extends ViewsBlockBase {
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $this->view->display_handler->preBlockBuild($this);
+ 
+     $args = [];
+diff --git a/core/modules/views/src/Plugin/Block/ViewsExposedFilterBlock.php b/core/modules/views/src/Plugin/Block/ViewsExposedFilterBlock.php
+index d877277d..42dd8954 100644
+--- a/core/modules/views/src/Plugin/Block/ViewsExposedFilterBlock.php
++++ b/core/modules/views/src/Plugin/Block/ViewsExposedFilterBlock.php
+@@ -31,7 +31,7 @@ public function getCacheContexts() {
+    *   A renderable array representing the content of the block with additional
+    *   context of current view and display ID.
+    */
+-  public function build() {
++  public function build(): array {
+     $output = $this->view->display_handler->viewExposedFormBlocks();
+     // Provide the context for block build and block view alter hooks.
+     // \Drupal\views\Plugin\Block\ViewsBlock::build() adds the same context in
+diff --git a/core/modules/workspaces/src/Plugin/Block/WorkspaceSwitcherBlock.php b/core/modules/workspaces/src/Plugin/Block/WorkspaceSwitcherBlock.php
+index 2f5a2fe7..843f08d9 100644
+--- a/core/modules/workspaces/src/Plugin/Block/WorkspaceSwitcherBlock.php
++++ b/core/modules/workspaces/src/Plugin/Block/WorkspaceSwitcherBlock.php
+@@ -70,7 +70,7 @@ public static function create(ContainerInterface $container, array $configuratio
+   /**
+    * {@inheritdoc}
+    */
+-  public function build() {
++  public function build(): array {
+     $build = [
+       'form' => $this->formBuilder->getForm(WorkspaceSwitcherForm::class),
+       '#cache' => [
+diff --git a/core/tests/Drupal/Tests/Core/Block/BlockManagerTest.php b/core/tests/Drupal/Tests/Core/Block/BlockManagerTest.php
+index 3f373fae..41665a24 100644
+--- a/core/tests/Drupal/Tests/Core/Block/BlockManagerTest.php
++++ b/core/tests/Drupal/Tests/Core/Block/BlockManagerTest.php
+@@ -4,9 +4,13 @@
+ 
+ use Drupal\Component\Plugin\Discovery\DiscoveryInterface;
+ use Drupal\Core\Block\BlockManager;
++use Drupal\Core\Block\BlockPluginInterface;
++use Drupal\Core\Block\BlockPluginTrait;
+ use Drupal\Core\Block\Plugin\Block\Broken;
++use Drupal\Core\Cache\CacheableDependencyTrait;
+ use Drupal\Core\Cache\CacheBackendInterface;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
++use Drupal\Core\Plugin\PluginBase;
+ use Drupal\Core\Session\AccountInterface;
+ use Drupal\Tests\UnitTestCase;
+ use Psr\Log\LoggerInterface;
+@@ -50,10 +54,9 @@ protected function setUp(): void {
+     $this->blockManager = new BlockManager(new \ArrayObject(), $cache_backend->reveal(), $module_handler->reveal(), $this->logger->reveal());
+     $this->blockManager->setStringTranslation($this->getStringTranslationStub());
+ 
+-    $discovery = $this->prophesize(DiscoveryInterface::class);
+     // Specify the 'broken' block, as well as 3 other blocks with admin labels
+     // that are purposefully not in alphabetical order.
+-    $discovery->getDefinitions()->willReturn([
++    $this->setDefinitions([
+       'broken' => [
+         'admin_label' => 'Broken/Missing',
+         'category' => 'Block',
+@@ -63,16 +66,30 @@ protected function setUp(): void {
+       'block1' => [
+         'admin_label' => 'Coconut',
+         'category' => 'Group 2',
++        'class' => TestBlockManagerBlock::class,
+       ],
+       'block2' => [
+         'admin_label' => 'Apple',
+         'category' => 'Group 1',
++        'class' => TestBlockManagerBlock::class,
+       ],
+       'block3' => [
+         'admin_label' => 'Banana',
+         'category' => 'Group 2',
++        'class' => TestBlockManagerBlock::class,
+       ],
+     ]);
++  }
++
++  /**
++   * Sets the definitions the block manager will return.
++   *
++   * @param array $definitions
++   *   An array of plugin definitions.
++   */
++  protected function setDefinitions(array $definitions) {
++    $discovery = $this->prophesize(DiscoveryInterface::class);
++    $discovery->getDefinitions()->willReturn($definitions);
+     // Force the discovery object onto the block manager.
+     $property = new \ReflectionProperty(BlockManager::class, 'discovery');
+     $property->setAccessible(TRUE);
+@@ -113,5 +130,71 @@ public function testHandlePluginNotFound() {
+     $plugin = $this->blockManager->createInstance('invalid');
+     $this->assertSame('broken', $plugin->getPluginId());
+   }
++  /**
++   * @group legacy
++   * @expectedDeprecation Declaring ::build() without an array return typehint in Drupal\Tests\Core\Block\TestBlockManagerNoArrayReturnTypeBlock is deprecated in drupal:9.2.0. Typehinting will be required before drupal:10.0.0. See https://www.drupal.org/node/3164649.
++   */
++  public function testBuildNoReturnType() {
++    // Overwrite the definitions from ::setUp() to have a block that does not
++    // have a return type for ::build().
++    $this->setDefinitions([
++      'block1' => [
++        'provider' => 'test',
++        'class' => TestBlockManagerNoArrayReturnTypeBlock::class,
++      ],
++    ]);
++    $expected = [];
++    $definitions = $this->blockManager->getDefinitions();
++    $this->assertSame($expected, $definitions);
++  }
++
++  /**
++   * @group legacy
++   * @expectedDeprecation Extending Drupal\Tests\Core\Block\TestBlockManagerExtendsExistingBlock from a concrete class is deprecated in drupal:9.2.0 and will be disallowed before drupal:10.0.0. Extend the class from an abstract base class instead. See https://www.drupal.org/node/xxxxxxxx.
++   */
++  public function testExtendsExistingBlock() {
++    // Overwrite the definitions from ::setUp() to have a block that extends
++    // an existing block.
++    $this->setDefinitions([
++      'block1' => [
++        'provider' => 'test',
++        'class' => TestBlockManagerExtendsExistingBlock::class,
++      ],
++    ]);
++    $expected = [];
++    $definitions = $this->blockManager->getDefinitions();
++    $this->assertSame($expected, $definitions);
++  }
++
++}
++
++class TestBlockManagerBlock extends PluginBase implements BlockPluginInterface {
++
++  use BlockPluginTrait;
++  use CacheableDependencyTrait;
++
++  /**
++   * {@inheritdoc}
++   */
++  public function build(): array {
++    return [];
++  }
++
++}
++
++class TestBlockManagerNoArrayReturnTypeBlock extends PluginBase implements BlockPluginInterface {
++
++  use BlockPluginTrait;
++  use CacheableDependencyTrait;
++
++  /**
++   * {@inheritdoc}
++   */
++  public function build() {
++  }
++
++}
++
++class TestBlockManagerExtendsExistingBlock extends TestBlockManagerBlock {
+ 
+ }

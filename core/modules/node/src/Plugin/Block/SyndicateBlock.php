@@ -36,7 +36,7 @@ class SyndicateBlock extends BlockBase {
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     return [
       '#theme' => 'feed_icon',
       '#url' => 'rss.xml',

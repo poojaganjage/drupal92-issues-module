@@ -152,7 +152,7 @@ class SystemBrandingBlock extends BlockBase implements ContainerFactoryPluginInt
   /**
    * {@inheritdoc}
    */
-  public function build() {
+  public function build(): array {
     $build = [];
     $site_config = $this->configFactory->get('system.site');
 

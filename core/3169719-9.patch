@@ -1,0 +1,50 @@
+diff --git a/core/tests/Drupal/KernelTests/Core/Theme/ConfirmClassyCopiesTest.php b/core/tests/Drupal/KernelTests/Core/Theme/ConfirmClassyCopiesTest.php
+index 5164f2b3..bc808b15 100644
+--- a/core/tests/Drupal/KernelTests/Core/Theme/ConfirmClassyCopiesTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Theme/ConfirmClassyCopiesTest.php
+@@ -692,7 +692,7 @@ protected function getClassyHash($type, $file) {
+         'icons.css' => '56f623bd343b9bc7e7ac3e3e95d7f3ce',
+         'image-widget.css' => '2da54829199f64a2c390930c3b0913a3',
+         'indented.css' => '48e214a106d9fede1e05aa10b4796361',
+-        'inline-form.css' => 'cc5cbfd34511d9021a53ec693c110740',
++        'inline-form.css' => '504bc16a837ee6cf16431db80acc43be',
+         'item-list.css' => '1d519afe6007f4b01e00f22b0ba8bf33',
+         'link.css' => '22f42d430fe458080a7739c70a2d2ea5',
+         'links.css' => '21fe64349f5702cd5b89104a1d3b9cd3',
+diff --git a/core/themes/seven/css/classy/components/inline-form.css b/core/themes/seven/css/classy/components/inline-form.css
+index b5201a78..987da47b 100644
+--- a/core/themes/seven/css/classy/components/inline-form.css
++++ b/core/themes/seven/css/classy/components/inline-form.css
+@@ -16,15 +16,6 @@
+ [dir="rtl"] .views-filterable-options-controls .form-item {
+   margin-right: 2%;
+ }
+-.form--inline .form-item-separator {
+-  margin-top: 2.3em;
+-  margin-right: 1em; /* LTR */
+-  margin-left: 0.5em; /* LTR */
+-}
+-[dir="rtl"] .form--inline .form-item-separator {
+-  margin-right: 0.5em;
+-  margin-left: 1em;
+-}
+ .form--inline .form-actions {
+   clear: left; /* LTR */
+ }
+diff --git a/core/themes/seven/css/components/field-ui.css b/core/themes/seven/css/components/field-ui.css
+index d099c519..68ba33f8 100644
+--- a/core/themes/seven/css/components/field-ui.css
++++ b/core/themes/seven/css/components/field-ui.css
+@@ -26,3 +26,12 @@
+   margin-right: 1em;
+   margin-left: 0;
+ }
++.form--inline .form-item-separator {
++  margin-top: 2.3em;
++  margin-right: 1em; /* LTR */
++  margin-left: 0.5em; /* LTR */
++}
++[dir="rtl"] .form--inline .form-item-separator {
++  margin-right: 0.5em;
++  margin-left: 1em;
++}
