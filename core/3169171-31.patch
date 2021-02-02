@@ -1,0 +1,91 @@
+diff --git a/core/tests/Drupal/Tests/AssertHelperTrait.php b/core/tests/Drupal/Tests/AssertHelperTrait.php
+index 29c0b290..09593102 100644
+--- a/core/tests/Drupal/Tests/AssertHelperTrait.php
++++ b/core/tests/Drupal/Tests/AssertHelperTrait.php
+@@ -4,8 +4,15 @@
+ 
+ use Drupal\Component\Render\MarkupInterface;
+ 
++@trigger_error(__NAMESPACE__ . '\AssertHelperTrait is deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. There is no replacement. See https://www.drupal.org/node/3123638', E_USER_DEPRECATED);
++
+ /**
+  * Provides helper methods for assertions.
++ *
++ * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. There is no
++ *   replacement.
++ *
++ * @see https://www.drupal.org/node/3123638
+  */
+ trait AssertHelperTrait {
+ 
+@@ -18,7 +25,7 @@ trait AssertHelperTrait {
+    * @return mixed
+    *   The input value, with MarkupInterface objects casted to string.
+    *
+-   * @deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. There is no
++   * @deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. There is no
+    *   replacement, just use assertEquals in tests.
+    *
+    * @see https://www.drupal.org/node/3123638
+diff --git a/core/tests/Drupal/Tests/AssertHelperTraitTest.php b/core/tests/Drupal/Tests/AssertHelperTraitTest.php
+index 7e14a8af..30750540 100644
+--- a/core/tests/Drupal/Tests/AssertHelperTraitTest.php
++++ b/core/tests/Drupal/Tests/AssertHelperTraitTest.php
+@@ -12,12 +12,18 @@
+  */
+ class AssertHelperTraitTest extends UnitTestCase {
+ 
++  public function testTraitDeprecation(): void {
++    $this->expectDeprecation('Drupal\Tests\AssertHelperTrait is deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. There is no replacement. See https://www.drupal.org/node/3123638');
++    require_once __DIR__ . '/../../fixtures/AssertHelperTestClass.php';
++    $class = new AssertHelperTestClass();
++  }
++
+   /**
+    * @covers ::castSafeStrings
+    * @dataProvider providerCastSafeStrings
+    */
+   public function testCastSafeStrings($expected, $value) {
+-    $this->expectDeprecation('AssertHelperTrait::castSafeStrings() is deprecated in drupal:9.1.0 and is removed from drupal:10.0.0. There is no replacement; assertEquals() will automatically cast MarkupInterface to strings when needed. See https://www.drupal.org/node/3123638');
++    $this->expectDeprecation('AssertHelperTrait::castSafeStrings() is deprecated in drupal:9.2.0 and is removed from drupal:10.0.0. There is no replacement; assertEquals() will automatically cast MarkupInterface to strings when needed. See https://www.drupal.org/node/3123638');
+     $class = new AssertHelperTestClass();
+     $this->assertSame($expected, $class->testMethod($value));
+   }
+@@ -34,12 +40,3 @@ public function providerCastSafeStrings() {
+   }
+ 
+ }
+-
+-class AssertHelperTestClass {
+-  use AssertHelperTrait;
+-
+-  public function testMethod($value) {
+-    return $this->castSafeStrings($value);
+-  }
+-
+-}
+diff --git a/core/tests/fixtures/AssertHelperTestClass.php b/core/tests/fixtures/AssertHelperTestClass.php
+new file mode 100644
+index 00000000..752c6c54
+--- /dev/null
++++ b/core/tests/fixtures/AssertHelperTestClass.php
+@@ -0,0 +1,19 @@
++<?php
++
++namespace Drupal\Tests;
++
++/**
++ * A helper class for deprecation of AssertHelperTrait.
++ *
++ * @todo remove this class in Drupal 10.
++ *
++ * @internal
++ */
++class AssertHelperTestClass {
++  use AssertHelperTrait;
++
++  public function testMethod($value) {
++    return $this->castSafeStrings($value);
++  }
++
++}
