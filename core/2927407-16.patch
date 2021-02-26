@@ -1,0 +1,31 @@
+diff --git a/core/misc/ajax.es6.js b/core/misc/ajax.es6.js
+index b5285936..0670d113 100644
+--- a/core/misc/ajax.es6.js
++++ b/core/misc/ajax.es6.js
+@@ -42,9 +42,7 @@
+       }
+ 
+       // Load all Ajax behaviors specified in the settings.
+-      Object.keys(settings.ajax || {}).forEach((base) =>
+-        loadAjaxBehavior(base),
+-      );
++      Object.keys(settings.ajax || {}).forEach(loadAjaxBehavior);
+ 
+       Drupal.ajax.bindAjaxLinks(document.body);
+ 
+diff --git a/core/misc/ajax.js b/core/misc/ajax.js
+index b7539af1..7dcb007c 100644
+--- a/core/misc/ajax.js
++++ b/core/misc/ajax.js
+@@ -34,9 +34,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len
+         });
+       }
+ 
+-      Object.keys(settings.ajax || {}).forEach(function (base) {
+-        return loadAjaxBehavior(base);
+-      });
++      Object.keys(settings.ajax || {}).forEach(loadAjaxBehavior);
++
+       Drupal.ajax.bindAjaxLinks(document.body);
+       $('.use-ajax-submit').once('ajax').each(function () {
+         var elementSettings = {};

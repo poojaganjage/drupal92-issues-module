@@ -34,9 +34,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         });
       }
 
-      Object.keys(settings.ajax || {}).forEach(function (base) {
-        return loadAjaxBehavior(base);
-      });
+      Object.keys(settings.ajax || {}).forEach(loadAjaxBehavior);
+
       Drupal.ajax.bindAjaxLinks(document.body);
       $('.use-ajax-submit').once('ajax').each(function () {
         var elementSettings = {};
