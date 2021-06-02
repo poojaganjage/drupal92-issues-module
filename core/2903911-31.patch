@@ -1,0 +1,1353 @@
+diff --git a/core/lib/Drupal/Component/Plugin/Exception/InvalidPluginDefinitionException.php b/core/lib/Drupal/Component/Plugin/Exception/InvalidPluginDefinitionException.php
+index c9582604..2c84ab0c 100644
+--- a/core/lib/Drupal/Component/Plugin/Exception/InvalidPluginDefinitionException.php
++++ b/core/lib/Drupal/Component/Plugin/Exception/InvalidPluginDefinitionException.php
+@@ -17,10 +17,14 @@ class InvalidPluginDefinitionException extends PluginException {
+   /**
+    * Constructs a InvalidPluginDefinitionException.
+    *
+-   * For the remaining parameters see \Exception.
+-   *
+    * @param string $plugin_id
+    *   The plugin ID of the mapper.
++   * @param string $message
++   *   The exception message.
++   * @param int $code
++   *   The exception code.
++   * @param \Exception|null $previous
++   *   The previous throwable used for exception chaining.
+    *
+    * @see \Exception
+    */
+diff --git a/core/lib/Drupal/Component/Plugin/Exception/PluginNotFoundException.php b/core/lib/Drupal/Component/Plugin/Exception/PluginNotFoundException.php
+index fa83e010..a79ca0be 100644
+--- a/core/lib/Drupal/Component/Plugin/Exception/PluginNotFoundException.php
++++ b/core/lib/Drupal/Component/Plugin/Exception/PluginNotFoundException.php
+@@ -10,10 +10,14 @@ class PluginNotFoundException extends PluginException {
+   /**
+    * Construct an PluginNotFoundException exception.
+    *
+-   * For the remaining parameters see \Exception.
+-   *
+    * @param string $plugin_id
+    *   The plugin ID that was not found.
++   * @param string $message
++   *   The exception message.
++   * @param int $code
++   *   The exception code.
++   * @param \Exception|null $previous
++   *   The previous throwable used for exception chaining.
+    *
+    * @see \Exception
+    */
+diff --git a/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php b/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php
+index 4f5a2364..0160243c 100644
+--- a/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php
++++ b/core/lib/Drupal/Core/Asset/LibraryDiscoveryParser.php
+@@ -453,10 +453,12 @@ protected function isValidUri($string) {
+    *   The containing library definition.
+    * @param array $sub_key
+    *   An array containing the sub-keys specifying the library asset, e.g.
+-   *   @code['js']@endcode or @code['css', 'component']@endcode
++   *   ['js'] or ['css', 'component'].
+    * @param array $overrides
+    *   Specifies the overrides, this is an array where the key is the asset to
+    *   be overridden while the value is overriding asset.
++   * @param string $theme_path
++   *   The theme or base theme.
+    */
+   protected function setOverrideValue(array &$library, array $sub_key, array $overrides, $theme_path) {
+     foreach ($overrides as $original => $replacement) {
+diff --git a/core/lib/Drupal/Core/Config/UnmetDependenciesException.php b/core/lib/Drupal/Core/Config/UnmetDependenciesException.php
+index 573ec548..8217aa5a 100644
+--- a/core/lib/Drupal/Core/Config/UnmetDependenciesException.php
++++ b/core/lib/Drupal/Core/Config/UnmetDependenciesException.php
+@@ -64,6 +64,8 @@ public function getExtension() {
+    *
+    * @param \Drupal\Core\StringTranslation\TranslationInterface $string_translation
+    *   The string translation service.
++   * @param string $extension
++   *   The name of the extension that is being installed.
+    *
+    * @return string
+    */
+diff --git a/core/lib/Drupal/Core/Database/Driver/pgsql/Schema.php b/core/lib/Drupal/Core/Database/Driver/pgsql/Schema.php
+index 1e7c4b6d..106add49 100644
+--- a/core/lib/Drupal/Core/Database/Driver/pgsql/Schema.php
++++ b/core/lib/Drupal/Core/Database/Driver/pgsql/Schema.php
+@@ -103,13 +103,16 @@ protected function ensureIdentifiersLength($table_identifier_part, $column_ident
+    * We introspect the database to collect the information required by insert
+    * and update queries.
+    *
+-   * @param $table_name
++   * @param string $table
+    *   The non-prefixed name of the table.
+    *
+-   * @return
++   * @return mixed|object
+    *   An object with two member variables:
+-   *     - 'blob_fields' that lists all the blob fields in the table.
+-   *     - 'sequences' that lists the sequences used in that table.
++   *   - 'blob_fields' that lists all the blob fields in the table.
++   *   - 'sequences' that lists the sequences used in that table.
++   *
++   * @throws \Exception
++   *   Exception thrown when the query for the table information fails.
+    */
+   public function queryTableInformation($table) {
+     // Generate a key to reference this table's information on.
+@@ -233,6 +236,9 @@ protected function resetTableInformation($table) {
+    *
+    * @return array
+    *   An array containing all the constraint names for the field.
++   *
++   * @throws \Exception
++   *   Exception thrown when the query for the table information fails.
+    */
+   public function queryFieldInformation($table, $field, $constraint_type = 'c') {
+     assert(in_array($constraint_type, ['c', 'f', 'p', 'u', 't', 'x']));
+@@ -267,12 +273,12 @@ public function queryFieldInformation($table, $field, $constraint_type = 'c') {
+   /**
+    * Generate SQL to create a new table from a Drupal schema definition.
+    *
+-   * @param $name
++   * @param string $name
+    *   The name of the table to create.
+-   * @param $table
++   * @param array $table
+    *   A Schema API table definition array.
+    *
+-   * @return
++   * @return array
+    *   An array of SQL statements to create the table.
+    */
+   protected function createTableSql($name, $table) {
+diff --git a/core/lib/Drupal/Core/Database/Schema.php b/core/lib/Drupal/Core/Database/Schema.php
+index fe932d3b..9083b274 100644
+--- a/core/lib/Drupal/Core/Database/Schema.php
++++ b/core/lib/Drupal/Core/Database/Schema.php
+@@ -72,13 +72,13 @@ public function nextPlaceholder() {
+   /**
+    * Get information about the table name and schema from the prefix.
+    *
+-   * @param
++   * @param string $table
+    *   Name of table to look prefix up for. Defaults to 'default' because that's
+    *   default key for prefix.
+-   * @param $add_prefix
++   * @param bool $add_prefix
+    *   Boolean that indicates whether the given table name should be prefixed.
+    *
+-   * @return
++   * @return array
+    *   A keyed array with information about the schema, table name and prefix.
+    */
+   protected function getPrefixInfo($table = 'default', $add_prefix = TRUE) {
+@@ -238,9 +238,9 @@ public function findTables($table_expression) {
+   /**
+    * Check if a column exists in the given table.
+    *
+-   * @param $table
++   * @param string $table
+    *   The name of the table in drupal (no prefixing).
+-   * @param $column
++   * @param string $column
+    *   The name of the column.
+    *
+    * @return
+diff --git a/core/lib/Drupal/Core/Entity/EntityFormInterface.php b/core/lib/Drupal/Core/Entity/EntityFormInterface.php
+index a6e8d2db..5c762daa 100644
+--- a/core/lib/Drupal/Core/Entity/EntityFormInterface.php
++++ b/core/lib/Drupal/Core/Entity/EntityFormInterface.php
+@@ -77,8 +77,6 @@ public function getEntityFromRouteMatch(RouteMatchInterface $route_match, $entit
+    * the submitted form values are copied to entity properties. The form's
+    * entity remains unchanged.
+    *
+-   * @see \Drupal\Core\Entity\EntityFormInterface::getEntity()
+-   *
+    * @param array $form
+    *   A nested array form elements comprising the form.
+    * @param \Drupal\Core\Form\FormStateInterface $form_state
+@@ -86,6 +84,8 @@ public function getEntityFromRouteMatch(RouteMatchInterface $route_match, $entit
+    *
+    * @return \Drupal\Core\Entity\EntityInterface
+    *   An updated copy of the form's entity object.
++   *
++   * @see \Drupal\Core\Entity\EntityFormInterface::getEntity()
+    */
+   public function buildEntity(array $form, FormStateInterface $form_state);
+ 
+diff --git a/core/lib/Drupal/Core/Entity/Plugin/DataType/Deriver/EntityDeriver.php b/core/lib/Drupal/Core/Entity/Plugin/DataType/Deriver/EntityDeriver.php
+index 888a4056..ec7b5049 100644
+--- a/core/lib/Drupal/Core/Entity/Plugin/DataType/Deriver/EntityDeriver.php
++++ b/core/lib/Drupal/Core/Entity/Plugin/DataType/Deriver/EntityDeriver.php
+@@ -50,6 +50,8 @@ class EntityDeriver implements ContainerDeriverInterface {
+    *   The base plugin ID.
+    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+    *   The entity type manager.
++   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info_service
++   *   The bundle info service.
+    */
+   public function __construct($base_plugin_id, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info_service) {
+     $this->basePluginId = $base_plugin_id;
+diff --git a/core/lib/Drupal/Core/Entity/Query/ConditionAggregateInterface.php b/core/lib/Drupal/Core/Entity/Query/ConditionAggregateInterface.php
+index 1926cf63..874cf6cd 100644
+--- a/core/lib/Drupal/Core/Entity/Query/ConditionAggregateInterface.php
++++ b/core/lib/Drupal/Core/Entity/Query/ConditionAggregateInterface.php
+@@ -33,10 +33,11 @@ public function condition($field, $function = NULL, $value = NULL, $operator = N
+   /**
+    * Queries for the existence of a field.
+    *
+-   * @param $field
++   * @param string $field
++   * @param string $function
+    * @param string $langcode
+    *
+-   * @return ConditionInterface
++   * @return \Drupal\Core\Entity\Query\ConditionInterface
+    * @see \Drupal\Core\Entity\Query\QueryInterface::exists()
+    */
+   public function exists($field, $function, $langcode = NULL);
+@@ -45,8 +46,10 @@ public function exists($field, $function, $langcode = NULL);
+    * Queries for the nonexistence of a field.
+    *
+    * @param string $field
++   * @param string $function
++   * @param string $langcode
+    *
+-   * @return ConditionInterface
++   * @return \Drupal\Core\Entity\Query\ConditionInterface
+    * @see \Drupal\Core\Entity\Query\QueryInterface::notExists()
+    */
+   public function notExists($field, $function, $langcode = NULL);
+diff --git a/core/lib/Drupal/Core/Entity/Query/ConditionInterface.php b/core/lib/Drupal/Core/Entity/Query/ConditionInterface.php
+index 7b5f513f..d0817fc7 100644
+--- a/core/lib/Drupal/Core/Entity/Query/ConditionInterface.php
++++ b/core/lib/Drupal/Core/Entity/Query/ConditionInterface.php
+@@ -54,6 +54,8 @@ public function exists($field, $langcode = NULL);
+    *
+    * @param string $field
+    * @param string $langcode
++   *   (optional) For which language the entity should be prepared, defaults to
++   *   the current content language.
+    *
+    * @return $this
+    *
+diff --git a/core/lib/Drupal/Core/Entity/Query/QueryInterface.php b/core/lib/Drupal/Core/Entity/Query/QueryInterface.php
+index 48052e47..16a696bc 100644
+--- a/core/lib/Drupal/Core/Entity/Query/QueryInterface.php
++++ b/core/lib/Drupal/Core/Entity/Query/QueryInterface.php
+@@ -18,6 +18,7 @@ interface QueryInterface extends AlterableInterface {
+    * Gets the ID of the entity type for this query.
+    *
+    * @return string
++   *   The entity type ID.
+    */
+   public function getEntityTypeId();
+ 
+@@ -103,9 +104,9 @@ public function condition($field, $value = NULL, $operator = NULL, $langcode = N
+   /**
+    * Queries for a non-empty value on a field.
+    *
+-   * @param $field
++   * @param string $field
+    *   Name of a field.
+-   * @param $langcode
++   * @param string|null $langcode
+    *   Language code (optional).
+    *
+    * @return $this
+@@ -115,9 +116,9 @@ public function exists($field, $langcode = NULL);
+   /**
+    * Queries for an empty field.
+    *
+-   * @param $field
++   * @param string $field
+    *   Name of a field.
+-   * @param $langcode
++   * @param string|null $langcode
+    *   Language code (optional).
+    *
+    * @return $this
+@@ -127,34 +128,35 @@ public function notExists($field, $langcode = NULL);
+   /**
+    * Enables a pager for the query.
+    *
+-   * @param $limit
++   * @param int $limit
+    *   An integer specifying the number of elements per page.  If passed a false
+    *   value (FALSE, 0, NULL), the pager is disabled.
+-   * @param $element
++   * @param int|null $element
+    *   An optional integer to distinguish between multiple pagers on one page.
+    *   If not provided, one is automatically calculated.
+    *
+    * @return $this
+-   *   The called object.
+    */
+   public function pager($limit = 10, $element = NULL);
+ 
+   /**
+-   * @param null $start
+-   * @param null $length
++   * Limits the query with a range.
++   *
++   * @param int|null $start
++   * @param int|null $length
++   *
+    * @return $this
+-   *   The called object.
+    */
+   public function range($start = NULL, $length = NULL);
+ 
+   /**
+-   * @param $field
++   * @param string $field
+    *   Name of a field.
+    * @param string $direction
+-   * @param $langcode
++   * @param string|null $langcode
+    *   Language code (optional).
++   *
+    * @return $this
+-   *   The called object.
+    */
+   public function sort($field, $direction = 'ASC', $langcode = NULL);
+ 
+@@ -164,27 +166,24 @@ public function sort($field, $direction = 'ASC', $langcode = NULL);
+    * For count queries, execute() returns the number entities found.
+    *
+    * @return $this
+-   *   The called object.
+    */
+   public function count();
+ 
+   /**
+    * Enables sortable tables for this query.
+    *
+-   * @param $headers
++   * @param array $headers
+    *   An array of headers of the same structure as described in
+    *   template_preprocess_table(). Use a 'specifier' in place of a 'field' to
+    *   specify what to sort on. This can be an entity or a field as described
+    *   in condition().
+    *
+    * @return $this
+-   *   The called object.
+    */
+   public function tableSort(&$headers);
+ 
+   /**
+    * @return $this
+-   *   The called object.
+    */
+   public function accessCheck($access_check = TRUE);
+ 
+@@ -218,6 +217,7 @@ public function execute();
+    * @endcode
+    *
+    * @return \Drupal\Core\Entity\Query\ConditionInterface
++   *   The called object.
+    */
+   public function andConditionGroup();
+ 
+@@ -246,6 +246,7 @@ public function andConditionGroup();
+    * @endcode
+    *
+    * @return \Drupal\Core\Entity\Query\ConditionInterface
++   *   The called object.
+    */
+   public function orConditionGroup();
+ 
+diff --git a/core/lib/Drupal/Core/Entity/Query/Sql/Tables.php b/core/lib/Drupal/Core/Entity/Query/Sql/Tables.php
+index 4697e77d..e05b8a5c 100644
+--- a/core/lib/Drupal/Core/Entity/Query/Sql/Tables.php
++++ b/core/lib/Drupal/Core/Entity/Query/Sql/Tables.php
+@@ -361,14 +361,32 @@ protected function ensureEntityTable($index_prefix, $property, $type, $langcode,
+   }
+ 
+   /**
+-   * Join field table if necessary.
++   * Ensure the field table is joined if necessary.
+    *
+-   * @param $field_name
+-   *   Name of the field.
++   * @param string $index_prefix
++   *   The table array index prefix. For a base table this will be empty,
++   *   for a target entity reference like 'field_tags.entity:taxonomy_term.name'
++   *   this will be 'entity:taxonomy_term.target_id.'.
++   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface &$field
++   *   The field storage definition for the field being joined.
++   * @param string $type
++   *   The join type.
++   * @param string $langcode
++   *   The langcode we use on the join.
++   * @param string $base_table
++   *   The table to join to. It can be either the table name, its alias or the
++   *   'base_table' placeholder.
++   * @param string $entity_id_field
++   *   The name of the ID field/property for the current entity. For instance:
++   *   tid, nid, etc.
++   * @param string $field_id_field
++   *   The column representing the id for the field. For example, 'revision_id'
++   *   or 'entity_id'.
++   * @param string $delta
++   *   A delta which should be used as additional condition.
+    *
+    * @return string
+-   *
+-   * @throws \Drupal\Core\Entity\Query\QueryException
++   *   The alias of the joined table.
+    */
+   protected function ensureFieldTable($index_prefix, &$field, $type, $langcode, $base_table, $entity_id_field, $field_id_field, $delta) {
+     $field_name = $field->getName();
+@@ -427,6 +445,7 @@ protected function addJoin($type, $table, $join_condition, $langcode, $delta = N
+    *
+    * @param string $table
+    *   The table name.
++   * @param string $entity_type_id
+    *
+    * @return array|false
+    *   An associative array of table field mapping for the given table, keyed by
+diff --git a/core/lib/Drupal/Core/Entity/TypedData/EntityDataDefinition.php b/core/lib/Drupal/Core/Entity/TypedData/EntityDataDefinition.php
+index 74463ee2..3e362317 100644
+--- a/core/lib/Drupal/Core/Entity/TypedData/EntityDataDefinition.php
++++ b/core/lib/Drupal/Core/Entity/TypedData/EntityDataDefinition.php
+@@ -15,6 +15,9 @@ class EntityDataDefinition extends ComplexDataDefinitionBase implements EntityDa
+    * @param string $entity_type_id
+    *   (optional) The ID of the entity type, or NULL if the entity type is
+    *   unknown. Defaults to NULL.
++   * @param string $bundle
++   *   (optional) The bundle of the entity type, or NULL if the bundle is
++   *   unknown. Defaults to NULL.
+    *
+    * @return static
+    */
+diff --git a/core/lib/Drupal/Core/EventSubscriber/ConfigSnapshotSubscriber.php b/core/lib/Drupal/Core/EventSubscriber/ConfigSnapshotSubscriber.php
+index 2d78d20e..20e0cd67 100644
+--- a/core/lib/Drupal/Core/EventSubscriber/ConfigSnapshotSubscriber.php
++++ b/core/lib/Drupal/Core/EventSubscriber/ConfigSnapshotSubscriber.php
+@@ -37,6 +37,8 @@ class ConfigSnapshotSubscriber implements EventSubscriberInterface {
+   /**
+    * Constructs the ConfigSnapshotSubscriber object.
+    *
++   * @param \Drupal\Core\Config\ConfigManagerInterface $config_manager
++   *   The configuration manager.
+    * @param \Drupal\Core\Config\StorageInterface $source_storage
+    *   The source storage used to discover configuration changes.
+    * @param \Drupal\Core\Config\StorageInterface $snapshot_storage
+diff --git a/core/lib/Drupal/Core/Installer/Form/SiteSettingsForm.php b/core/lib/Drupal/Core/Installer/Form/SiteSettingsForm.php
+index c37b5b71..d98c4820 100644
+--- a/core/lib/Drupal/Core/Installer/Form/SiteSettingsForm.php
++++ b/core/lib/Drupal/Core/Installer/Form/SiteSettingsForm.php
+@@ -37,6 +37,8 @@ class SiteSettingsForm extends FormBase {
+    *
+    * @param string $site_path
+    *   The site path.
++   * @param \Drupal\Core\Render\RendererInterface $renderer
++   *   The renderer.
+    */
+   public function __construct($site_path, RendererInterface $renderer) {
+     $this->sitePath = $site_path;
+diff --git a/core/lib/Drupal/Core/Site/Settings.php b/core/lib/Drupal/Core/Site/Settings.php
+index cee1a915..d2810558 100644
+--- a/core/lib/Drupal/Core/Site/Settings.php
++++ b/core/lib/Drupal/Core/Site/Settings.php
+@@ -213,9 +213,13 @@ public static function getHashSalt() {
+    * module directories setting apcu_ensure_unique_prefix would allow the sites
+    * to share APCu cache items.
+    *
+-   * @param $identifier
++   * @param string $identifier
+    *   An identifier for the prefix. For example, 'class_loader' or
+    *   'cache_backend'.
++   * @param string $root
++   *   The app root.
++   * @param string $site_path
++   *   (optional) The site path. Defaults to an empty string.
+    *
+    * @return string
+    *   The prefix for APCu user cache keys.
+diff --git a/core/lib/Drupal/Core/TypedData/Plugin/DataType/ItemList.php b/core/lib/Drupal/Core/TypedData/Plugin/DataType/ItemList.php
+index 4c83afc6..733a4e86 100644
+--- a/core/lib/Drupal/Core/TypedData/Plugin/DataType/ItemList.php
++++ b/core/lib/Drupal/Core/TypedData/Plugin/DataType/ItemList.php
+@@ -48,6 +48,9 @@ public function getValue() {
+    *
+    * @param array|null $values
+    *   An array of values of the field items, or NULL to unset the field.
++   * @param bool $notify
++   *   (optional) Whether to notify the parent object of the change. Defaults to
++   *   TRUE.
+    */
+   public function setValue($values, $notify = TRUE) {
+     if (!isset($values) || $values === []) {
+diff --git a/core/lib/Drupal/Core/TypedData/Plugin/DataType/Map.php b/core/lib/Drupal/Core/TypedData/Plugin/DataType/Map.php
+index aee25bc0..cadebd7d 100644
+--- a/core/lib/Drupal/Core/TypedData/Plugin/DataType/Map.php
++++ b/core/lib/Drupal/Core/TypedData/Plugin/DataType/Map.php
+@@ -70,6 +70,10 @@ public function getValue() {
+    *
+    * @param array|null $values
+    *   An array of property values.
++   * @param bool $notify
++   *   (optional) Whether to notify the parent object of the change. Defaults to
++   *   TRUE. If a property is updated from a parent object, set it to FALSE to
++   *   avoid being notified again.
+    */
+   public function setValue($values, $notify = TRUE) {
+     if (isset($values) && !is_array($values)) {
+@@ -214,6 +218,8 @@ public function __clone() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param $property_name
++   *   The name of the property.
+    * @param bool $notify
+    *   (optional) Whether to forward the notification to the parent. Defaults to
+    *   TRUE. By passing FALSE, overrides of this method can re-use the logic
+diff --git a/core/modules/action/src/Form/ActionAddForm.php b/core/modules/action/src/Form/ActionAddForm.php
+index 54a2c4c0..b05e8535 100644
+--- a/core/modules/action/src/Form/ActionAddForm.php
++++ b/core/modules/action/src/Form/ActionAddForm.php
+@@ -14,6 +14,11 @@ class ActionAddForm extends ActionFormBase {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   An associative array containing the structure of the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
++   *
+    * @param string $action_id
+    *   The action ID.
+    */
+diff --git a/core/modules/ban/src/Form/BanAdmin.php b/core/modules/ban/src/Form/BanAdmin.php
+index d71be8d4..6aafaf38 100644
+--- a/core/modules/ban/src/Form/BanAdmin.php
++++ b/core/modules/ban/src/Form/BanAdmin.php
+@@ -48,6 +48,11 @@ public function getFormId() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   A nested array form elements comprising the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
++   *
+    * @param string $default_ip
+    *   (optional) IP address to be passed on to
+    *   \Drupal::formBuilder()->getForm() for use as the default value of the IP
+diff --git a/core/modules/ban/src/Form/BanDelete.php b/core/modules/ban/src/Form/BanDelete.php
+index 9a3ddd48..d171e327 100644
+--- a/core/modules/ban/src/Form/BanDelete.php
++++ b/core/modules/ban/src/Form/BanDelete.php
+@@ -80,6 +80,11 @@ public function getCancelUrl() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   A nested array form elements comprising the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
++   *
+    * @param string $ban_id
+    *   The IP address record ID to unban.
+    */
+diff --git a/core/modules/block/src/BlockListBuilder.php b/core/modules/block/src/BlockListBuilder.php
+index 01ae5986..0cb4df4e 100644
+--- a/core/modules/block/src/BlockListBuilder.php
++++ b/core/modules/block/src/BlockListBuilder.php
+@@ -70,6 +70,8 @@ class BlockListBuilder extends ConfigEntityListBuilder implements FormInterface
+    *   The theme manager.
+    * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
+    *   The form builder.
++   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
++   *   The messenger service.
+    */
+   public function __construct(EntityTypeInterface $entity_type, EntityStorageInterface $storage, ThemeManagerInterface $theme_manager, FormBuilderInterface $form_builder, MessengerInterface $messenger) {
+     parent::__construct($entity_type, $storage);
+diff --git a/core/modules/comment/src/CommentForm.php b/core/modules/comment/src/CommentForm.php
+index 48c72712..0f9c7dbd 100644
+--- a/core/modules/comment/src/CommentForm.php
++++ b/core/modules/comment/src/CommentForm.php
+@@ -74,6 +74,8 @@ public static function create(ContainerInterface $container) {
+    *   The entity type bundle service.
+    * @param \Drupal\Component\Datetime\TimeInterface $time
+    *   The time service.
++   * @param \Drupal\Core\Entity\EntityFieldManagerInterface $entity_field_manager
++   *   The entity field manager service.
+    */
+   public function __construct(EntityRepositoryInterface $entity_repository, AccountInterface $current_user, RendererInterface $renderer, EntityTypeBundleInfoInterface $entity_type_bundle_info = NULL, TimeInterface $time = NULL, EntityFieldManagerInterface $entity_field_manager = NULL) {
+     parent::__construct($entity_repository, $entity_type_bundle_info, $time);
+diff --git a/core/modules/content_moderation/src/EntityTypeInfo.php b/core/modules/content_moderation/src/EntityTypeInfo.php
+index 00ddda2d..cc250704 100644
+--- a/core/modules/content_moderation/src/EntityTypeInfo.php
++++ b/core/modules/content_moderation/src/EntityTypeInfo.php
+@@ -91,10 +91,14 @@ class EntityTypeInfo implements ContainerInjectionInterface {
+    *   The moderation information service.
+    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+    *   Entity type manager.
++   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
++   *   The entity type bundle info.
+    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
+    *   Bundle information service.
+    * @param \Drupal\Core\Session\AccountInterface $current_user
+    *   Current user.
++   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
++   *   State transition validator.
+    */
+   public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
+     $this->stringTranslation = $translation;
+diff --git a/core/modules/content_translation/src/ContentTranslationHandler.php b/core/modules/content_translation/src/ContentTranslationHandler.php
+index 12a579ec..ff1938f2 100644
+--- a/core/modules/content_translation/src/ContentTranslationHandler.php
++++ b/core/modules/content_translation/src/ContentTranslationHandler.php
+@@ -116,6 +116,8 @@ class ContentTranslationHandler implements ContentTranslationHandlerInterface, E
+    *   The messenger service.
+    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
+    *   The date formatter service.
++   * @param \Drupal\Core\Entity\EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository
++   *   The installed entity definition repository service.
+    */
+   public function __construct(EntityTypeInterface $entity_type, LanguageManagerInterface $language_manager, ContentTranslationManagerInterface $manager, EntityTypeManagerInterface $entity_type_manager, AccountInterface $current_user, MessengerInterface $messenger, DateFormatterInterface $date_formatter, EntityLastInstalledSchemaRepositoryInterface $entity_last_installed_schema_repository) {
+     $this->entityTypeId = $entity_type->id();
+@@ -667,6 +669,10 @@ protected function addTranslatabilityClue(&$element) {
+    *   The type of the entity.
+    * @param \Drupal\Core\Entity\EntityInterface $entity
+    *   The entity whose form is being built.
++   * @param array $form
++   *   A nested array form elements comprising the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    *
+    * @see \Drupal\content_translation\ContentTranslationHandler::entityFormAlter()
+    */
+diff --git a/core/modules/content_translation/tests/src/Kernel/ContentTranslationHandlerTest.php b/core/modules/content_translation/tests/src/Kernel/ContentTranslationHandlerTest.php
+index 80c4ed19..22c41112 100644
+--- a/core/modules/content_translation/tests/src/Kernel/ContentTranslationHandlerTest.php
++++ b/core/modules/content_translation/tests/src/Kernel/ContentTranslationHandlerTest.php
+@@ -93,8 +93,14 @@ protected function setUp(): void {
+    *   Whether or not the entity is the default translation.
+    * @param bool $translation_form
+    *   Whether or not the form is a translation form.
++   * @param bool $is_submitted
++   *   Whether or not the form should be marked as submitted.
++   * @param bool $is_rebuilding
++   *   Whether or not the form should be flagged for rebuild.
+    * @param array $expected
+    *   The expected altered element.
++   * @param bool $display_warning
++   *   Whether or not the warning message should be displayed.
+    *
+    * @dataProvider providerTestEntityFormSharedElements
+    *
+diff --git a/core/modules/editor/src/Form/EditorImageDialog.php b/core/modules/editor/src/Form/EditorImageDialog.php
+index 489011df..6308aea7 100644
+--- a/core/modules/editor/src/Form/EditorImageDialog.php
++++ b/core/modules/editor/src/Form/EditorImageDialog.php
+@@ -57,6 +57,10 @@ public function getFormId() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   An associative array containing the structure of the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param \Drupal\editor\Entity\Editor $editor
+    *   The text editor to which this dialog corresponds.
+    */
+diff --git a/core/modules/editor/src/Form/EditorLinkDialog.php b/core/modules/editor/src/Form/EditorLinkDialog.php
+index 5f34e107..1b1735a2 100644
+--- a/core/modules/editor/src/Form/EditorLinkDialog.php
++++ b/core/modules/editor/src/Form/EditorLinkDialog.php
+@@ -27,8 +27,14 @@ public function getFormId() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   An associative array containing the structure of the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param \Drupal\editor\Entity\Editor $editor
+    *   The text editor to which this dialog corresponds.
++   *
++   * @return array
+    */
+   public function buildForm(array $form, FormStateInterface $form_state, Editor $editor = NULL) {
+     // The default values are set directly from \Drupal::request()->request,
+diff --git a/core/modules/field/src/Entity/FieldConfig.php b/core/modules/field/src/Entity/FieldConfig.php
+index f6961277..53e53842 100644
+--- a/core/modules/field/src/Entity/FieldConfig.php
++++ b/core/modules/field/src/Entity/FieldConfig.php
+@@ -90,6 +90,9 @@ class FieldConfig extends FieldConfigBase implements FieldConfigInterface {
+    *   bundle to which the field is attached to. Other array elements will be
+    *   used to set the corresponding properties on the class; see the class
+    *   property documentation for details.
++   * @param string $entity_type
++   *   (optional) The entity type on which the field should be created.
++   *   Defaults to "field_config".
+    */
+   public function __construct(array $values, $entity_type = 'field_config') {
+     // Allow either an injected FieldStorageConfig object, or a field_name and
+diff --git a/core/modules/field/src/Entity/FieldStorageConfig.php b/core/modules/field/src/Entity/FieldStorageConfig.php
+index 86c3f4f1..8da89bac 100644
+--- a/core/modules/field/src/Entity/FieldStorageConfig.php
++++ b/core/modules/field/src/Entity/FieldStorageConfig.php
+@@ -245,6 +245,9 @@ class FieldStorageConfig extends ConfigEntityBase implements FieldStorageConfigI
+    *     a 'field_name' property can be accepted in place of 'id'.
+    *   - entity_type: required.
+    *   - type: required.
++   * @param string $entity_type
++   *   (optional) The entity type on which the field should be created.
++   *   Defaults to "field_storage_config".
+    */
+   public function __construct(array $values, $entity_type = 'field_storage_config') {
+     // Check required properties.
+diff --git a/core/modules/field_ui/src/FieldStorageConfigListBuilder.php b/core/modules/field_ui/src/FieldStorageConfigListBuilder.php
+index 600d4180..03fd5b6a 100644
+--- a/core/modules/field_ui/src/FieldStorageConfigListBuilder.php
++++ b/core/modules/field_ui/src/FieldStorageConfigListBuilder.php
+@@ -56,6 +56,8 @@ class FieldStorageConfigListBuilder extends ConfigEntityListBuilder {
+    *   The entity type manager.
+    * @param \Drupal\Core\Field\FieldTypePluginManagerInterface $field_type_manager
+    *   The 'field type' plugin manager.
++   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info_service
++   *   The bundle info service.
+    */
+   public function __construct(EntityTypeInterface $entity_type, EntityTypeManagerInterface $entity_type_manager, FieldTypePluginManagerInterface $field_type_manager, EntityTypeBundleInfoInterface $bundle_info_service) {
+     parent::__construct($entity_type, $entity_type_manager->getStorage($entity_type->id()));
+diff --git a/core/modules/field_ui/src/Form/FieldStorageConfigEditForm.php b/core/modules/field_ui/src/Form/FieldStorageConfigEditForm.php
+index 6ec88c97..a023a502 100644
+--- a/core/modules/field_ui/src/Form/FieldStorageConfigEditForm.php
++++ b/core/modules/field_ui/src/Form/FieldStorageConfigEditForm.php
+@@ -41,6 +41,10 @@ public function getEntityFromRouteMatch(RouteMatchInterface $route_match, $entit
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   A nested array form elements comprising the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param string $field_config
+    *   The ID of the field config whose field storage config is being edited.
+    */
+diff --git a/core/modules/image/src/Form/ImageEffectFormBase.php b/core/modules/image/src/Form/ImageEffectFormBase.php
+index ccf03c22..69ce18ad 100644
+--- a/core/modules/image/src/Form/ImageEffectFormBase.php
++++ b/core/modules/image/src/Form/ImageEffectFormBase.php
+@@ -39,6 +39,10 @@ public function getFormId() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   A nested array form elements comprising the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param \Drupal\image\ImageStyleInterface $image_style
+    *   The image style.
+    * @param string $image_effect
+diff --git a/core/modules/image/tests/src/Unit/ImageStyleTest.php b/core/modules/image/tests/src/Unit/ImageStyleTest.php
+index 2256cdf0..e38d9152 100644
+--- a/core/modules/image/tests/src/Unit/ImageStyleTest.php
++++ b/core/modules/image/tests/src/Unit/ImageStyleTest.php
+@@ -40,6 +40,8 @@ class ImageStyleTest extends UnitTestCase {
+    *   The image effect ID.
+    * @param \Drupal\image\ImageEffectInterface|\PHPUnit\Framework\MockObject\MockObject $image_effect
+    *   The image effect used for testing.
++   * @param array $stubs
++   *   An array of additional method names to mock.
+    *
+    * @return \Drupal\image\ImageStyleInterface
+    *   The mocked image style.
+diff --git a/core/modules/language/src/Entity/ContentLanguageSettings.php b/core/modules/language/src/Entity/ContentLanguageSettings.php
+index 509dbaf3..d3751a0e 100644
+--- a/core/modules/language/src/Entity/ContentLanguageSettings.php
++++ b/core/modules/language/src/Entity/ContentLanguageSettings.php
+@@ -86,6 +86,9 @@ class ContentLanguageSettings extends ConfigEntityBase implements ContentLanguag
+    *   - target_bundle: The bundle.
+    *   Other array elements will be used to set the corresponding properties on
+    *   the class; see the class property documentation for details.
++   * @param string $entity_type
++   *   (optional) The entity type ID that is being created. Defaults to
++   *   "language_content_settings".
+    */
+   public function __construct(array $values, $entity_type = 'language_content_settings') {
+     if (empty($values['target_entity_type_id'])) {
+diff --git a/core/modules/language/src/LanguageNegotiator.php b/core/modules/language/src/LanguageNegotiator.php
+index 47911024..40a0d029 100644
+--- a/core/modules/language/src/LanguageNegotiator.php
++++ b/core/modules/language/src/LanguageNegotiator.php
+@@ -81,6 +81,8 @@ class LanguageNegotiator implements LanguageNegotiatorInterface {
+    *   The configuration factory.
+    * @param \Drupal\Core\Site\Settings $settings
+    *   The settings instance.
++   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
++   *   The request stack service.
+    */
+   public function __construct(ConfigurableLanguageManagerInterface $language_manager, PluginManagerInterface $negotiator_manager, ConfigFactoryInterface $config_factory, Settings $settings, RequestStack $requestStack) {
+     $this->languageManager = $language_manager;
+diff --git a/core/modules/language/tests/language_test/src/Controller/LanguageTestController.php b/core/modules/language/tests/language_test/src/Controller/LanguageTestController.php
+index 2737f31c..9166dae3 100644
+--- a/core/modules/language/tests/language_test/src/Controller/LanguageTestController.php
++++ b/core/modules/language/tests/language_test/src/Controller/LanguageTestController.php
+@@ -37,6 +37,8 @@ class LanguageTestController implements ContainerInjectionInterface {
+    *
+    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+    *   An HTTP kernel.
++   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
++   *   The language manager.
+    */
+   public function __construct(HttpKernelInterface $httpKernel, LanguageManagerInterface $language_manager) {
+     $this->httpKernel = $httpKernel;
+diff --git a/core/modules/locale/src/LocaleDefaultConfigStorage.php b/core/modules/locale/src/LocaleDefaultConfigStorage.php
+index fb4e3520..d68d7180 100644
+--- a/core/modules/locale/src/LocaleDefaultConfigStorage.php
++++ b/core/modules/locale/src/LocaleDefaultConfigStorage.php
+@@ -56,6 +56,8 @@ class LocaleDefaultConfigStorage {
+    *   The storage object to use for reading configuration data.
+    * @param \Drupal\language\ConfigurableLanguageManagerInterface $language_manager
+    *   The language manager.
++   * @param string $install_profile
++   *   The current installation profile.
+    */
+   public function __construct(StorageInterface $config_storage, ConfigurableLanguageManagerInterface $language_manager, $install_profile) {
+     $this->configStorage = $config_storage;
+diff --git a/core/modules/media/src/Form/EditorMediaDialog.php b/core/modules/media/src/Form/EditorMediaDialog.php
+index fe7e07d5..1b52044d 100644
+--- a/core/modules/media/src/Form/EditorMediaDialog.php
++++ b/core/modules/media/src/Form/EditorMediaDialog.php
+@@ -77,6 +77,10 @@ public function getFormId() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   A nested array form elements comprising the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param \Drupal\editor\EditorInterface $editor
+    *   The text editor to which this dialog corresponds.
+    */
+diff --git a/core/modules/media/tests/src/Functional/MediaUiFunctionalTest.php b/core/modules/media/tests/src/Functional/MediaUiFunctionalTest.php
+index 34c342a0..6155a1ac 100644
+--- a/core/modules/media/tests/src/Functional/MediaUiFunctionalTest.php
++++ b/core/modules/media/tests/src/Functional/MediaUiFunctionalTest.php
+@@ -247,6 +247,8 @@ public function providerTestMediaReferenceWidget() {
+    *   one that allows the user to create media and a second that does not.
+    * @param bool $list_access
+    *   Whether to grant the test user access to list media.
++   * @param string $widget_id
++   *   The widget ID to test.
+    *
+    * @see media_field_widget_entity_reference_autocomplete_form_alter()
+    * @see media_field_widget_multiple_entity_reference_autocomplete_form_alter()
+diff --git a/core/modules/menu_ui/src/Form/MenuLinkEditForm.php b/core/modules/menu_ui/src/Form/MenuLinkEditForm.php
+index 1afafd64..fafb293d 100644
+--- a/core/modules/menu_ui/src/Form/MenuLinkEditForm.php
++++ b/core/modules/menu_ui/src/Form/MenuLinkEditForm.php
+@@ -55,6 +55,10 @@ public function getFormId() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   An associative array containing the structure of the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param \Drupal\Core\Menu\MenuLinkInterface $menu_link_plugin
+    *   The plugin instance to use for this form.
+    */
+diff --git a/core/modules/migrate/src/Plugin/Exception/BadPluginDefinitionException.php b/core/modules/migrate/src/Plugin/Exception/BadPluginDefinitionException.php
+index 5387f971..081d4c01 100644
+--- a/core/modules/migrate/src/Plugin/Exception/BadPluginDefinitionException.php
++++ b/core/modules/migrate/src/Plugin/Exception/BadPluginDefinitionException.php
+@@ -12,12 +12,14 @@ class BadPluginDefinitionException extends InvalidPluginDefinitionException {
+   /**
+    * Constructs a BadPluginDefinitionException.
+    *
+-   * For the remaining parameters see \Exception.
+-   *
+    * @param string $plugin_id
+    *   The plugin ID of the mapper.
+    * @param string $property
+    *   The name of the property that is missing from the plugin.
++   * @param int $code
++   *   (optional) The exception code. Defaults to 0.
++   * @param \Exception|null $previous
++   *   The previous throwable used for exception chaining.
+    *
+    * @see \Exception
+    */
+diff --git a/core/modules/migrate/tests/src/Unit/MigrateSourceTest.php b/core/modules/migrate/tests/src/Unit/MigrateSourceTest.php
+index 466786cf..4e299208 100644
+--- a/core/modules/migrate/tests/src/Unit/MigrateSourceTest.php
++++ b/core/modules/migrate/tests/src/Unit/MigrateSourceTest.php
+@@ -74,6 +74,8 @@ class MigrateSourceTest extends MigrateTestCase {
+    * @param int $status
+    *   (optional) The default status for the new rows to be imported. Defaults
+    *   to MigrateIdMapInterface::STATUS_NEEDS_UPDATE.
++   * @param int $high_water_value
++   *   (optional) The high water mark to start from, if set.
+    *
+    * @return \Drupal\migrate\Plugin\MigrateSourceInterface
+    *   A mocked source plugin.
+diff --git a/core/modules/node/tests/src/Kernel/Migrate/d7/MigrateNodeTypeTest.php b/core/modules/node/tests/src/Kernel/Migrate/d7/MigrateNodeTypeTest.php
+index e3596112..160b2c19 100644
+--- a/core/modules/node/tests/src/Kernel/Migrate/d7/MigrateNodeTypeTest.php
++++ b/core/modules/node/tests/src/Kernel/Migrate/d7/MigrateNodeTypeTest.php
+@@ -43,6 +43,11 @@ protected function setUp(): void {
+    *   The expected node type description.
+    * @param string $help
+    *   The expected help text.
++   * @param bool $display_submitted
++   * @param bool $new_revision
++   * @param array $expected_available_menus
++   * @param string $expected_parent
++   * @param string|null $body_label
+    */
+   protected function assertEntity($id, $label, $description, $help, $display_submitted, $new_revision, $expected_available_menus, $expected_parent, $body_label = NULL) {
+     /** @var \Drupal\node\NodeTypeInterface $entity */
+diff --git a/core/modules/quickedit/tests/src/FunctionalJavascript/QuickEditJavascriptTestBase.php b/core/modules/quickedit/tests/src/FunctionalJavascript/QuickEditJavascriptTestBase.php
+index acfe3fb2..5b86a5b0 100644
+--- a/core/modules/quickedit/tests/src/FunctionalJavascript/QuickEditJavascriptTestBase.php
++++ b/core/modules/quickedit/tests/src/FunctionalJavascript/QuickEditJavascriptTestBase.php
+@@ -156,7 +156,10 @@ protected function awaitEntityInstanceFieldState($entity_type_id, $entity_id, $e
+    * Asserts the state of the Quick Edit entity toolbar.
+    *
+    * @param string $expected_entity_label
+-   *   The expected label in the Quick Edit Entity Toolbar.
++   *   The expected entity label in the Quick Edit Entity Toolbar.
++   * @param string|null $expected_field_label
++   *   The expected field label in the Quick Edit Entity Toolbar, or NULL
++   *   if no field label is expected.
+    */
+   protected function assertQuickEditEntityToolbar($expected_entity_label, $expected_field_label) {
+     $quickedit_entity_toolbar = $this->getSession()->getPage()->findById('quickedit-entity-toolbar');
+diff --git a/core/modules/rdf/tests/src/Functional/CommentAttributesTest.php b/core/modules/rdf/tests/src/Functional/CommentAttributesTest.php
+index 67091357..b8b8e95b 100644
+--- a/core/modules/rdf/tests/src/Functional/CommentAttributesTest.php
++++ b/core/modules/rdf/tests/src/Functional/CommentAttributesTest.php
+@@ -249,10 +249,11 @@ public function testCommentReplyOfRdfaMarkup() {
+    *
+    * Tests the current page for basic comment RDFa markup.
+    *
+-   * @param $comment
++   * @param \Drupal\comment\CommentInterface $comment
+    *   Comment object.
+-   * @param $account
+-   *   An array containing information about an anonymous user.
++   * @param array|null $account
++   *   (optional) An array containing information about an anonymous user.
++   *   Defaults to NULL.
+    */
+   public function _testBasicCommentRdfaMarkup(CommentInterface $comment, $account = NULL) {
+     $this->drupalGet($this->node->toUrl());
+diff --git a/core/modules/rest/tests/src/Functional/ResourceTestBase.php b/core/modules/rest/tests/src/Functional/ResourceTestBase.php
+index 531226dc..f9cfb1e1 100644
+--- a/core/modules/rest/tests/src/Functional/ResourceTestBase.php
++++ b/core/modules/rest/tests/src/Functional/ResourceTestBase.php
+@@ -143,6 +143,8 @@ public function setUp() {
+    *   The allowed formats for this resource.
+    * @param string[] $authentication
+    *   The allowed authentication providers for this resource.
++   * @param string[] $methods
++   *   The allowed methods for this resource.
+    */
+   protected function provisionResource($formats = [], $authentication = [], array $methods = ['GET', 'POST', 'PATCH', 'DELETE']) {
+     $this->resourceConfigStorage->create([
+diff --git a/core/modules/serialization/tests/serialization_test/src/SerializationTestNormalizer.php b/core/modules/serialization/tests/serialization_test/src/SerializationTestNormalizer.php
+index 2c8a9626..35300d8a 100644
+--- a/core/modules/serialization/tests/serialization_test/src/SerializationTestNormalizer.php
++++ b/core/modules/serialization/tests/serialization_test/src/SerializationTestNormalizer.php
+@@ -18,8 +18,11 @@ class SerializationTestNormalizer implements NormalizerInterface {
+    *
+    * @param object $object
+    *   Object to normalize.
+-   * @param string $format
+-   *   Format the normalization result will be encoded as.
++   * @param string|null $format
++   *   (optional) Format the normalization result will be encoded as. Defaults
++   *   to NULL
++   * @param array $context
++   *   (optional) The context data. Defaults to an empty array.
+    *
+    * @return array
+    *   An array containing a normalized representation of $object, appropriate
+diff --git a/core/modules/statistics/src/NodeStatisticsDatabaseStorage.php b/core/modules/statistics/src/NodeStatisticsDatabaseStorage.php
+index 47d6183e..aa446ebc 100644
+--- a/core/modules/statistics/src/NodeStatisticsDatabaseStorage.php
++++ b/core/modules/statistics/src/NodeStatisticsDatabaseStorage.php
+@@ -39,6 +39,8 @@ class NodeStatisticsDatabaseStorage implements StatisticsStorageInterface {
+    *   The database connection for the node view storage.
+    * @param \Drupal\Core\State\StateInterface $state
+    *   The state service.
++   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
++   *   The request stack.
+    */
+   public function __construct(Connection $connection, StateInterface $state, RequestStack $request_stack) {
+     $this->connection = $connection;
+diff --git a/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php b/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php
+index c20accd5..5209bcf0 100644
+--- a/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php
++++ b/core/modules/statistics/src/Plugin/Block/StatisticsPopularBlock.php
+@@ -64,6 +64,8 @@ class StatisticsPopularBlock extends BlockBase implements ContainerFactoryPlugin
+    *   The entity repository service
+    * @param \Drupal\statistics\StatisticsStorageInterface $statistics_storage
+    *   The storage for statistics.
++   * @param \Drupal\Core\Render\RendererInterface $renderer
++   *   The renderer configuration array.
+    */
+   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityRepositoryInterface $entity_repository, StatisticsStorageInterface $statistics_storage, RendererInterface $renderer) {
+     parent::__construct($configuration, $plugin_id, $plugin_definition);
+diff --git a/core/modules/system/src/Controller/DbUpdateController.php b/core/modules/system/src/Controller/DbUpdateController.php
+index b8ea203d..05af9270 100644
+--- a/core/modules/system/src/Controller/DbUpdateController.php
++++ b/core/modules/system/src/Controller/DbUpdateController.php
+@@ -510,6 +510,10 @@ protected function results(Request $request) {
+   /**
+    * Renders a list of requirement errors or warnings.
+    *
++   * @param $severity
++   *   The severity of the message, as per RFC 3164.
++   * @param array $requirements
++   *   The array of requirement values.
+    * @param \Symfony\Component\HttpFoundation\Request $request
+    *   The current request.
+    *
+diff --git a/core/modules/system/src/Form/ThemeSettingsForm.php b/core/modules/system/src/Form/ThemeSettingsForm.php
+index e863c0f8..1baf7c2d 100644
+--- a/core/modules/system/src/Form/ThemeSettingsForm.php
++++ b/core/modules/system/src/Form/ThemeSettingsForm.php
+@@ -123,6 +123,10 @@ protected function getEditableConfigNames() {
+   /**
+    * {@inheritdoc}
+    *
++   * @param array $form
++   *   An associative array containing the structure of the form.
++   * @param \Drupal\Core\Form\FormStateInterface $form_state
++   *   The current state of the form.
+    * @param string $theme
+    *   The theme name.
+    */
+diff --git a/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php b/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php
+index 60617048..4595a055 100644
+--- a/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php
++++ b/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php
+@@ -25,6 +25,8 @@ class MonkeysInTheControlRoom implements HttpKernelInterface {
+    *
+    * @param \Symfony\Component\HttpKernel\HttpKernelInterface $app
+    *   The wrapper HTTP kernel.
++   * @param \Drupal\Core\Site\Settings $settings
++   *   The settings object.
+    */
+   public function __construct(HttpKernelInterface $app, Settings $settings) {
+     $this->app = $app;
+diff --git a/core/modules/system/tests/src/Functional/Common/UrlTest.php b/core/modules/system/tests/src/Functional/Common/UrlTest.php
+index 20686be4..24e6394d 100644
+--- a/core/modules/system/tests/src/Functional/Common/UrlTest.php
++++ b/core/modules/system/tests/src/Functional/Common/UrlTest.php
+@@ -204,6 +204,7 @@ public function testLinkRenderArrayText() {
+   /**
+    * Checks for class existence in link.
+    *
++   * @param $attribute
+    * @param $link
+    *   URL to search.
+    * @param $class
+diff --git a/core/modules/system/tests/src/Functional/Form/ElementsTableSelectTest.php b/core/modules/system/tests/src/Functional/Form/ElementsTableSelectTest.php
+index ce0f3d84..2ed48f04 100644
+--- a/core/modules/system/tests/src/Functional/Form/ElementsTableSelectTest.php
++++ b/core/modules/system/tests/src/Functional/Form/ElementsTableSelectTest.php
+@@ -196,13 +196,16 @@ public function testMultipleFalseOptionchecker() {
+   /**
+    * Helper function for the option check test to submit a form while collecting errors.
+    *
+-   * @param $form_element
+-   *   A form element to test.
+-   * @param $edit
++   * @param array $form
++   *   Nested array of form elements that comprise the form.
++   * @param array $edit
+    *   An array containing post data.
+    *
+-   * @return
++   * @return array
+    *   An array containing the processed form, the form_state and any errors.
++   *
++   * @internal param $form_element A form element to test.
++   *   A form element to test.
+    */
+   private function formSubmitHelper($form, $edit) {
+     $form_id = $this->randomMachineName();
+diff --git a/core/modules/views/src/Plugin/views/argument/ArgumentPluginBase.php b/core/modules/views/src/Plugin/views/argument/ArgumentPluginBase.php
+index 4b97a4ec..8eae3232 100644
+--- a/core/modules/views/src/Plugin/views/argument/ArgumentPluginBase.php
++++ b/core/modules/views/src/Plugin/views/argument/ArgumentPluginBase.php
+@@ -926,6 +926,8 @@ public function summaryBasics($count_field = TRUE) {
+    *
+    * @param $order
+    *   The order selected in the UI.
++   * @param string|null $by
++   *   (Asc) Defaults to NULL.
+    */
+   public function summarySort($order, $by = NULL) {
+     $this->query->addOrderBy(NULL, NULL, $order, (!empty($by) ? $by : $this->name_alias));
+diff --git a/core/modules/views/src/Plugin/views/relationship/EntityReverse.php b/core/modules/views/src/Plugin/views/relationship/EntityReverse.php
+index 1510d22e..7f6d26b8 100644
+--- a/core/modules/views/src/Plugin/views/relationship/EntityReverse.php
++++ b/core/modules/views/src/Plugin/views/relationship/EntityReverse.php
+@@ -18,6 +18,12 @@ class EntityReverse extends RelationshipPluginBase {
+   /**
+    * Constructs an EntityReverse object.
+    *
++   * @param array $configuration
++   *   A configuration array containing information about the plugin instance.
++   * @param string $plugin_id
++   *   The plugin_id for the plugin instance.
++   * @param array $plugin_definition
++   *   The plugin implementation definition.
+    * @param \Drupal\views\Plugin\ViewsHandlerManager $join_manager
+    *   The views plugin join manager.
+    */
+diff --git a/core/modules/views_ui/src/ViewEditForm.php b/core/modules/views_ui/src/ViewEditForm.php
+index c4a5a94b..0385e5b6 100644
+--- a/core/modules/views_ui/src/ViewEditForm.php
++++ b/core/modules/views_ui/src/ViewEditForm.php
+@@ -391,7 +391,9 @@ public function getDisplayTab($view) {
+   /**
+    * Helper function to get the display details section of the edit UI.
+    *
+-   * @param $display
++   * @param \Drupal\views_ui\ViewUI $view
++   *   The ViewUI entity.
++   * @param array $display
+    *
+    * @return array
+    *   A renderable page build array.
+diff --git a/core/modules/views_ui/src/ViewFormBase.php b/core/modules/views_ui/src/ViewFormBase.php
+index 0b045b51..a2b70767 100644
+--- a/core/modules/views_ui/src/ViewFormBase.php
++++ b/core/modules/views_ui/src/ViewFormBase.php
+@@ -81,8 +81,11 @@ protected function prepareEntity() {
+    * having them as secondary local tasks isn't desired. The caller is responsible
+    * for setting the active tab's #active property to TRUE.
+    *
+-   * @param $display_id
+-   *   The display_id which is edited on the current request.
++   * @param \Drupal\views_ui\ViewUI $view
++   *   The ViewUI entity.
++   *
++   * @return array
++   *   An array of tab definitions.
+    */
+   public function getDisplayTabs(ViewUI $view) {
+     $executable = $view->getExecutable();
+diff --git a/core/modules/workspaces/src/WorkspaceListBuilder.php b/core/modules/workspaces/src/WorkspaceListBuilder.php
+index 23aa6521..a269971c 100644
+--- a/core/modules/workspaces/src/WorkspaceListBuilder.php
++++ b/core/modules/workspaces/src/WorkspaceListBuilder.php
+@@ -51,6 +51,8 @@ class WorkspaceListBuilder extends EntityListBuilder {
+    *   The entity storage class.
+    * @param \Drupal\workspaces\WorkspaceManagerInterface $workspace_manager
+    *   The workspace manager service.
++   * @param \Drupal\workspaces\WorkspaceRepositoryInterface $workspace_repository
++   *   The workspace repository service.
+    * @param \Drupal\Core\Render\RendererInterface $renderer
+    *   The renderer service.
+    */
+diff --git a/core/modules/workspaces/src/WorkspacePublisher.php b/core/modules/workspaces/src/WorkspacePublisher.php
+index aeaef8d1..9d3b5fc3 100644
+--- a/core/modules/workspaces/src/WorkspacePublisher.php
++++ b/core/modules/workspaces/src/WorkspacePublisher.php
+@@ -62,6 +62,8 @@ class WorkspacePublisher implements WorkspacePublisherInterface {
+    *   The workspace manager.
+    * @param \Drupal\workspaces\WorkspaceAssociationInterface $workspace_association
+    *   The workspace association service.
++   * @param \Drupal\workspaces\WorkspaceInterface $source
++   *   The source workspace entity.
+    */
+   public function __construct(EntityTypeManagerInterface $entity_type_manager, Connection $database, WorkspaceManagerInterface $workspace_manager, WorkspaceAssociationInterface $workspace_association, WorkspaceInterface $source) {
+     $this->entityTypeManager = $entity_type_manager;
+diff --git a/core/phpcs.xml.dist b/core/phpcs.xml.dist
+index 38c19fff..aed949e4 100644
+--- a/core/phpcs.xml.dist
++++ b/core/phpcs.xml.dist
+@@ -71,7 +71,6 @@
+     <exclude name="Drupal.Commenting.FunctionComment.MissingReturnComment"/>
+     <exclude name="Drupal.Commenting.FunctionComment.MissingReturnType"/>
+     <exclude name="Drupal.Commenting.FunctionComment.ParamCommentFullStop"/>
+-    <exclude name="Drupal.Commenting.FunctionComment.ParamMissingDefinition"/>
+     <exclude name="Drupal.Commenting.FunctionComment.TypeHintMissing"/>
+   </rule>
+   <rule ref="Drupal.Commenting.GenderNeutralComment" />
+diff --git a/core/profiles/demo_umami/modules/demo_umami_content/src/InstallHelper.php b/core/profiles/demo_umami/modules/demo_umami_content/src/InstallHelper.php
+index 0b5b0a65..c4764fad 100644
+--- a/core/profiles/demo_umami/modules/demo_umami_content/src/InstallHelper.php
++++ b/core/profiles/demo_umami/modules/demo_umami_content/src/InstallHelper.php
+@@ -427,6 +427,8 @@ protected function processPage(array $data, $langcode) {
+    *
+    * @param array $data
+    *   Data of line that was read from the file.
++   * @param string $langcode
++   *   Current language code.
+    *
+    * @return array
+    *   Data structured as a recipe node.
+diff --git a/core/tests/Drupal/FunctionalTests/Bootstrap/UncaughtExceptionTest.php b/core/tests/Drupal/FunctionalTests/Bootstrap/UncaughtExceptionTest.php
+index 71d1d105..5c603261 100644
+--- a/core/tests/Drupal/FunctionalTests/Bootstrap/UncaughtExceptionTest.php
++++ b/core/tests/Drupal/FunctionalTests/Bootstrap/UncaughtExceptionTest.php
+@@ -283,7 +283,7 @@ public function testLoggerException() {
+     $this->assertStringContainsString('Failed to log error', $errors[0], 'The error handling logs when an error could not be logged to the logger.');
+ 
+     $expected_path = \Drupal::root() . '/core/modules/system/tests/modules/error_service_test/src/MonkeysInTheControlRoom.php';
+-    $expected_line = 59;
++    $expected_line = 61;
+     $expected_entry = "Failed to log error: Exception: Deforestation in Drupal\\error_service_test\\MonkeysInTheControlRoom->handle() (line ${expected_line} of ${expected_path})";
+     $this->assertStringContainsString($expected_entry, $errors[0], 'Original error logged to the PHP error log when an exception is thrown by a logger');
+ 
+diff --git a/core/tests/Drupal/KernelTests/Config/DefaultConfigTest.php b/core/tests/Drupal/KernelTests/Config/DefaultConfigTest.php
+index b8b4c618..5552fbbb 100644
+--- a/core/tests/Drupal/KernelTests/Config/DefaultConfigTest.php
++++ b/core/tests/Drupal/KernelTests/Config/DefaultConfigTest.php
+@@ -96,6 +96,8 @@ public function testModuleConfig($module) {
+    *
+    * @param \Drupal\Core\Config\StorageInterface $default_config_storage
+    *   The default config storage to test.
++   * @param string $module
++   *   The module that is being tested.
+    */
+   protected function doTestsOnConfigStorage(StorageInterface $default_config_storage, $module) {
+     /** @var \Drupal\Core\Config\ConfigManagerInterface $config_manager */
+diff --git a/core/tests/Drupal/KernelTests/Core/Database/SchemaTest.php b/core/tests/Drupal/KernelTests/Core/Database/SchemaTest.php
+index 8dce4204..2dda0f57 100644
+--- a/core/tests/Drupal/KernelTests/Core/Database/SchemaTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Database/SchemaTest.php
+@@ -1011,6 +1011,8 @@ public function testSchemaChangeFieldDefaultInitial() {
+    *   The beginning field specification.
+    * @param $new_spec
+    *   The ending field specification.
++   * @param $test_data
++   *   (optional) A test value to insert and test, if specified.
+    */
+   protected function assertFieldChange($old_spec, $new_spec, $test_data = NULL) {
+     $table_name = 'test_table_' . ($this->counter++);
+diff --git a/core/tests/Drupal/KernelTests/Core/Entity/EntityLanguageTestBase.php b/core/tests/Drupal/KernelTests/Core/Entity/EntityLanguageTestBase.php
+index 36ab8d3e..fb29598f 100644
+--- a/core/tests/Drupal/KernelTests/Core/Entity/EntityLanguageTestBase.php
++++ b/core/tests/Drupal/KernelTests/Core/Entity/EntityLanguageTestBase.php
+@@ -118,6 +118,8 @@ protected function setUp() {
+    *
+    * @param string $entity_type
+    *   The type of the entity fields are attached to.
++   * @param string $bundle
++   *   The bundle of the entity.
+    */
+   protected function toggleFieldTranslatability($entity_type, $bundle) {
+     $fields = [$this->fieldName, $this->untranslatableFieldName];
+diff --git a/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryAggregateTest.php b/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryAggregateTest.php
+index 6b88d40a..ee6421bc 100644
+--- a/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryAggregateTest.php
++++ b/core/tests/Drupal/KernelTests/Core/Entity/EntityQueryAggregateTest.php
+@@ -578,6 +578,7 @@ public function testRepeatedExecution() {
+    *
+    * @param array $expected
+    *   An array of the expected results.
++   * @param bool $sorted
+    */
+   protected function assertResults($expected, $sorted = FALSE) {
+     $found = TRUE;
+diff --git a/core/tests/Drupal/Tests/Component/Datetime/DateTimePlusTest.php b/core/tests/Drupal/Tests/Component/Datetime/DateTimePlusTest.php
+index cde8daca..25ce4d2a 100644
+--- a/core/tests/Drupal/Tests/Component/Datetime/DateTimePlusTest.php
++++ b/core/tests/Drupal/Tests/Component/Datetime/DateTimePlusTest.php
+@@ -187,7 +187,7 @@ public function testDateTimestamp($input, array $initial, array $transform) {
+    *
+    * @param \Drupal\Component\Datetime\DateTimePlus $date
+    *   DateTimePlus to test.
+-   * @input mixed $input
++   * @param string $input
+    *   The original input passed to the test method.
+    * @param array $initial
+    *   @see testTimestamp()
+@@ -230,6 +230,7 @@ public function assertDateTimestamp($date, $input, $initial, $transform) {
+    *   Input argument for DateTimePlus.
+    * @param string $timezone
+    *   Timezone argument for DateTimePlus.
++   * @param string $format
+    * @param string $format_date
+    *   Format argument for DateTimePlus::format().
+    * @param string $expected
+diff --git a/core/tests/Drupal/Tests/Component/ProxyBuilder/ProxyBuilderTest.php b/core/tests/Drupal/Tests/Component/ProxyBuilder/ProxyBuilderTest.php
+index 5ea17d61..2ff8083f 100644
+--- a/core/tests/Drupal/Tests/Component/ProxyBuilder/ProxyBuilderTest.php
++++ b/core/tests/Drupal/Tests/Component/ProxyBuilder/ProxyBuilderTest.php
+@@ -312,8 +312,12 @@ public function typehintSelf(?\Drupal\Tests\Component\ProxyBuilder\TestServiceNu
+   /**
+    * Constructs the expected class output.
+    *
++   * @param string $class
++   *   The class name that is being built.
+    * @param string $expected_methods_body
+    *   The expected body of decorated methods.
++   * @param string $interface_string
++   *   (optional) The expected "implements" clause of the class definition.
+    *
+    * @return string
+    *   The code of the entire proxy.
+diff --git a/core/tests/Drupal/Tests/Core/Entity/Sql/DefaultTableMappingTest.php b/core/tests/Drupal/Tests/Core/Entity/Sql/DefaultTableMappingTest.php
+index 97b16de0..99784a24 100644
+--- a/core/tests/Drupal/Tests/Core/Entity/Sql/DefaultTableMappingTest.php
++++ b/core/tests/Drupal/Tests/Core/Entity/Sql/DefaultTableMappingTest.php
+@@ -578,6 +578,9 @@ public function providerTestGetDedicatedTableName() {
+    *   The field name.
+    * @param array $column_names
+    *   An array of column names for the storage definition.
++   * @param bool $base_field
++   *   Flag indicating whether the field should be treated as a base or bundle
++   *   field.
+    *
+    * @return \Drupal\Core\Field\FieldStorageDefinitionInterface|\PHPUnit\Framework\MockObject\MockObject
+    */
+diff --git a/core/tests/Drupal/Tests/Core/ProxyBuilder/ProxyBuilderTest.php b/core/tests/Drupal/Tests/Core/ProxyBuilder/ProxyBuilderTest.php
+index aa940b83..33bdef6f 100644
+--- a/core/tests/Drupal/Tests/Core/ProxyBuilder/ProxyBuilderTest.php
++++ b/core/tests/Drupal/Tests/Core/ProxyBuilder/ProxyBuilderTest.php
+@@ -62,8 +62,12 @@ public function complexMethod($parameter, callable $function, ?\Drupal\Tests\Cor
+   /**
+    * Constructs the expected class output.
+    *
++   * @param string $class
++   *   The class name that is being built.
+    * @param string $expected_methods_body
+    *   The expected body of decorated methods.
++   * @param string $interface_string
++   *   (optional) The expected "implements" clause of the class definition.
+    *
+    * @return string
+    *   The code of the entire proxy.
+diff --git a/core/tests/Drupal/Tests/Core/Render/RendererTestBase.php b/core/tests/Drupal/Tests/Core/Render/RendererTestBase.php
+index 4a243dca..65121946 100644
+--- a/core/tests/Drupal/Tests/Core/Render/RendererTestBase.php
++++ b/core/tests/Drupal/Tests/Core/Render/RendererTestBase.php
+@@ -265,6 +265,9 @@ class PlaceholdersTest implements TrustedCallbackInterface {
+    *
+    * @param string $animal
+    *   An animal.
++   * @param bool $use_animal_as_array_key
++   *   TRUE if the $animal parameter should be used as an array key, FALSE
++   *   if it should be used as a plain string.
+    *
+    * @return array
+    *   A renderable array.
+diff --git a/core/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php b/core/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php
+index 4fd896bb..25703e7b 100644
+--- a/core/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php
++++ b/core/tests/Drupal/Tests/Core/TypedData/RecursiveContextualValidatorTest.php
+@@ -188,6 +188,7 @@ public function testPropertiesValidateWithMultipleLevels() {
+    *
+    * @param array $tree
+    *   An array of value, constraints and properties.
++   * @param string $name
+    *
+    * @return \Drupal\Core\TypedData\TypedDataInterface|\PHPUnit\Framework\MockObject\MockObject
+    */

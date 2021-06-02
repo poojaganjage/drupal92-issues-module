@@ -91,10 +91,14 @@ class EntityTypeInfo implements ContainerInjectionInterface {
    *   The moderation information service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   Entity type manager.
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   *   The entity type bundle info.
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $bundle_info
    *   Bundle information service.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   Current user.
+   * @param \Drupal\content_moderation\StateTransitionValidationInterface $validator
+   *   State transition validator.
    */
   public function __construct(TranslationInterface $translation, ModerationInformationInterface $moderation_information, EntityTypeManagerInterface $entity_type_manager, EntityTypeBundleInfoInterface $bundle_info, AccountInterface $current_user, StateTransitionValidationInterface $validator) {
     $this->stringTranslation = $translation;

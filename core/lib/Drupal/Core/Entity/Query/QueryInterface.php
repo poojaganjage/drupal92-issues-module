@@ -18,6 +18,7 @@ interface QueryInterface extends AlterableInterface {
    * Gets the ID of the entity type for this query.
    *
    * @return string
+   *   The entity type ID.
    */
   public function getEntityTypeId();
 
@@ -103,9 +104,9 @@ interface QueryInterface extends AlterableInterface {
   /**
    * Queries for a non-empty value on a field.
    *
-   * @param $field
+   * @param string $field
    *   Name of a field.
-   * @param $langcode
+   * @param string|null $langcode
    *   Language code (optional).
    *
    * @return $this
@@ -115,9 +116,9 @@ interface QueryInterface extends AlterableInterface {
   /**
    * Queries for an empty field.
    *
-   * @param $field
+   * @param string $field
    *   Name of a field.
-   * @param $langcode
+   * @param string|null $langcode
    *   Language code (optional).
    *
    * @return $this
@@ -127,34 +128,35 @@ interface QueryInterface extends AlterableInterface {
   /**
    * Enables a pager for the query.
    *
-   * @param $limit
+   * @param int $limit
    *   An integer specifying the number of elements per page.  If passed a false
    *   value (FALSE, 0, NULL), the pager is disabled.
-   * @param $element
+   * @param int|null $element
    *   An optional integer to distinguish between multiple pagers on one page.
    *   If not provided, one is automatically calculated.
    *
    * @return $this
-   *   The called object.
    */
   public function pager($limit = 10, $element = NULL);
 
   /**
-   * @param null $start
-   * @param null $length
+   * Limits the query with a range.
+   *
+   * @param int|null $start
+   * @param int|null $length
+   *
    * @return $this
-   *   The called object.
    */
   public function range($start = NULL, $length = NULL);
 
   /**
-   * @param $field
+   * @param string $field
    *   Name of a field.
    * @param string $direction
-   * @param $langcode
+   * @param string|null $langcode
    *   Language code (optional).
+   *
    * @return $this
-   *   The called object.
    */
   public function sort($field, $direction = 'ASC', $langcode = NULL);
 
@@ -164,27 +166,24 @@ interface QueryInterface extends AlterableInterface {
    * For count queries, execute() returns the number entities found.
    *
    * @return $this
-   *   The called object.
    */
   public function count();
 
   /**
    * Enables sortable tables for this query.
    *
-   * @param $headers
+   * @param array $headers
    *   An array of headers of the same structure as described in
    *   template_preprocess_table(). Use a 'specifier' in place of a 'field' to
    *   specify what to sort on. This can be an entity or a field as described
    *   in condition().
    *
    * @return $this
-   *   The called object.
    */
   public function tableSort(&$headers);
 
   /**
    * @return $this
-   *   The called object.
    */
   public function accessCheck($access_check = TRUE);
 
@@ -218,6 +217,7 @@ interface QueryInterface extends AlterableInterface {
    * @endcode
    *
    * @return \Drupal\Core\Entity\Query\ConditionInterface
+   *   The called object.
    */
   public function andConditionGroup();
 
@@ -246,6 +246,7 @@ interface QueryInterface extends AlterableInterface {
    * @endcode
    *
    * @return \Drupal\Core\Entity\Query\ConditionInterface
+   *   The called object.
    */
   public function orConditionGroup();
 

@@ -926,6 +926,8 @@ abstract class ArgumentPluginBase extends HandlerBase implements CacheableDepend
    *
    * @param $order
    *   The order selected in the UI.
+   * @param string|null $by
+   *   (Asc) Defaults to NULL.
    */
   public function summarySort($order, $by = NULL) {
     $this->query->addOrderBy(NULL, NULL, $order, (!empty($by) ? $by : $this->name_alias));

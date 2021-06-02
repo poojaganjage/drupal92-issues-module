@@ -1,0 +1,13 @@
+diff --git a/core/MAINTAINERS.txt b/core/MAINTAINERS.txt
+index 93c37a55..20817eb4 100644
+--- a/core/MAINTAINERS.txt
++++ b/core/MAINTAINERS.txt
+@@ -508,7 +508,7 @@ Initiative coordinators
+ 
+ The Drupal Core Initiative coordinators oversee approved projects that
+ re-architect or otherwise improve large areas of Drupal core. See
+-https://www.drupal.org/community-initiatives/drupal-core for more information on
++https://www.drupal.org/contribute/core/maintainers for more information on
+ their responsibilities. The initiative coordinators for Drupal 8 are:
+ 
+ Admin UI & JavaScript Modernisation Initiative
